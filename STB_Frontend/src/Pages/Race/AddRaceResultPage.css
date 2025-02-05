@@ -1,0 +1,43 @@
+.add-race-results-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .result-form input {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .result-form button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .result-form button:hover {
+    background-color: #0056b3;
+  }
+  
+  .results-list ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .results-list li {
+    background-color: #eef;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+  }
+  

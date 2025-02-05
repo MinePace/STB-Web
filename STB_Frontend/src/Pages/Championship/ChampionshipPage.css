@@ -1,0 +1,76 @@
+/* Hover-effect voor rijen */
+tbody tr:hover {
+  background-color: #636363 !important; /* Donkergrijze hoverkleur */
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer; /* Pointer bij hover */
+}
+
+/* Stijl de links binnen de tabel */
+.driver-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.driver-link:hover {
+  color: #4caeff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Stijl de eerste en laatste kolom met een andere achtergrondkleur, behalve voor de eerste twee rijen */
+tbody td:first-child, tbody td:last-child {
+  background-color: #9b4040; /* Donkerblauwe kleur */
+}
+
+
+/* Maak de bovenste twee rijen vast */
+.header-table {
+  position: sticky;
+  top: 0;
+  background-color: #0b4e8b; /* Achtergrondkleur vastgezette rijen */
+  z-index: 2;
+}
+
+.scrollable {
+  table-layout: fixed; /* Maak de tabelkolommen een vaste breedte */
+  background-color: #1468b6; /* Achtergrondkleur vastgezette rijen */
+  width: 100%; /* Zorg dat beide tabellen even breed zijn */
+}
+
+/* Zorg dat de breedtes consistent zijn tussen de tabellen */
+.header-table th:first-child{
+  width: 18.3%; /* Brede kolom voor de Driver */
+}
+
+.header-table th:last-child{
+  width: 6.6%; /* Brede kolom voor Total Points */
+}
+
+.header-table th:not(:first-child):not(:last-child){
+  width: calc(72% / 20); /* Verdeel resterende breedte over 18 racekolommen */
+}
+
+/* Zorg voor consistente breedte voor de driver- en puntenkolom */
+.scrollable td:first-child,
+.scrollable th:first-child {
+  width: 20%; /* Brede kolom voor de Driver */
+}
+
+.scrollable td:last-child,
+.scrollable th:last-child {
+  width: 7%; /* Brede kolom voor Total Points */
+}
+
+/* Verdeel de resterende breedte gelijkmatig over de racekolommen */
+.scrollable td:not(:first-child):not(:last-child),
+.scrollable th:not(:first-child):not(:last-child) {
+  width: calc(73% / 20); /* Aanpassen aan het aantal racekolommen */
+}
+
+.page-container {
+  background: linear-gradient(to bottom, #0b4e8b, #093b6d); /* Dynamische gradient */
+  min-height: 100vh; /* Zorg dat het minstens 100% hoogte heeft */
+  padding: 20px;
+  box-sizing: border-box;
+}

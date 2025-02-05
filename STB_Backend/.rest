@@ -1,0 +1,53 @@
+GET http://localhost:5110/api/test
+
+##########
+
+GET http://localhost:5110/api/race/championship/8/2
+
+##########
+
+GET http://localhost:5110/api/race/driver/stats/Cbowers2000
+
+##########
+
+GET http://localhost:5110/api/race/results/9/5/2/main
+
+##########
+
+POST http://localhost:5110/api/auth/login
+Content-Type: application/json
+
+{
+    "username": "testuser",
+    "password": "test123"
+}
+
+##########
+
+POST http://localhost:5110/api/race/track
+Content-Type: application/json
+
+{
+    "name": "Gilles Villeneuve",
+    "country": "Canada"
+}
+
+##########
+
+GET http://localhost:5110/api/race/races
+
+##########
+
+POST http://localhost:5110/api/race
+Content-Type: application/json
+
+{
+    "game": 24,
+    "season": 27,
+    "name": "Canadian",
+    "division": 1,
+    "round": 9,
+    "sprint": "No",
+    "trackId": 5,
+    "youtubeLink": "https://www.youtube.com/watch?v=K-u9nUpkbN0"
+}

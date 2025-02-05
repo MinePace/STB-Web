@@ -1,0 +1,59 @@
+.home-container {
+    display: flex;
+    height: 100vh;
+}
+
+/* Zorg dat de topbar items zich aanpassen binnen het beschikbare scherm */
+.topbar {
+    display: flex;
+    flex-wrap: wrap; /* Sta knoppen toe om naar de volgende regel te gaan als er geen ruimte is */
+    justify-content: flex-end; /* Plaats de knoppen aan de rechterkant */
+    align-items: center; /* Centreer de knoppen verticaal */
+    padding: 10px 20px; /* Ruimte rondom de knoppen */
+    position: fixed; /* Zorg dat de topbar altijd zichtbaar is */
+    top: 0;
+    left: 200px; /* Start na de sidebar */
+    width: calc(100% - 200px); /* Zorg dat de topbar naast de sidebar blijft */
+    background: transparent; /* Maak het transparant */
+    z-index: 10; /* Zorg dat het bovenaan blijft */
+}
+
+/* Stijl voor de knoppen */
+.admin-hub-button, .logout-button {
+    margin-left: 10px; /* Ruimte tussen de knoppen */
+    padding: 10px 15px; /* Maak de knoppen klikbaar */
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff; /* Blauwe achtergrond */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.admin-hub-button:hover, .logout-button:hover {
+    background-color: #0056b3; /* Donkerder blauw bij hover */
+}
+
+/* Zorg dat de hoofdinhoud naast de sidebar wordt weergegeven */
+.main-content {
+    margin-left: 200px; /* Laat ruimte voor de zijbalk */
+    padding: 20px;
+    flex-grow: 1; /* Vul de resterende ruimte */
+    overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 150px; /* Verklein de sidebar op kleine schermen */
+    }
+
+    .topbar {
+        left: 150px; /* Pas aan op basis van de nieuwe sidebarbreedte */
+        width: calc(100% - 150px);
+    }
+
+    .main-content {
+        margin-left: 150px; /* Laat ruimte voor de kleinere sidebar */
+    }
+}

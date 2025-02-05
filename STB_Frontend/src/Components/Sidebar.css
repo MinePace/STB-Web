@@ -1,0 +1,63 @@
+.sidebar {
+    position: fixed; /* Zorg dat de sidebar aan de linkerkant blijft plakken */
+    top: 0;
+    left: 0; /* Zet de zijbalk tegen de linker rand */
+    width: 5%; /* Breedte van de zijbalk */
+    height: 100%; /* Laat de zijbalk de volledige hoogte van het scherm innemen */
+    background-color: #004080; /* Donkerblauw */
+    color: white;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Voeg een subtiele schaduw toe */
+    z-index: 1000; /* Zorg dat de zijbalk altijd bovenaan blijft */
+}
+
+.sidebar h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.season-item {
+    position: relative; /* Maak de season-label de parent voor absolute positioning */
+    margin: 10px 0;
+}
+
+.season-label {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.division-dropdown {
+    display: none; /* Verberg divisies standaard */
+    position: absolute;
+    left: 80px; /* Plaats de divisies rechts van het seizoen */
+    top: 0;
+    background-color: #003366; /* Donkerder blauw */
+    padding: 10px;
+    border-radius: 5px;
+    list-style-type: none;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Zorg ervoor dat het boven andere elementen blijft */
+}
+
+.division-dropdown li {
+    margin: 5px 0;
+}
+
+.division-link {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+.division-link:hover {
+    color: #89a3ea; /* Lichtere blauwe kleur bij hover */
+}
+
+.season-item:hover .division-dropdown {
+    display: block; /* Toon divisies bij hover */
+}

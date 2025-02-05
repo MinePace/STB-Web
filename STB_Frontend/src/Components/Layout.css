@@ -1,0 +1,32 @@
+.layout-container {
+    display: flex;
+    height: 92vh;
+  }
+  
+  .content-container {
+    margin-left: 100px; /* Zorg voor ruimte naast de sidebar */
+    overflow-x: auto; /* Zorg ervoor dat de inhoud horizontaal kan scrollen */
+  }
+
+  /* Stijl voor de scrollbar */
+.content-container::-webkit-scrollbar {
+  width: 6px; /* Maak de scrollbar dunner */
+  background-color: transparent; /* Zorg dat de achtergrond subtiel is */
+}
+
+/* Stijl voor de scrollbar thumb (de bewegende balk) */
+.content-container::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4); /* Maak de balk minder zichtbaar */
+  border-radius: 10px; /* Maak de randen afgerond */
+}
+
+/* Hover-effect voor scrollbar */
+.content-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(212, 225, 255); /* Wordt iets zichtbaarder bij hover */
+}
+
+/* Scrollbar track (achtergrond) */
+.content-container::-webkit-scrollbar-track {
+  background-color: transparent; /* Geen zichtbare achtergrond */
+}
+  
