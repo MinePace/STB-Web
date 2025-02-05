@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "STB_Backend", "STB_Backend\STB_Backend.csproj", "{5EEDA8AE-73C5-5AED-20B4-58E1441DD885}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5EEDA8AE-73C5-5AED-20B4-58E1441DD885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EEDA8AE-73C5-5AED-20B4-58E1441DD885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EEDA8AE-73C5-5AED-20B4-58E1441DD885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EEDA8AE-73C5-5AED-20B4-58E1441DD885}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6C6069D8-9A02-4776-A3C0-DC54B8952D4D}
+	EndGlobalSection
+EndGlobal
