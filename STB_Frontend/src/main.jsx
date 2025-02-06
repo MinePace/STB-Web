@@ -13,6 +13,7 @@ import AddRaceResultPage from "./Pages/Race/AddRaceResultPage";
 import AddTrackPage from "./Pages/Track/AddTrackPage";
 import AddRacePage from "./Pages/Race/AddRacePage";
 import CSVUploadPage from "./Pages/Admin/CSVUploadPage";
+import EditRacePage from "./Pages/Race/EditRacePage";
 
 import Layout from "./Components/Layout";
 import "./index.css";
@@ -30,6 +31,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/STB/Add/Track" element={<AddTrackPage />} />
       <Route path="/STB/Add/Race" element={<AddRacePage />} />
       <Route path="/STB/Add/CSV" element={<CSVUploadPage />} />
+      <Route path="/STB/Edit/Race" element={<EditRacePage />} />
     </Routes>
   </Router>
 );

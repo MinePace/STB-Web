@@ -97,6 +97,13 @@ function ChampionshipPage() {
         <table className="header-table" border="1">
           <thead>
             <tr>
+              <th colspan="1">
+                <img
+                  src="/STB.png"
+                  alt="Championship Logo"
+                  class="header-logo"
+                />
+              </th>
               <th colSpan={(sortedDrivers.raceNumbers?.length || 0) + 2}>
                 Championship - Season {season} - Tier {division}
               </th>

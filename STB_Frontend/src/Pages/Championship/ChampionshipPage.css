@@ -23,6 +23,13 @@ tbody td:first-child, tbody td:last-child {
   background-color: #9b4040; /* Donkerblauwe kleur */
 }
 
+.header-table thead tr:first-child th {
+  font-weight: bold; /* Maak de tekst dikker */
+  font-size: 2em; /* Maak de tekst iets groter */
+  color: #ffffff; /* Zorg voor contrasterende tekstkleur */
+  text-align: center; /* Centreer de tekst */
+  padding: 15px 0; /* Voeg wat extra padding toe */
+}
 
 /* Maak de bovenste twee rijen vast */
 .header-table {
@@ -30,7 +37,20 @@ tbody td:first-child, tbody td:last-child {
   top: 0;
   background-color: #0b4e8b; /* Achtergrondkleur vastgezette rijen */
   z-index: 2;
+  padding: 0; /* Verwijdert padding in de cel */
+  margin: 0; /* Verwijdert marge in de cel */
 }
+
+.header-logo {
+  width: 50%; /* Vul de volledige breedte */
+  height: 50%; /* Vul de volledige hoogte */
+  object-fit: cover; /* Zorg dat de afbeelding de cel vult, zelfs als verhoudingen worden aangepast */
+  display: block; /* Verwijdert extra witruimte */
+  margin: 0; /* Geen marges rond de afbeelding */
+  padding: 0; /* Geen padding rond de afbeelding */
+  border: none; /* Verwijder ongewenste rand (indien aanwezig) */
+}
+
 
 .scrollable {
   table-layout: fixed; /* Maak de tabelkolommen een vaste breedte */

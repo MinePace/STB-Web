@@ -76,6 +76,74 @@ public class RaceController : ControllerBase
         return Ok(races );
     }
 
+    [HttpGet("races/{season}")]
+    public IActionResult GetRacesBySeason(int season)
+    {
+        var races  = _context.Races
+            .Where(r => r.Season == season)
+            .ToList();
+
+        if (!races.Any())
+        return NotFound(new { message = "No races were found." });
+
+        foreach(var race in races){
+            var track = _context.Tracks.FirstOrDefault(t => t.Id == race.Id);
+            race.Track = track;
+        }
+
+        return Ok(races );
+    }
+
+    [HttpGet("race/{id}")]
+    public IActionResult GetRacesById(int id)
+    {
+        var race  = _context.Races
+            .Where(r => r.Id == id)
+            .Include(r => r.Track)
+            .FirstOrDefault();
+
+        if (race is null)
+        return NotFound(new { message = "No races were found." });
+
+        return Ok(race );
+    }
+
+    [HttpGet("seasons")]
+    public async Task<IActionResult> GetUniqueSeasons()
+    {
+        try
+        {
+            // Haal alle unieke seizoenen op uit de tabel Races
+            var seasons = await _context.Races
+                .Select(r => r.Season)
+                .Distinct()
+                .OrderBy(season => season)
+                .ToListAsync();
+
+            return Ok(seasons); // Stuur de unieke seizoenen terug als een lijst
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Interne serverfout: {ex.Message}");
+        }
+    }
+
+
+    [HttpGet("race/{season}/{division}/{round}/{type}")]
+    public IActionResult GetRace(int season, int division, int round)
+    {
+        var race  = _context.Races
+            .Where(r => r.Season == season && r.Division == division && r.Round == round)
+            .Include(r => r.Track)
+            .FirstAsync();
+
+        if (race == null){
+            return NotFound(new { message = "No races were found." });
+        }
+
+        return Ok(race );
+    }
+
     [HttpGet("driver/stats/{driverName}")]
     public IActionResult GetDriverStats(string driverName)
     {
@@ -114,6 +182,7 @@ public class RaceController : ControllerBase
 
         var raceResults = _context.RaceResults
             .Where(r => r.Race.Season == season && r.Race.Round == round && r.Race.Division == division && (isSprint ? r.Race.Sprint == "1" : r.Race.Sprint == "0" || r.Race.Sprint == "No"))
+            .Include(r => r.Race)
             .OrderBy(r => r.Position)
             .ToList();
 
@@ -215,6 +284,34 @@ public class RaceController : ControllerBase
 
         return Ok(new { message = $"{race.Name} added successfully!" });
     }
+
+    [HttpPut("update/{id}")]
+    public async Task<IActionResult> UpdateRace(int id, [FromBody] Race updatedRace)
+    {
+        var race = await _context.Races.Include(r => r.Track).FirstOrDefaultAsync(r => r.Id == id);
+
+        if (race == null)
+            return NotFound("Race not found.");
+
+        race.Name = updatedRace.Name;
+        race.F1_Game = updatedRace.F1_Game;
+        race.Season = updatedRace.Season;
+        race.Division = updatedRace.Division;
+        race.Round = updatedRace.Round;
+        race.Sprint = updatedRace.Sprint;
+        race.YoutubeLink = updatedRace.YoutubeLink;
+
+        // Update track details
+        if (updatedRace.Track != null)
+        {
+            race.Track.Name = updatedRace.Track.Name;
+            race.Track.Country = updatedRace.Track.Country;
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok("Race updated successfully.");
+    }
+
 
 }
 
