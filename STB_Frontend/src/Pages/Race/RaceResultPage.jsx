@@ -1,5 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import "./RaceResultPage.css";
 
 function RaceResultPage() {
   const { season, round, division, type } = useParams(); // Haal "type" op uit de URL
@@ -93,7 +95,7 @@ function RaceResultPage() {
 
       {/* Race Resultaten */}
       <div className="table-container">
-        <table border="1">
+        <table className="result-table" border="1">
           <thead>
             <tr>
               <th>Position</th>
@@ -107,7 +109,12 @@ function RaceResultPage() {
             {raceResults.map((row, index) => (
               <tr key={index}>
                 <td>{row.position}</td>
-                <td>{row.driver}</td>
+                <Link
+                      to={`/STB/Driver/${encodeURIComponent(row.driver)}`}
+                      className="driver-link"
+                    >
+                      {row.driver}
+                    </Link>
                 <td style={{ color: teamColors[row.team] || "white" }}>{row.team}</td>
                 <td>{row.points}</td>
                 <td>{row.qualifying}</td>

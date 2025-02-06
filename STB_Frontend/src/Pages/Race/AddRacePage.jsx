@@ -54,7 +54,7 @@ function AddRacePage() {
         division: "",
         round: "",
         sprint: "",
-        trackId: "",
+        trackId: null,
         youtubeLink: "",
       }); // Reset het formulier
     } else {

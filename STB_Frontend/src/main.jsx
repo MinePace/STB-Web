@@ -12,6 +12,7 @@ import AdminPage from "./Pages/Admin/AdminPage";
 import AddRaceResultPage from "./Pages/Race/AddRaceResultPage";
 import AddTrackPage from "./Pages/Track/AddTrackPage";
 import AddRacePage from "./Pages/Race/AddRacePage";
+import CSVUploadPage from "./Pages/Admin/CSVUploadPage";
 
 import Layout from "./Components/Layout";
 import "./index.css";
@@ -28,6 +29,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/STB/Add/RaceResults" element={<Layout showSidebar={true}><AddRaceResultPage /></Layout>} />
       <Route path="/STB/Add/Track" element={<AddTrackPage />} />
       <Route path="/STB/Add/Race" element={<AddRacePage />} />
+      <Route path="/STB/Add/CSV" element={<CSVUploadPage />} />
     </Routes>
   </Router>
 );

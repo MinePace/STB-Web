@@ -9,14 +9,53 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace STB_Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250204221758_MoreUserData")]
-    partial class MoreUserData
+    [Migration("20250206124811_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
+
+            modelBuilder.Entity("Race", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Division")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("F1_Game")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Round")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Season")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Sprint")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TrackId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("YoutubeLink")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TrackId");
+
+                    b.ToTable("Races");
+                });
 
             modelBuilder.Entity("RaceResult", b =>
                 {
@@ -28,15 +67,9 @@ namespace STB_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Division")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Driver")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("F1_Game")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Points")
                         .HasColumnType("INTEGER");
@@ -50,15 +83,8 @@ namespace STB_Backend.Migrations
                     b.Property<int>("Qualifying")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Round")
+                    b.Property<int>("RaceId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<int>("Season")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Sprint")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Team")
                         .IsRequired()
@@ -66,7 +92,28 @@ namespace STB_Backend.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("RaceId");
+
                     b.ToTable("RaceResults");
+                });
+
+            modelBuilder.Entity("Track", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tracks");
                 });
 
             modelBuilder.Entity("User", b =>
@@ -97,6 +144,28 @@ namespace STB_Backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Race", b =>
+                {
+                    b.HasOne("Track", "Track")
+                        .WithMany()
+                        .HasForeignKey("TrackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Track");
+                });
+
+            modelBuilder.Entity("RaceResult", b =>
+                {
+                    b.HasOne("Race", "Race")
+                        .WithMany()
+                        .HasForeignKey("RaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Race");
                 });
 #pragma warning restore 612, 618
         }

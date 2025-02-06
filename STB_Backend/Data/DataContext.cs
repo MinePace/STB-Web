@@ -15,11 +15,8 @@ public class RaceResult
 {
     [Key]
     public int Id { get; set; }
-    public int F1_Game { get; set; }
-    public int Season { get; set; }
-    public int Division { get; set; }
-    public int Round { get; set; }
-    public string Sprint { get; set; }
+    public int RaceId { get; set; }
+    public Race Race { get; set; }
     public int Position { get; set; }
     public string Driver { get; set; }
     public string Team { get; set; }
@@ -53,7 +50,7 @@ public class Race{
     public int Round { get; set; }
     public string Sprint { get; set; }
     public Track Track { get; set; }
-    public string YoutubeLink { get; set; }
+    public string? YoutubeLink { get; set; }
 }
 
 public class Track{

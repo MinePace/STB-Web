@@ -19,7 +19,9 @@ public class RaceController : ControllerBase
     public IActionResult GetChampionship(int season, int division)
     {
         var championshipResults  = _context.RaceResults
-            .Where(r => r.Season == season && r.Division == division)
+            .Where(r => r.Race.Season == season && r.Race.Division == division)
+            .Include(r => r.Race)
+            .Include(r => r.Race.Track)
             .OrderByDescending(r => r.Points)
             .ToList();
 
@@ -27,6 +29,22 @@ public class RaceController : ControllerBase
         return NotFound(new { message = "No results found for this division." });
 
         return Ok(championshipResults );
+    }
+
+    [HttpGet("championship-races/{season}/{division}")]
+    public IActionResult GetChampionshipRaces(int season, int division)
+    {
+        var championshipRaces  = _context.Races
+            .Where(r => r.Season == season && r.Division == division)
+            .OrderBy(r => r.Id)
+            
+            .Include(r => r.Track)
+            .ToList();
+
+        if (!championshipRaces.Any())
+        return NotFound(new { message = "No results found for this division." });
+
+        return Ok(championshipRaces );
     }
 
     [HttpGet("tracks")]
@@ -95,7 +113,7 @@ public class RaceController : ControllerBase
         bool isSprint = type.ToLower() == "sprint"; // Controleer of het een Sprint Race is
 
         var raceResults = _context.RaceResults
-            .Where(r => r.Season == season && r.Round == round && r.Division == division && (isSprint ? r.Sprint == "1" : r.Sprint == "0" || r.Sprint == "No"))
+            .Where(r => r.Race.Season == season && r.Race.Round == round && r.Race.Division == division && (isSprint ? r.Race.Sprint == "1" : r.Race.Sprint == "0" || r.Race.Sprint == "No"))
             .OrderBy(r => r.Position)
             .ToList();
 

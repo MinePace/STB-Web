@@ -45,7 +45,6 @@ namespace STB_Backend.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("YoutubeLink")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -65,15 +64,9 @@ namespace STB_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Division")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Driver")
                         .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("F1_Game")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Points")
                         .HasColumnType("INTEGER");
@@ -87,21 +80,16 @@ namespace STB_Backend.Migrations
                     b.Property<int>("Qualifying")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Round")
+                    b.Property<int>("RaceId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<int>("Season")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Sprint")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("Team")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RaceId");
 
                     b.ToTable("RaceResults");
                 });
@@ -164,6 +152,17 @@ namespace STB_Backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Track");
+                });
+
+            modelBuilder.Entity("RaceResult", b =>
+                {
+                    b.HasOne("Race", "Race")
+                        .WithMany()
+                        .HasForeignKey("RaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Race");
                 });
 #pragma warning restore 612, 618
         }

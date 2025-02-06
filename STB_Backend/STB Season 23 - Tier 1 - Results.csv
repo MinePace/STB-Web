@@ -1,0 +1,341 @@
+F1 Game,Season,Division,Round,Sprint,Country,Track Name,Race Name,Position,Driver,Team,Points,DNF,PosChange,Qualifying
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,1,xSk45x,Alpha Tauri,25,,4,5
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,2,A11ila,Mercedes,18,,1,3
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,3,Shaddrin,Alpine,15,,3,6
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,4,Joey1854,Haas,12,,14,18
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,5,SupplyRaptor,Aston Martin,10,,3,8
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,6,Bl3nd,Mclaren,8,,8,14
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,7,Crukren89,Mercedes,6,,8,15
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,8,Dracarys,Ferrari,4,,11,19
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,9,Cbowers2000,Alpine,2,,3,12
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,10,Emre Berber,Williams,1,,-8,2
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,11,German Polyakov,Alfa Romeo,0,,6,17
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,12,STB SemmieK,Red Bull,0,,-5,7
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,13,Yulian Kalenantovich,Ferrari,0,,3,16
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,14,II Mafio II,Aston Martin,0,DNF,-1,13
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,15,7Right,Mclaren,0,DNF,-4,11
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,16,Jrepo11,Haas,0,DNF,-12,4
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,17,Seb_Goncalves,Alfa Romeo,0,DNF,-16,1
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,18,Deha Demircloglu,Alpha Tauri,0,DNF,-9,9
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,19,Tris the goat,Red Bull,0,DNF,-9,10
+23,23,1,1,,Austria,Red Bull Ring,Austrian Grand Prix,20,AliFerrari5,Williams,0,DNF,0,20
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,1,A11ila,Williams,26,,1,2
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,2,SHZ Milan,Mclaren,18,,2,4
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,3,xSk45x,Alpha Tauri,15,,7,10
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,4,Joey1854,Haas,12,,7,11
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,5,Cbowers2000,Alpine,10,,4,9
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,6,STB SemmieK,Red Bull,8,,11,17
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,7,Pauete18,Mercedes,6,,0,7
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,8,Crukren89,Mercedes,4,,5,13
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,9,Shaddrin,Alpine,2,,5,14
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,10,Yulian Kalenantovich,Ferrari,1,,10,20
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,11,Emre Berber,Williams,0,,-6,5
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,12,SupplyRaptor,Red Bull,0,,-6,6
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,13,II Mafio II,Aston Martin,0,,2,15
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,14,Patrik Segec,Aston Martin,0,,-6,8
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,15,Seb_Goncalves,Alfa Romeo,0,DNF,-12,3
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,16,German Polyakov,Alfa Romeo,0,DNF,2,18
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,17,BRT RyanM,Ferrari,0,DNF,-16,1
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,18,7Right,Mclaren,0,DNF,1,19
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,19,F1SLK,Alpha Tauri,0,DNF,-7,12
+23,23,1,2,,Spain,Barcelona-Catalunya,Spanish Grand Prix,20,Jrepo11,Haas,0,DNF,-4,16
+23,23,1,3,,Italy,Imola,Emilia-Romagna,1,Cbowers2000,Alpine,25,,3,4
+23,23,1,3,,Italy,Imola,Emilia-Romagna,2,A11ila,Alfa Romeo,18,,-1,1
+23,23,1,3,,Italy,Imola,Emilia-Romagna,3,Crukren89,Mercedes,15,,4,7
+23,23,1,3,,Italy,Imola,Emilia-Romagna,4,Joey1854,Haas,12,,13,17
+23,23,1,3,,Italy,Imola,Emilia-Romagna,5,II Mafio II,Aston Martin,10,,1,6
+23,23,1,3,,Italy,Imola,Emilia-Romagna,6,Bl3nd,Mclaren,8,,10,16
+23,23,1,3,,Italy,Imola,Emilia-Romagna,7,Darius Cotiga,Red Bull,6,,6,13
+23,23,1,3,,Italy,Imola,Emilia-Romagna,8,xSk45x,Alpha Tauri,4,,-5,3
+23,23,1,3,,Italy,Imola,Emilia-Romagna,9,Patrik Segec,Aston Martin,2,,5,14
+23,23,1,3,,Italy,Imola,Emilia-Romagna,10,Astrief,Red Bull,1,,0,10
+23,23,1,3,,Italy,Imola,Emilia-Romagna,11,Emre Berber,Williams,0,,-6,5
+23,23,1,3,,Italy,Imola,Emilia-Romagna,12,Za1n,Alfa Romeo,0,,-3,9
+23,23,1,3,,Italy,Imola,Emilia-Romagna,13,Jrepo11,Haas,0,DNF,-5,8
+23,23,1,3,,Italy,Imola,Emilia-Romagna,14,Shaddrin,Alpine,0,DNF,-2,12
+23,23,1,3,,Italy,Imola,Emilia-Romagna,15,F1SLK,Alpha Tauri,0,DNF,0,15
+23,23,1,3,,Italy,Imola,Emilia-Romagna,16,Pauete18,Mercedes,0,DNF,-14,2
+23,23,1,3,,Italy,Imola,Emilia-Romagna,17,AliFerrari5,Williams,0,DNF,1,18
+23,23,1,3,,Italy,Imola,Emilia-Romagna,18,Yulian Kalenantovich,Ferrari,0,DNF,-7,11
+23,23,1,3,,Italy,Imola,Emilia-Romagna,19,,,,,,
+23,23,1,3,,Italy,Imola,Emilia-Romagna,20,,,,,,
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,1,STB SemmieK,Red Bull,8,,3,4
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,2,Crukren89,Mercedes,7,,9,11
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,3,Jrepo11,Haas,6,,-1,2
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,4,Bl3nd,Mclaren,5,,2,6
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,5,A11ila,Alfa Romeo,4,,-2,3
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,6,Emre Berber,Williams,3,,-5,1
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,7,xSk45x,Alpha Tauri,2,,2,9
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,8,Yulian Kalenantovich,Ferrari,1,,0,8
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,9,Shaddrin,Alpine,0,,-2,7
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,10,AliFerrari5,Williams,0,,-5,5
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,11,F1SLK,Alpha Tauri,0,,2,13
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,12,VIF Cxllum,Ferrari,0,,0,12
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,13,Pauete18,Mercedes,0,,1,14
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,14,II Mafio II,Aston Martin,0,DNF,-4,10
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,15,,,,,,
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,16,,,,,,
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,17,,,,,,
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,18,,,,,,
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,19,,,,,,
+23,23,1,4,Spint,Bahrain,Bahrain,Bahrain Grand Prix,20,,,,,,
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,1,A11ila,Alfa Romeo,25,,4,5
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,2,STB SemmieK,Red Bull,18,,-1,1
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,3,Jrepo11,Haas,15,,0,3
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,4,Bl3nd,Mclaren,12,,0,4
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,5,xSk45x,Alpha Tauri,10,,2,7
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,6,Crukren89,Mercedes,8,,-4,2
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,7,Emre Berber,Williams,6,,-1,6
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,8,Shaddrin,Alpine,4,,1,9
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,9,II Mafio II,Aston Martin,3,,5,14
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,10,VIF Cxllum,Ferrari,1,,2,12
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,11,Pauete18,Mercedes,0,,2,13
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,12,Yulian Kalenantovich,Ferrari,0,DNF,-4,8
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,13,F1SLK,Alpha Tauri,0,DNF,-2,11
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,14,AliFerrari5,Williams,0,DNF,-4,10
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,15,,,,,,
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,16,,,,,,
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,17,,,,,,
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,18,,,,,,
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,19,,,,,,
+23,23,1,4,,Bahrain,Bahrain,Bahrain Grand Prix,20,,,,,,
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,1,SHZ Milan,Mclaren,26,,0,1
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,2,Jrepo11,Haas,18,,5,7
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,3,A11ila,Alfa Romeo,15,,6,9
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,4,II Mafio II,Aston Martin,12,,11,15
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,5,STB SemmieK,Red Bull,10,,1,6
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,6,Emre Berber,Williams,8,,-3,3
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,7,Its Rapy,Mclaren,6,,3,10
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,8,xSk45x,Alpha Tauri,4,,-3,5
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,9,Za1n,Alfa Romeo,2,,7,16
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,10,blurlxe,Aston Martin,1,,-2,8
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,11,Crukren89,Mercedes,0,,1,12
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,12,Joey1854,Haas,0,,-10,2
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,13,SRT Might,Ferrari,0,,-9,4
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,14,Shaddrin,Alpine,0,,0,14
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,15,Yulian Kalenantovich,Ferrari,0,,-2,13
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,16,Pauete18,Mercedes,0,DNF,2,18
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,17,AliFerrari5,Williams,0,DNF,0,17
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,18,7Right,Mclaren,0,DNF,-7,11
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,19,,,,,,
+23,23,1,5,,Saudi Arabia,Jeddah,Saudi Arabian Grand Prix,20,,,,,,
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,1,SRT Might,Ferrari,25,,4,5
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,2,PSR Plakkie,Alpine,19,,0,2
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,3,STB SemmieK,Red Bull,15,,5,8
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,4,II Mafio II,Aston Martin,12,,3,7
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,5,Cbowers2000,Alpine,10,,14,19
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,6,Spenny,Mclaren,8,,7,13
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,7,Joey1854,Haas,6,,2,9
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,8,VIF Cxllum,Alpha Tauri,4,,6,14
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,9,xSk45x,Alpha Tauri,2,,-5,4
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,10,Bl3nd,Mclaren,1,,7,17
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,11,Crukren89,Mercedes,0,,4,15
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,12,Jrepo11,Haas,0,DNF,4,16
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,13,AliFerrari5,Williams,0,DNF,5,18
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,14,Pauete18,Mclaren,0,DNF,-11,3
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,15,FVR Nyck,Red Bull,0,DNF,-5,10
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,16,Thalo4,Williams,0,DNF,-4,12
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,17,Yulian Kalenantovich,Ferrari,0,DNF,-6,11
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,18,FVR Sacha,Alfa Romeo,0,DNF,-17,1
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,19,RCX Stefanko,Aston Martin,0,DNF,-13,6
+23,23,1,6,,Canada,Gilles-Villeneuve,Canadian Grand Prix,20,,,,,,
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,1,A11ila,Alfa Romeo,25,,1,2
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,2,Jrepo11,Haas,18,,-1,1
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,3,II Mafio II,Aston Martin,15,,3,6
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,4,Thalo4,Williams,12,,14,18
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,5,STB SemmieK,Red Bull,10,,0,5
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,6,VIF Cxllum,Mercedes,8,,5,11
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,7,Bl3nd,Mclaren,6,,0,7
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,8,Rah its Toby,Ferrari,4,,2,10
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,9,xSk45x,Alpha Tauri,2,,0,9
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,10,Spenny,Mclaren,1,,5,15
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,11,Crukren89,Mercedes,0,,5,16
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,12,Kroks,Aston Martin,0,,-8,4
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,13,Yulian Kalenantovich,Ferrari,0,,-5,8
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,14,AliFerrari5,Williams,0,,-11,3
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,15,Joey1854,Haas,0,,-2,13
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,16,Haubica,Red Bull,0,DNF,-2,14
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,17,Vettel24,Alfa Romeo,0,DNF,0,17
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,18,FVR Nyck,Alpine,0,DNF,-6,12
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,19,,,,,,
+23,23,1,7,,Japan,Suzuka,Japanese Grand Prix,20,,,,,,
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,1,SupplyRaptor,Red Bull,25,,0,1
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,2,A11ila,Alfa Romeo,18,,9,11
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,3,Joey1854,Haas,15,,0,3
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,4,Yulian Kalenantovich,Ferrari,12,,5,9
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,5,blurlxe,Alfa Romeo,10,,2,7
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,6,II Mafio II,Aston Martin,8,,9,15
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,7,xSk45x,Alpha Tauri,6,,-5,2
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,8,Cbowers2000,Alpine,4,,-3,5
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,9,Kroks,Aston Martin,2,,-3,6
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,10,Bl3nd,Mclaren,1,,4,14
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,11,Darius Cotiga,Alpine,0,,9,20
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,12,Astrief,Williams,0,,6,18
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,13,Alex Ferre,Alpha Tauri,0,,4,17
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,14,Crukren89,Mercedes,0,,-1,13
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,15,Spenny,Mclaren,0,,-3,12
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,16,Jrepo11,Haas,0,,-8,8
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,17,VIF Cxllum,Williams,0,,-1,16
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,18,STB SemmieK,Red Bull,0,,-14,4
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,19,Pauete18,Mercedes,0,,0,19
+23,23,1,8,,Great Britain,Silverstone,British Grand Prix,20,Rah its Toby,Ferrari,0,,-10,10
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,1,xSk45x,Alpha Tauri,25,,2,3
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,2,A11ila,Alfa Romeo,18,,0,2
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,3,EQR Pztem,Ferrari,15,,5,8
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,4,Kroks,Aston Martin,12,,0,4
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,5,SHZ Milan,Mercedes,10,,-4,1
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,6,Spenny,Mclaren,8,,12,18
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,7,II Mafio II,Aston Martin,6,,6,13
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,8,blurlxe,Alpine,4,,1,9
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,9,Darius Cotiga,Mclaren,2,,-3,6
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,10,VIF Cxllum,Haas,1,,5,15
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,11,Thalo4,Williams,0,,8,19
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,12,Yulian Kalenantovich,Ferrari,0,,-1,11
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,13,Alex Ferre,Alpha Tauri,0,,3,16
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,14,Vettel24,Alfa Romeo,0,,3,17
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,15,Kappakox,Red Bull,0,,-1,14
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,16,Cbowers2000,Alpine,0,,-11,5
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,17,Haubica,Red Bull,0,,-5,12
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,18,Joey1854,Haas,0,DNF,-8,10
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,19,AliFerrari5,Williams,0,DNF,-12,7
+23,23,1,9,,Belgium,Spa-Francorchamps,Belgian Grand Prix,20,SR Kisiel,Mercedes,0,DNF,0,20
+23,23,1,10,,Italy,Monza,Italian Grand Prix,1,STB SemmieK,Red Bull,25,,2,3
+23,23,1,10,,Italy,Monza,Italian Grand Prix,2,II Mafio II,Aston Martin,18,,6,8
+23,23,1,10,,Italy,Monza,Italian Grand Prix,3,Cbowers2000,Alpine,15,,2,5
+23,23,1,10,,Italy,Monza,Italian Grand Prix,4,A11ila,Alfa Romeo,12,,-2,2
+23,23,1,10,,Italy,Monza,Italian Grand Prix,5,Kubawoz,Red Bull,10,,1,6
+23,23,1,10,,Italy,Monza,Italian Grand Prix,6,Alex Ferre,Alpha Tauri,8,,7,13
+23,23,1,10,,Italy,Monza,Italian Grand Prix,7,EQR Pztem,Ferrari,7,,0,7
+23,23,1,10,,Italy,Monza,Italian Grand Prix,8,Darius Cotiga,Mclaren,4,,2,10
+23,23,1,10,,Italy,Monza,Italian Grand Prix,9,SHZ Milan,Mercedes,2,,-8,1
+23,23,1,10,,Italy,Monza,Italian Grand Prix,10,Jrepo11,Haas,1,,6,16
+23,23,1,10,,Italy,Monza,Italian Grand Prix,11,brainycactus30,Mercedes,0,,1,12
+23,23,1,10,,Italy,Monza,Italian Grand Prix,12,Kroks,Aston Martin,0,,-8,4
+23,23,1,10,,Italy,Monza,Italian Grand Prix,13,Spenny,Mclaren,0,DNF,2,15
+23,23,1,10,,Italy,Monza,Italian Grand Prix,14,SHZ Vortex,Alpine,0,DNF,-5,9
+23,23,1,10,,Italy,Monza,Italian Grand Prix,15,Thalo4,Williams,0,DNF,-1,14
+23,23,1,10,,Italy,Monza,Italian Grand Prix,16,Joey1854,Haas,0,DNF,-5,11
+23,23,1,10,,Italy,Monza,Italian Grand Prix,17,,,,,,
+23,23,1,10,,Italy,Monza,Italian Grand Prix,18,,,,,,
+23,23,1,10,,Italy,Monza,Italian Grand Prix,19,,,,,,
+23,23,1,10,,Italy,Monza,Italian Grand Prix,20,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,1,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,2,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,3,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,4,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,5,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,6,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,7,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,8,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,9,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,10,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,11,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,12,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,13,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,14,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,15,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,16,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,17,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,18,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,19,,,,,,
+23,23,1,11,,United States,Circuit of the Americas,United States Grand Prix,20,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,1,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,2,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,3,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,4,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,5,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,6,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,7,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,8,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,9,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,10,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,11,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,12,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,13,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,14,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,15,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,16,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,17,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,18,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,19,,,,,,
+23,23,1,12,,United States,Las Vegas,Las Vegas Grand Prix,20,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,1,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,2,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,3,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,4,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,5,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,6,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,7,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,8,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,9,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,10,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,11,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,12,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,13,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,14,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,15,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,16,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,17,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,18,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,19,,,,,,
+23,23,1,13,Spint,Qatar,Losail,Qatar Grand Prix,20,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,1,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,2,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,3,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,4,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,5,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,6,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,7,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,8,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,9,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,10,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,11,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,12,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,13,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,14,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,15,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,16,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,17,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,18,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,19,,,,,,
+23,23,1,13,,Qatar,Losail,Qatar Grand Prix,20,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,1,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,2,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,3,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,4,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,5,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,6,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,7,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,8,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,9,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,10,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,11,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,12,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,13,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,14,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,15,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,16,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,17,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,18,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,19,,,,,,
+23,23,1,14,Spint,Brazil,Interlagos,Brazilian Grand Prix,20,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,1,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,2,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,3,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,4,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,5,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,6,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,7,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,8,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,9,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,10,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,11,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,12,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,13,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,14,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,15,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,16,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,17,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,18,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,19,,,,,,
+23,23,1,14,,Brazil,Interlagos,Brazilian Grand Prix,20,,,,,,

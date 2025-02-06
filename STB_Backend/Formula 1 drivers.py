@@ -1,42 +1,54 @@
 import sqlite3
 
-# Databasebestand
-db_path = "C:/Users/joeyz/Desktop/STB Project/STB_Backend/Data.db"  # Pas dit aan naar het pad van je databasebestand
+# Pad naar beide databasebestanden
+db1_path = "C:/Users/joeyz/Documents/GitHub/STB-Web/STB_Backend/Data.db"    # Doel-database
+db2_path = "C:/Users/joeyz/Documents/GitHub/STB-Web/STB_Backend/Data2.db"   # Bron-database
 
-def update_rounds():
+def copy_data_with_id(table_name):
+    """Kopieert data van een specifieke tabel van Data2.db naar Data.db en behoudt de Id-waarden."""
     try:
-        # Verbinden met de database
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+        # Verbind met beide databases
+        conn1 = sqlite3.connect(db1_path)  # Doel
+        conn2 = sqlite3.connect(db2_path)  # Bron
+        cursor1 = conn1.cursor()
+        cursor2 = conn2.cursor()
 
-        # Update query uitvoeren
-        update_query = """
-        UPDATE RaceResults
-        SET Round = 4
-        WHERE Id BETWEEN 608 AND 619
-          AND Round = 5;
-        """
-        cursor.execute(update_query)
+        # Haal kolomnamen op inclusief Id
+        cursor2.execute(f"PRAGMA table_info({table_name});")
+        columns = [col[1] for col in cursor2.fetchall()]  # Neem Id mee
 
-        # Wijzigingen bevestigen
-        conn.commit()
+        # Data ophalen uit de bron-database
+        cursor2.execute(f"SELECT {', '.join(columns)} FROM {table_name};")
+        rows = cursor2.fetchall()
 
-        # Controleer de wijzigingen
-        select_query = "SELECT * FROM RaceResults WHERE Id BETWEEN 608 AND 619;"
-        cursor.execute(select_query)
-        rows = cursor.fetchall()
+        # Voeg data toe aan de doel-database (inclusief Id)
+        if rows:
+            placeholders = ", ".join(["?"] * len(columns))
+            insert_query = f"INSERT INTO {table_name} ({', '.join(columns)}) VALUES ({placeholders});"
+            cursor1.executemany(insert_query, rows)
+            conn1.commit()
+            print(f"{len(rows)} records toegevoegd aan {table_name} met Id-behoud.")
 
-        # Toon de gewijzigde records
-        print("Updated records:")
-        for row in rows:
-            print(row)
+        # Reset de ID-reeks zodat nieuwe records verder tellen vanaf de hoogste Id
+        cursor1.execute(f"SELECT MAX(Id) FROM {table_name};")
+        max_id = cursor1.fetchone()[0]
+        if max_id:
+            cursor1.execute(f"UPDATE sqlite_sequence SET seq = {max_id} WHERE name = '{table_name}';")
+            conn1.commit()
+            print(f"ID-sequence van {table_name} geüpdatet tot {max_id}.")
+
+        # Sluit de verbindingen
+        conn1.close()
+        conn2.close()
 
     except sqlite3.Error as e:
-        print(f"An error occurred: {e}")
-    finally:
-        if conn:
-            conn.close()
+        print(f"Fout bij kopiëren van {table_name}: {e}")
 
-# Script uitvoeren
-if __name__ == "__main__":
-    update_rounds()
+# Tabellen die we willen kopiëren
+tables = ["Users", "Tracks", "Races", "RaceResults"]
+
+# Data overzetten
+for table in tables:
+    copy_data_with_id(table)
+
+print("Data-overdracht met behoud van Id's voltooid!")

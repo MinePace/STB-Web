@@ -21,6 +21,7 @@ function HomePage() {
   };
 
   const seasons = [
+    { year: 23, divisions: ["1"] },
     { year: 22, divisions: ["1", "2", "3"] },
     { year: 21, divisions: ["1", "2"] },
     { year: 20, divisions: ["1"] },
@@ -46,7 +47,7 @@ function HomePage() {
 
       {/* Zijbalk */}
       <div className="sidebar">
-        <h2>Championships</h2>
+        <h2>Data</h2>
         <ul>
           {seasons.map((season) => (
             <li key={season.year} className="season-item">

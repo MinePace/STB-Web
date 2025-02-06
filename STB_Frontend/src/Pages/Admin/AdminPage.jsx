@@ -26,13 +26,16 @@ function AdminHub() {
             <Link to="/STB/Add/Track">Add a New Track</Link>
           </li>
           <li>
-            <Link to="/STB/Add/RaceResults">Add Race Results</Link>
+            <Link to="/STB/Add/RaceResults">Add a Race Results</Link>
           </li>
           <li>
             <Link to="/STB/Edit/Race">Edit Existing Races</Link>
           </li>
           <li>
             <Link to="/STB/Edit/RaceResults">Edit Race Results</Link>
+          </li>
+          <li>
+            <Link to="/STB/Add/CSV">Add a Race with .CSV</Link>
           </li>
         </ul>
       </div>

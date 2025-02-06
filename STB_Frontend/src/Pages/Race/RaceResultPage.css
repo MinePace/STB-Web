@@ -1,0 +1,19 @@
+.result-table {
+    position: sticky;
+    top: 0;
+    background-color: #0b4e8b; /* Achtergrondkleur vastgezette rijen */
+    z-index: 2;
+  }
+
+  /* Stijl de links binnen de tabel */
+.driver-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .driver-link:hover {
+    color: #4caeff;
+    text-decoration: none;
+    font-weight: bold;
+  }

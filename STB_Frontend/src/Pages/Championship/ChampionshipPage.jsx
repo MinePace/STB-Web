@@ -7,60 +7,74 @@ import "./ChampionshipPage.css";
 function ChampionshipPage() {
   const { season } = useParams();
   const { division } = useParams();
-  const [data, setData] = useState([]);
+  const [races, setRaces] = useState([]);
+  const [raceResults, setRaceResults] = useState([]);
   const [sortedDrivers, setSortedDrivers] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:5110/api/race/championship/${season}/${division}`)
+    // Stap 1: Haal alle races op
+    fetch(`http://localhost:5110/api/race/championship-races/${season}/${division}`)
       .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        transformData(data);
+      .then((raceData) => {
+        setRaces(raceData);
+        
+        // Stap 2: Haal race results op nadat races geladen zijn
+        fetch(`http://localhost:5110/api/race/championship/${season}/${division}`)
+          .then((res) => res.json())
+          .then((resultData) => {
+            setRaceResults(resultData);
+            transformData(raceData, resultData);
+          })
+          .catch((err) => console.error("Error fetching race results:", err));
       })
-      .catch((err) => console.error("Error fetching data:", err));
-  }, [season]);
+      .catch((err) => console.error("Error fetching races:", err));
+  }, [season, division]);
 
-  const transformData = (data) => {
+  const transformData = (races, raceResults) => {
+    console.log("Races:", races); // Controleer races
+    console.log("RaceResults:", raceResults); // Controleer race results
+    
     const drivers = {};
-    const raceNumbers = new Set();
+    const raceNumbers = races.map((race) =>
+      race.sprint === "Yes" ? `${race.round} S` : `${race.round}`
+    );
+    console.log("RaceNumbers:", raceNumbers); // Controleer race labels
+    
     const racePositions = {};
-
-    data.forEach((row) => {
-      if (!drivers[row.driver]) {
-        drivers[row.driver] = { totalPoints: 0 };
+    
+    raceResults.forEach((result) => {
+      if (!drivers[result.driver]) {
+        drivers[result.driver] = { totalPoints: 0 };
       }
-
-      const raceLabel = row.sprint === "1" ? `${row.round} S` : `${row.round}`;
-
-      drivers[row.driver][raceLabel] = row.points;
-      drivers[row.driver].totalPoints += row.points;
-      raceNumbers.add(raceLabel);
-
+  
+      // Gebruik de `race`-eigenschap van `result` om het label te genereren
+      const race = result.race;
+      const raceLabel = race.sprint === "Yes" ? `${race.round} S` : `${race.round}`;
+      console.log(`Driver: ${result.driver}, RaceLabel: ${raceLabel}, Points: ${result.points}`);
+      
+      drivers[result.driver][raceLabel] = result.points || 0;
+      drivers[result.driver].totalPoints += result.points || 0;
+      
       if (!racePositions[raceLabel]) {
         racePositions[raceLabel] = {};
       }
-      racePositions[raceLabel][row.driver] = row.position;
+      racePositions[raceLabel][result.driver] = result.position;
     });
-
-    const sortedRaceNumbers = [...raceNumbers].sort((a, b) => {
-      const numA = parseInt(a.replace(/\D/g, ""), 10);
-      const numB = parseInt(b.replace(/\D/g, ""), 10);
-      if (numA === numB) return a.includes("S") ? 1 : -1;
-      return numA - numB;
-    });
-
+    
     const sortedDrivers = Object.entries(drivers)
       .map(([driver, races]) => ({ driver, ...races }))
       .sort((a, b) => b.totalPoints - a.totalPoints);
-
-    setSortedDrivers({ drivers: sortedDrivers, raceNumbers: sortedRaceNumbers, racePositions });
+    
+    console.log("SortedDrivers:", sortedDrivers); // Controleer de uiteindelijke output
+    
+    setSortedDrivers({ drivers: sortedDrivers, raceNumbers, racePositions });
   };
 
   const handleExportToPng = () => {
-    const tableContainer = document.querySelector(".table-container"); // Selecteer het element
+    const tableContainer = document.querySelector(".table-container");
     if (tableContainer) {
       toPng(tableContainer, {
-        backgroundColor: window.getComputedStyle(document.body).backgroundColor, // Haal de huidige achtergrondkleur op
+        backgroundColor: window.getComputedStyle(document.body).backgroundColor,
       })
         .then((dataUrl) => {
           const link = document.createElement("a");
@@ -80,7 +94,6 @@ function ChampionshipPage() {
         Export to PNG
       </button>
       <div className="table-container">
-        {/* Header tabel */}
         <table className="header-table" border="1">
           <thead>
             <tr>
@@ -98,7 +111,6 @@ function ChampionshipPage() {
           </thead>
         </table>
 
-        {/* Scrollbare body tabel */}
         <div className="scrollable-table">
           <table className="scrollable" border="1">
             <tbody>
@@ -113,12 +125,9 @@ function ChampionshipPage() {
                     </Link>
                   </td>
                   {sortedDrivers.raceNumbers?.map((race) => {
-                    const isWinner =
-                      sortedDrivers.racePositions?.[race]?.[driver] === 1;
-                    const isSecond =
-                      sortedDrivers.racePositions?.[race]?.[driver] === 2;
-                    const isThird =
-                      sortedDrivers.racePositions?.[race]?.[driver] === 3;
+                    const isWinner = sortedDrivers.racePositions?.[race]?.[driver] === 1;
+                    const isSecond = sortedDrivers.racePositions?.[race]?.[driver] === 2;
+                    const isThird = sortedDrivers.racePositions?.[race]?.[driver] === 3;
                     return (
                       <td
                         key={race}

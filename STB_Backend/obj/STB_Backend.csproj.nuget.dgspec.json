@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\joeyz\\Desktop\\STB Project\\STB_Backend\\STB_Backend.csproj": {}
+    "C:\\Users\\joeyz\\Documents\\GitHub\\STB-Web\\STB_Backend\\STB_Backend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\joeyz\\Desktop\\STB Project\\STB_Backend\\STB_Backend.csproj": {
+    "C:\\Users\\joeyz\\Documents\\GitHub\\STB-Web\\STB_Backend\\STB_Backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\joeyz\\Desktop\\STB Project\\STB_Backend\\STB_Backend.csproj",
+        "projectUniqueName": "C:\\Users\\joeyz\\Documents\\GitHub\\STB-Web\\STB_Backend\\STB_Backend.csproj",
         "projectName": "STB_Backend",
-        "projectPath": "C:\\Users\\joeyz\\Desktop\\STB Project\\STB_Backend\\STB_Backend.csproj",
+        "projectPath": "C:\\Users\\joeyz\\Documents\\GitHub\\STB-Web\\STB_Backend\\STB_Backend.csproj",
         "packagesPath": "C:\\Users\\joeyz\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\joeyz\\Desktop\\STB Project\\STB_Backend\\obj\\",
+        "outputPath": "C:\\Users\\joeyz\\Documents\\GitHub\\STB-Web\\STB_Backend\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\joeyz\\AppData\\Roaming\\NuGet\\NuGet.Config",
