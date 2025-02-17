@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { toPng } from "html-to-image"; // Import html-to-image
+import { toPng } from "html-to-image";
 import "./ChampionshipPage.css";
 
 function ChampionshipPage() {
@@ -10,63 +10,83 @@ function ChampionshipPage() {
   const [races, setRaces] = useState([]);
   const [raceResults, setRaceResults] = useState([]);
   const [sortedDrivers, setSortedDrivers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    // Stap 1: Haal alle races op
+    setLoading(true);
+    setNotFound(false);
+
     fetch(`http://localhost:5110/api/race/championship-races/${season}/${division}`)
       .then((res) => res.json())
       .then((raceData) => {
+        if (!raceData || raceData.length === 0) {
+          setNotFound(true);
+          setLoading(false);
+          return;
+        }
         setRaces(raceData);
-        
-        // Stap 2: Haal race results op nadat races geladen zijn
+        console.log(raceData)
+
         fetch(`http://localhost:5110/api/race/championship/${season}/${division}`)
           .then((res) => res.json())
           .then((resultData) => {
+            if (!Array.isArray(resultData)) {
+              setRaceResults([]);
+              setNotFound(true);
+              setLoading(false);
+              return;
+            }
+
             setRaceResults(resultData);
             transformData(raceData, resultData);
+            setLoading(false);
           })
-          .catch((err) => console.error("Error fetching race results:", err));
+          .catch(() => {
+            setNotFound(true);
+            setLoading(false);
+          });
       })
-      .catch((err) => console.error("Error fetching races:", err));
+      .catch(() => {
+        setNotFound(true);
+        setLoading(false);
+      });
   }, [season, division]);
 
   const transformData = (races, raceResults) => {
-    console.log("Races:", races); // Controleer races
-    console.log("RaceResults:", raceResults); // Controleer race results
-    
     const drivers = {};
     const raceNumbers = races.map((race) =>
       race.sprint === "Yes" ? `${race.round} S` : `${race.round}`
     );
-    console.log("RaceNumbers:", raceNumbers); // Controleer race labels
-    
+
     const racePositions = {};
-    
+    const raceSums = {};
+
     raceResults.forEach((result) => {
       if (!drivers[result.driver]) {
         drivers[result.driver] = { totalPoints: 0 };
       }
-  
-      // Gebruik de `race`-eigenschap van `result` om het label te genereren
+
       const race = result.race;
       const raceLabel = race.sprint === "Yes" ? `${race.round} S` : `${race.round}`;
-      console.log(`Driver: ${result.driver}, RaceLabel: ${raceLabel}, Points: ${result.points}`);
-      
       drivers[result.driver][raceLabel] = result.points || 0;
       drivers[result.driver].totalPoints += result.points || 0;
       
+      if (!raceSums[raceLabel]) {
+        raceSums[raceLabel] = 0;
+      }
+      raceSums[raceLabel] += result.points || 0;
+
       if (!racePositions[raceLabel]) {
         racePositions[raceLabel] = {};
       }
       racePositions[raceLabel][result.driver] = result.position;
     });
-    
+
     const sortedDrivers = Object.entries(drivers)
       .map(([driver, races]) => ({ driver, ...races }))
       .sort((a, b) => b.totalPoints - a.totalPoints);
-    
-    console.log("SortedDrivers:", sortedDrivers); // Controleer de uiteindelijke output
-    
+
     setSortedDrivers({ drivers: sortedDrivers, raceNumbers, racePositions });
   };
 
@@ -88,6 +108,14 @@ function ChampionshipPage() {
     }
   };
 
+  if (loading) {
+    return <div className="loading-bar">Loading Championship Data...</div>;
+  }
+
+  if (notFound) {
+    return <div className="not-found">No races found for this championship.</div>;
+  }
+
   return (
     <div>
       <button onClick={handleExportToPng} className="export-button">
@@ -97,13 +125,6 @@ function ChampionshipPage() {
         <table className="header-table" border="1">
           <thead>
             <tr>
-              <th colspan="1">
-                <img
-                  src="/STB.png"
-                  alt="Championship Logo"
-                  class="header-logo"
-                />
-              </th>
               <th colSpan={(sortedDrivers.raceNumbers?.length || 0) + 2}>
                 Championship - Season {season} - Tier {division}
               </th>
@@ -124,10 +145,7 @@ function ChampionshipPage() {
               {sortedDrivers.drivers?.map(({ driver, totalPoints, ...races }) => (
                 <tr key={driver} className="table-row">
                   <td>
-                    <Link
-                      to={`/STB/Driver/${encodeURIComponent(driver)}`}
-                      className="driver-link"
-                    >
+                    <Link to={`/STB/Driver/${encodeURIComponent(driver)}`} className="driver-link">
                       {driver}
                     </Link>
                   </td>
@@ -139,21 +157,13 @@ function ChampionshipPage() {
                       <td
                         key={race}
                         style={{
-                          backgroundColor: isWinner
-                            ? "#FFD700"
-                            : isSecond
-                            ? "#D3D3D3"
-                            : isThird
-                            ? "#CD7F32"
+                          backgroundColor: isWinner ?"rgb(255, 215, 0)"
+                            : isSecond ?"rgb(211, 211, 211)"
+                            : isThird ?"rgb(165, 107, 49)"
                             : "transparent",
                         }}
                       >
-                        <Link
-                          to={`/STB/Race/${season}/${race.replace(/\D/g, "")}/${division}/${
-                            race.includes("S") ? "Sprint" : "Main"
-                          }`}
-                          className="driver-link"
-                        >
+                        <Link to={`/STB/Race/${season}/${race.replace(/\D/g, "")}/${division}/${race.includes("S") ? "Sprint" : "Main"}`} className="driver-link">
                           {races[race] ?? "-"}
                         </Link>
                       </td>

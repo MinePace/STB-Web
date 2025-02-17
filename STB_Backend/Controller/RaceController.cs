@@ -130,10 +130,17 @@ public class RaceController : ControllerBase
 
 
     [HttpGet("race/{season}/{division}/{round}/{type}")]
-    public IActionResult GetRace(int season, int division, int round)
+    public IActionResult GetRace(int season, int division, int round, string type)
     {
+        var Type = "No";
+        bool isSprint = string.Equals(type.ToLower(), "sprint"); // Controleer of het een Sprint
+        if (isSprint)
+        {
+            Type = "Yes";
+        }
+
         var race  = _context.Races
-            .Where(r => r.Season == season && r.Division == division && r.Round == round)
+            .Where(r => r.Season == season && r.Division == division && r.Round == round && r.Sprint == Type)
             .Include(r => r.Track)
             .FirstAsync();
 
@@ -178,10 +185,13 @@ public class RaceController : ControllerBase
     [HttpGet("results/{season}/{round}/{division}/{type}")]
     public IActionResult GetRaceResults(int season, int round, int division, string type)
     {
-        bool isSprint = type.ToLower() == "sprint"; // Controleer of het een Sprint Race is
+        string sprintType = type.Equals("sprint", StringComparison.OrdinalIgnoreCase) ? "Yes" : "No";
 
         var raceResults = _context.RaceResults
-            .Where(r => r.Race.Season == season && r.Race.Round == round && r.Race.Division == division && (isSprint ? r.Race.Sprint == "1" : r.Race.Sprint == "0" || r.Race.Sprint == "No"))
+            .Where(r => r.Race.Season == season 
+                && r.Race.Round == round 
+                && r.Race.Division == division 
+                && r.Race.Sprint.ToLower() == sprintType.ToLower()) // Ensure case-insensitivity
             .Include(r => r.Race)
             .OrderBy(r => r.Position)
             .ToList();
@@ -192,8 +202,9 @@ public class RaceController : ControllerBase
         return Ok(raceResults);
     }
 
+
     [HttpPost("raceresults")]
-    public async Task<IActionResult> AddRaceResults([FromBody] List<RaceResult> raceResults)
+    public async Task<IActionResult> AddRaceResults([FromBody] List<RaceResultRequest> raceResults)
     {
         if (!ModelState.IsValid)
         {
@@ -205,8 +216,24 @@ public class RaceController : ControllerBase
             return BadRequest("The race results list cannot be empty.");
         }
 
-        _context.RaceResults.AddRange(raceResults);
-        await _context.SaveChangesAsync();
+        foreach (var result in raceResults)
+        {
+            var NewResult = new RaceResult
+            {
+                RaceId = result.RaceId,
+                Race = await _context.Races.FindAsync(result.RaceId),
+                Position = result.Position,
+                Driver = result.Driver,
+                Team = result.Team,
+                Points = result.Points,
+                DNF = result.DNF,
+                Pos_Change = result.Pos_Change,
+                Qualifying = result.Qualifying
+            };
+
+            _context.RaceResults.AddRange(NewResult);
+            await _context.SaveChangesAsync();
+        }
 
         return Ok(new { message = $"{raceResults.Count} race results added successfully!" });
     }
@@ -312,6 +339,19 @@ public class RaceController : ControllerBase
         return Ok("Race updated successfully.");
     }
 
+    // 🔹 GET: api/race/raceresults
+    [HttpGet("raceresults")]
+    public async Task<ActionResult<RaceResult>> GetAllRaceResults()
+    {
+        var raceResult = await _context.RaceResults.ToListAsync();
+        if (raceResult == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(raceResult);
+    }
+
 
 }
 
@@ -325,4 +365,16 @@ public class RaceRequest{
     public string Sprint { get; set; }
     public int TrackId { get; set; }
     public string YoutubeLink { get; set; }
+}
+
+public class RaceResultRequest{
+    public int Id { get; set; }
+    public int RaceId { get; set; }
+    public int Position { get; set; }
+    public string Driver { get; set; }
+    public string Team { get; set; }
+    public int Points { get; set; }
+    public string DNF { get; set; }
+    public int Pos_Change { get; set; }
+    public int Qualifying { get; set; }
 }

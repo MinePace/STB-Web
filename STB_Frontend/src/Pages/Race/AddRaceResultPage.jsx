@@ -1,227 +1,197 @@
 import React, { useState, useEffect, useRef } from "react";
 
+// Points Table for Main and Sprint Races
+const MAIN_RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+const SPRINT_RACE_POINTS = [8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
 function AddRaceResults() {
-  const [races, setRaces] = useState([]); // Lijst met races
-  const [selectedRace, setSelectedRace] = useState(null); // Geselecteerde race
-  const [raceResults, setRaceResults] = useState([]); // Ingevoerde resultaten
-  const [nextPosition, setNextPosition] = useState(1); // Houdt de volgende Final Position bij
-  const [newResult, setNewResult] = useState({
-    position: "", // Dit wordt automatisch ingevuld
-    driver: "",
-    team: "",
-    points: "",
-    dnf: "",
-    pos_Change: 0, // Automatisch berekend
-    qualifying: "",
-  });
+  const [races, setRaces] = useState([]);
+  const [filteredRaces, setFilteredRaces] = useState([]); // Filtered list
+  const [existingResults, setExistingResults] = useState(new Set()); // Store race IDs that have results
+  const [selectedRace, setSelectedRace] = useState(null);
+  const [raceResults, setRaceResults] = useState([]);
 
-  const driverInputRef = useRef(null); // Ref voor focus
+  const driverInputRef = useRef(null);
 
-  // 🏁 Haal de races op bij het laden van de pagina
+  // Fetch races and existing results
   useEffect(() => {
     fetch("http://localhost:5110/api/race/races")
       .then((res) => res.json())
-      .then((data) => setRaces(data))
+      .then((data) => {
+        setRaces(data);
+        fetchExistingResults(data); // Fetch existing results after fetching races
+      })
       .catch((err) => console.error("Error fetching races:", err));
   }, []);
 
-  // 🏁 Selecteer een race
+  // Fetch existing race results
+  const fetchExistingResults = (allRaces) => {
+    fetch("http://localhost:5110/api/race/raceresults")
+      .then((res) => res.json())
+      .then((data) => {
+        const raceIdsWithResults = new Set(data.map((result) => result.raceId)); // Extract race IDs that have results
+        setExistingResults(raceIdsWithResults);
+
+        // Filter races that do not have results
+        const availableRaces = allRaces.filter((race) => !raceIdsWithResults.has(race.id));
+        setFilteredRaces(availableRaces);
+      })
+      .catch((err) => console.error("Error fetching existing results:", err));
+  };
+
   const handleRaceSelect = (e) => {
     const raceId = e.target.value;
-    const race = races.find((r) => r.id.toString() === raceId);
-    setSelectedRace(race || null);
-    setRaceResults([]); // Reset resultaten bij nieuwe race
-    setNextPosition(1); // Reset de Final Position teller
+    const race = filteredRaces.find((race) => race.id.toString() === raceId);
+
+    if (!race) {
+      console.error("Selected race not found!");
+      return;
+    }
+
+    setSelectedRace(race);
+    const pointsTable = race.sprint === "Yes" ? SPRINT_RACE_POINTS : MAIN_RACE_POINTS;
+
+    setRaceResults(
+      Array.from({ length: 20 }, (_, index) => ({
+        position: index + 1,
+        driver: "",
+        team: "",
+        points: pointsTable[index] || 0,
+        dnf: "No",
+        pos_Change: 0,
+        qualifying: "",
+        fastestLap: false, // Default to false
+      }))
+    );
   };
 
-  // 🏎️ Input handler voor resultaten
-  const handleResultChange = (e) => {
-    const { name, value } = e.target;
-
-    setNewResult((prev) => {
-      const updatedResult = { ...prev, [name]: value };
-
-      // Bereken Position Change automatisch
-      if (name === "position" || name === "qualifying") {
-        const positionChange =
-          updatedResult.qualifying && updatedResult.position
-            ? updatedResult.qualifying - updatedResult.position
+  const handleResultChange = (index, field, value) => {
+    setRaceResults((prevResults) => {
+      const updatedResults = [...prevResults];
+      updatedResults[index] = { ...updatedResults[index], [field]: value };
+  
+      if (field === "position" || field === "qualifying") {
+        updatedResults[index].pos_Change =
+          updatedResults[index].qualifying && updatedResults[index].position
+            ? updatedResults[index].qualifying - updatedResults[index].position
             : 0;
-        updatedResult.pos_Change = positionChange;
       }
-
-      return updatedResult;
+  
+      if (field === "dnf" && value === "Yes") {
+        for (let i = index; i < updatedResults.length; i++) {
+          updatedResults[i].dnf = "Yes";
+        }
+      }
+  
+      // ✅ Ensure only one driver gets Fastest Lap
+      if (field === "fastestLap") {
+        updatedResults.forEach((row, i) => {
+          if (i !== index) row.fastestLap = false; // Uncheck others
+        });
+  
+        // ✅ Recalculate points and only add +1 in non-sprint races
+        updatedResults.forEach((row, i) => {
+          row.points = selectedRace?.sprint === "Yes" ? SPRINT_RACE_POINTS[i] || 0 : MAIN_RACE_POINTS[i] || 0;
+          if (row.fastestLap === true && row.position <= 10 && selectedRace?.sprint !== "Yes") {
+            row.points += 1; // ✅ Add fastest lap bonus only for main races
+          }
+        });
+      }
+  
+      return updatedResults;
     });
-  };
-
-  // ❌ Controleer of alle velden zijn ingevuld
-  const isResultValid = () => {
-    return (
-      selectedRace &&
-      newResult.driver &&
-      newResult.team &&
-      newResult.points &&
-      newResult.dnf &&
-      newResult.qualifying
-    );
-  };
-
-  // ➕ Voeg een nieuw resultaat toe
-  const handleAddResult = () => {
-    if (!isResultValid()) return;
-
-    // Check voor dubbele Qualifying Position
-    const duplicateQualifying = raceResults.some(
-      (result) => result.qualifying === newResult.qualifying
-    );
-    if (duplicateQualifying) {
-      alert("Duplicate Qualifying Position! Please assign a different Qualifying Position.");
-      return;
-    }
-
-    // Voeg nieuwe result toe met automatische Final Position
-    const updatedResult = {
-      ...newResult,
-      position: nextPosition, // Automatische Final Position
-      raceId: selectedRace.id,
-    };
-
-    setRaceResults((prev) => [...prev, updatedResult]);
-    setNewResult({
-      position: nextPosition + 1, // Voorstel voor volgende positie
-      driver: "",
-      team: "",
-      points: "",
-      dnf: "",
-      pos_Change: 0,
-      qualifying: "",
-    });
-    setNextPosition(nextPosition + 1); // Verhoog de Final Position teller
-    driverInputRef.current.focus(); // Zet focus op Driver Name
-  };
-
-  // ❌ Verwijder een resultaat uit de lijst
-  const handleRemoveResult = (index) => {
-    const updatedResults = [...raceResults];
-    updatedResults.splice(index, 1); // Verwijder resultaat
-    setRaceResults(updatedResults);
-
-    // Reset de Final Positions opnieuw vanaf 1
-    const reIndexedResults = updatedResults.map((result, i) => ({
-      ...result,
-      position: i + 1,
-    }));
-    setRaceResults(reIndexedResults);
-    setNextPosition(reIndexedResults.length + 1);
-  };
-
-  // 📤 Verstuur alle resultaten
-  const handleSubmit = async () => {
-    if (!selectedRace) {
-      alert("Please select a race before submitting results.");
-      return;
-    }
-
-    const response = await fetch("http://localhost:5110/api/race/raceresults", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(raceResults),
-    });
-
-    if (response.ok) {
-      alert(`${raceResults.length} Race Results Added Successfully!`);
-      setRaceResults([]);
-      setNextPosition(1);
-    } else {
-      alert("Failed to add race results. Please try again.");
-    }
-  };
+  };  
 
   return (
     <div className="add-race-results-container">
       <h1>Add Race Results</h1>
 
-      {/* 🏁 Selecteer Race */}
+      {/* Race Selection */}
       <div className="race-settings">
         <h2>Select Race</h2>
         <select onChange={handleRaceSelect} required>
           <option value="">Select a Race</option>
-          {races.map((race) => (
-            <option key={race.id} value={race.id}>
-              {race.name} - Season {race.season}, Round {race.round}, Division {race.division}
-            </option>
-          ))}
+          {filteredRaces.length > 0 ? (
+            filteredRaces.map((race) => (
+              <option key={race.id} value={race.id}>
+                {race.name} - Season {race.season}, Round {race.round}, Division {race.division}{" "}
+                {race.sprint === "Yes" ? "(Sprint)" : ""}
+              </option>
+            ))
+          ) : (
+            <option disabled>No races available</option>
+          )}
         </select>
       </div>
 
-      {/* Formulier voor een nieuw race resultaat */}
+      {/* Results Form */}
       <div className="result-form">
-        <h2>Add Result</h2>
-        <input
-          type="number"
-          name="position"
-          placeholder="Final Position"
-          value={newResult.position}
-          onChange={handleResultChange}
-          readOnly // Automatisch ingevuld
-        />
-        <input
-          type="text"
-          name="driver"
-          placeholder="Driver Name"
-          value={newResult.driver}
-          onChange={handleResultChange}
-          ref={driverInputRef}
-        />
-        <input
-          type="text"
-          name="team"
-          placeholder="Team Name"
-          value={newResult.team}
-          onChange={handleResultChange}
-        />
-        <input
-          type="number"
-          name="points"
-          placeholder="Points"
-          value={newResult.points}
-          onChange={handleResultChange}
-        />
-        <input
-          type="text"
-          name="dnf"
-          placeholder="DNF (Yes/No)"
-          value={newResult.dnf}
-          onChange={handleResultChange}
-        />
-        <input
-          type="number"
-          name="qualifying"
-          placeholder="Qualifying Position"
-          value={newResult.qualifying}
-          onChange={handleResultChange}
-        />
-        <button onClick={handleAddResult} disabled={!isResultValid()}>
-          Add to List
-        </button>
+        <h2>Add Results</h2>
+        <table>
+        <thead>
+          <tr>
+            <th>Position</th>
+            <th>Driver</th>
+            <th>Team</th>
+            <th>Points</th>
+            <th>DNF</th>
+            <th>Qualifying</th>
+            <th>Position Change</th>
+            <th>Fastest Lap</th> {/* ✅ Always visible */}
+          </tr>
+        </thead>
+          <tbody>
+            {raceResults.map((result, index) => (
+              <tr key={index}>
+                <td>{result.position}</td>
+                <td>
+                  <input
+                    type="text"
+                    value={result.driver}
+                    onChange={(e) => handleResultChange(index, "driver", e.target.value)}
+                    ref={index === 0 ? driverInputRef : null}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={result.team}
+                    onChange={(e) => handleResultChange(index, "team", e.target.value)}
+                  />
+                </td>
+                <td>{result.points}</td>
+                <td>
+                  <select
+                    value={result.dnf}
+                    onChange={(e) => handleResultChange(index, "dnf", e.target.value)}
+                  >
+                    <option value="No">No</option>
+                    <option value="Yes">Yes</option>
+                  </select>
+                </td>
+                <td>
+                  <input
+                    type="number"
+                    value={result.qualifying}
+                    onChange={(e) => handleResultChange(index, "qualifying", e.target.value)}
+                  />
+                </td>
+                <td>{result.pos_Change}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={result.fastestLap}
+                    onChange={(e) => handleResultChange(index, "fastestLap", e.target.checked)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* Lijst van ingevoerde resultaten */}
-      <div className="results-list">
-        <h2>Race Results to Submit:</h2>
-        <ul>
-          {raceResults.map((result, index) => (
-            <li key={index}>
-              {result.driver} - {result.team} - Position: {result.position} - Points: {result.points} - Position Change:{" "}
-              {result.pos_Change}{" "}
-              <button onClick={() => handleRemoveResult(index)}>Remove</button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Verstuur naar backend */}
-      <button onClick={handleSubmit} disabled={raceResults.length === 0}>
+      {/* Submit Button */}
+      <button onClick={() => console.log("Submit")} disabled={!selectedRace}>
         Submit All Results
       </button>
     </div>

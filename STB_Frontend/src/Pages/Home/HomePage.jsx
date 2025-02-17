@@ -21,6 +21,7 @@ function HomePage() {
   };
 
   const seasons = [
+    { year: 28, divisions: ["1", "2", "3"]},
     { year: 25, divisions: ["1"] },
     { year: 24, divisions: ["1"] },
     { year: 23, divisions: ["1"] },

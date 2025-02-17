@@ -51,7 +51,6 @@ function RaceResultPage() {
     }
   };
   
-
   const teamColors = {
     "Red Bull": "rgb(23, 38, 122)",
     "Mercedes": "rgb(109, 230, 205)",
