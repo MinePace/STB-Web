@@ -24,7 +24,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/" element={<HomePage />} />
       <Route path="/STB/Championship/:season/:division" element={<Layout showSidebar={true}><ChampionshipPage /></Layout>} />
       <Route path="/STB/Driver/:driverName" element={<Layout showSidebar={true}><DriverPage /></Layout>} />
-      <Route path="/STB/Race/:season/:round/:division/:type" element={<Layout showSidebar={true}><RaceResultPage /></Layout>} />
+      <Route path="/STB/Race/:raceId" element={<Layout showSidebar={true}><RaceResultPage /></Layout>} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/STB/Add/RaceResults" element={<Layout showSidebar={true}><AddRaceResultPage /></Layout>} />

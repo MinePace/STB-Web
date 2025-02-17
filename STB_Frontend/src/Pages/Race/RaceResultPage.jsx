@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 import "./RaceResultPage.css";
 
 function RaceResultPage() {
-  const { season, round, division, type } = useParams(); // Haal "type" op uit de URL
+  const { raceId } = useParams(); // Haal "type" op uit de URL
   const [raceResults, setRaceResults] = useState([]);
   const [race, setRaceData] = useState();
   const [embedUrl, setEmbedUrl] = useState(""); // Opslag voor de embed-URL
 
   useEffect(() => {
     // Fetch race results
-    fetch(`http://localhost:5110/api/race/results/${season}/${round}/${division}/${type}`)
+    fetch(`http://localhost:5110/api/race/results/${raceId}`)
       .then((res) => res.json())
       .then((data) => {
         setRaceResults(data); 
@@ -23,7 +23,7 @@ function RaceResultPage() {
         }
       })
       .catch((err) => console.error("Error fetching race results:", err));
-  }, [season, round, division, type]);
+  }, [raceId]);
 
   // Functie om race-informatie op te halen
   const fetchRaceInfo = (raceId) => {
@@ -72,60 +72,72 @@ function RaceResultPage() {
 
   return (
     <div className="race-page-container">
-      <h1>{type === "Sprint" ? "Sprint Race" : "Main Race"} {round} - Season {season}</h1>
-
-      {/* Container voor video en tabel */}
-      <div className="content-section">
-        {/* YouTube Video Speler */}
-        {embedUrl && (
-          <div className="video-player">
-            <iframe
-              width="100%"
-              height="250px"
-              src={embedUrl}
-              title="YouTube Video Player"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
+      {/* Check if raceResults has data before rendering */}
+      {raceResults.length > 0 ? (
+        <>
+          <h1>
+            {raceResults[0].race.sprint === "Yes" ? "Sprint Race" : "Main Race"}{" "}
+            {raceResults[0].race.round} - Season {raceResults[0].race.Season}
+          </h1>
+  
+          {/* Container for video and table */}
+          <div className="content-section">
+            {/* YouTube Video Player */}
+            {embedUrl && (
+              <div className="video-player">
+                <iframe
+                  width="100%"
+                  height="250px"
+                  src={embedUrl}
+                  title="YouTube Video Player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            )}
+  
+            {/* Race Results Table */}
+            <div className="table-container">
+              <table className="result-table" border="1">
+                <thead>
+                  <tr>
+                    <th>Position</th>
+                    <th>Driver</th>
+                    <th>Team</th>
+                    <th>Points</th>
+                    <th>Qualifying</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {raceResults.map((row, index) => (
+                    <tr key={index}>
+                      <td>{row.position}</td>
+                      <td>
+                        <Link
+                          to={`/STB/Driver/${encodeURIComponent(row.driver)}`}
+                          className="driver-link"
+                        >
+                          {row.driver}
+                        </Link>
+                      </td>
+                      <td style={{ color: teamColors[row.team] || "white" }}>
+                        {row.team}
+                      </td>
+                      <td>{row.points}</td>
+                      <td>{row.qualifying}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        )}
-
-        {/* Race Resultaten */}
-        <div className="table-container">
-          <table className="result-table" border="1">
-            <thead>
-              <tr>
-                <th>Position</th>
-                <th>Driver</th>
-                <th>Team</th>
-                <th>Points</th>
-                <th>Qualifying</th>
-              </tr>
-            </thead>
-            <tbody>
-              {raceResults.map((row, index) => (
-                <tr key={index}>
-                  <td>{row.position}</td>
-                  <td>
-                    <Link
-                      to={`/STB/Driver/${encodeURIComponent(row.driver)}`}
-                      className="driver-link"
-                    >
-                      {row.driver}
-                    </Link>
-                  </td>
-                  <td style={{ color: teamColors[row.team] || "white" }}>{row.team}</td>
-                  <td>{row.points}</td>
-                  <td>{row.qualifying}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+        </>
+      ) : (
+        <div className="loading-message">Loading race results...</div>
+      )}
     </div>
-  );
+  );  
 }
 
 export default RaceResultPage;

@@ -17,7 +17,7 @@ function ChampionshipPage() {
     setLoading(true);
     setNotFound(false);
 
-    fetch(`http://localhost:5110/api/race/championship-races/${season}/${division}`)
+    fetch(`http://localhost:5110/api/championship/races/${season}/${division}`)
       .then((res) => res.json())
       .then((raceData) => {
         if (!raceData || raceData.length === 0) {
@@ -26,9 +26,8 @@ function ChampionshipPage() {
           return;
         }
         setRaces(raceData);
-        console.log(raceData)
 
-        fetch(`http://localhost:5110/api/race/championship/${season}/${division}`)
+        fetch(`http://localhost:5110/api/championship/${season}/${division}`)
           .then((res) => res.json())
           .then((resultData) => {
             if (!Array.isArray(resultData)) {
@@ -142,7 +141,7 @@ function ChampionshipPage() {
         <div className="scrollable-table">
           <table className="scrollable" border="1">
             <tbody>
-              {sortedDrivers.drivers?.map(({ driver, totalPoints, ...races }) => (
+              {sortedDrivers.drivers?.map(({ driver, totalPoints, ...driversraces }) => (
                 <tr key={driver} className="table-row">
                   <td>
                     <Link to={`/STB/Driver/${encodeURIComponent(driver)}`} className="driver-link">
@@ -153,6 +152,21 @@ function ChampionshipPage() {
                     const isWinner = sortedDrivers.racePositions?.[race]?.[driver] === 1;
                     const isSecond = sortedDrivers.racePositions?.[race]?.[driver] === 2;
                     const isThird = sortedDrivers.racePositions?.[race]?.[driver] === 3;
+                    let RaceId = null; // Use let instead of const
+
+                    for (let i = 0; i < races.length; i++) {
+                      if (race.includes("S")) {
+                        if (races[i].round == race.replace(/\D/g, "") && races[i].sprint == "Yes") {
+                          RaceId = races[i].id;
+                          break; // Exit loop once found
+                        }
+                      } else {
+                        if (races[i].round == race.replace(/\D/g, "") && races[i].sprint == "No") {
+                          RaceId = races[i].id;
+                          break; // Exit loop once found
+                        }
+                      }
+                    }
                     return (
                       <td
                         key={race}
@@ -163,8 +177,9 @@ function ChampionshipPage() {
                             : "transparent",
                         }}
                       >
-                        <Link to={`/STB/Race/${season}/${race.replace(/\D/g, "")}/${division}/${race.includes("S") ? "Sprint" : "Main"}`} className="driver-link">
-                          {races[race] ?? "-"}
+                      
+                        <Link to={`/STB/Race/${RaceId}`} className="driver-link">
+                          {driversraces[race] ?? "-"}
                         </Link>
                       </td>
                     );

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json;
 
 
-[Route("api/[controller]")]
+[Route("api/race")]
 [ApiController]
 public class RaceController : ControllerBase
 {
@@ -13,38 +13,6 @@ public class RaceController : ControllerBase
     public RaceController(DataContext context)
     {
         _context = context;
-    }
-
-    [HttpGet("championship/{season}/{division}")]
-    public IActionResult GetChampionship(int season, int division)
-    {
-        var championshipResults  = _context.RaceResults
-            .Where(r => r.Race.Season == season && r.Race.Division == division)
-            .Include(r => r.Race)
-            .Include(r => r.Race.Track)
-            .OrderByDescending(r => r.Points)
-            .ToList();
-
-        if (!championshipResults.Any())
-        return NotFound(new { message = "No results found for this division." });
-
-        return Ok(championshipResults );
-    }
-
-    [HttpGet("championship-races/{season}/{division}")]
-    public IActionResult GetChampionshipRaces(int season, int division)
-    {
-        var championshipRaces  = _context.Races
-            .Where(r => r.Season == season && r.Division == division)
-            .OrderBy(r => r.Id)
-            
-            .Include(r => r.Track)
-            .ToList();
-
-        if (!championshipRaces.Any())
-        return NotFound(new { message = "No results found for this division." });
-
-        return Ok(championshipRaces );
     }
 
     [HttpGet("tracks")]
@@ -182,16 +150,11 @@ public class RaceController : ControllerBase
         return Ok(stats);
     }
 
-    [HttpGet("results/{season}/{round}/{division}/{type}")]
-    public IActionResult GetRaceResults(int season, int round, int division, string type)
+    [HttpGet("results/{raceId}")]
+    public IActionResult GetRaceResults(int raceId)
     {
-        string sprintType = type.Equals("sprint", StringComparison.OrdinalIgnoreCase) ? "Yes" : "No";
-
         var raceResults = _context.RaceResults
-            .Where(r => r.Race.Season == season 
-                && r.Race.Round == round 
-                && r.Race.Division == division 
-                && r.Race.Sprint.ToLower() == sprintType.ToLower()) // Ensure case-insensitivity
+            .Where(r => r.Race.Id == raceId) // Ensure case-insensitivity
             .Include(r => r.Race)
             .OrderBy(r => r.Position)
             .ToList();
@@ -352,6 +315,20 @@ public class RaceController : ControllerBase
         return Ok(raceResult);
     }
 
+    [HttpGet("test/{raceId}")]
+    public IActionResult GetTest(int raceId)
+    {
+        var raceResults = _context.RaceResults
+            .Where(r => r.Race.Id == raceId) // Ensure case-insensitivity
+            .Include(r => r.Race)
+            .OrderBy(r => r.Position)
+            .ToList();
+
+        if (!raceResults.Any())
+            return NotFound(new { message = "Race not found" });
+
+        return Ok(raceResults);
+    }
 
 }
 
