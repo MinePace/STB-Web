@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System.Linq;
 using System.Text.Json;
 
@@ -178,27 +179,31 @@ public class RaceController : ControllerBase
         {
             return BadRequest("The race results list cannot be empty.");
         }
+        int count = 0;
 
         foreach (var result in raceResults)
         {
-            var NewResult = new RaceResult
-            {
-                RaceId = result.RaceId,
-                Race = await _context.Races.FindAsync(result.RaceId),
-                Position = result.Position,
-                Driver = result.Driver,
-                Team = result.Team,
-                Points = result.Points,
-                DNF = result.DNF,
-                Pos_Change = result.Pos_Change,
-                Qualifying = result.Qualifying
-            };
+            if(!string.IsNullOrWhiteSpace(result.Driver)){
+                var NewResult = new RaceResult
+                {
+                    RaceId = result.RaceId,
+                    Race = await _context.Races.FindAsync(result.RaceId),
+                    Position = result.Position,
+                    Driver = result.Driver,
+                    Team = result.Team,
+                    Points = result.Points,
+                    DNF = result.DNF,
+                    Pos_Change = result.Pos_Change,
+                    Qualifying = result.Qualifying
+                };
 
-            _context.RaceResults.AddRange(NewResult);
-            await _context.SaveChangesAsync();
+                _context.RaceResults.AddRange(NewResult);
+                await _context.SaveChangesAsync();
+                count++;
+            }
         }
 
-        return Ok(new { message = $"{raceResults.Count} race results added successfully!" });
+        return Ok(new { message = $"{count} race results added successfully!" });
     }
 
     // 🔹 GET: api/raceresults/{id} (optioneel)

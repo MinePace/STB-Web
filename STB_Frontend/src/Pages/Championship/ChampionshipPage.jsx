@@ -1,12 +1,10 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { toPng } from "html-to-image";
 import "./ChampionshipPage.css";
 
 function ChampionshipPage() {
-  const { season } = useParams();
-  const { division } = useParams();
+  const { season, division } = useParams();
   const [races, setRaces] = useState([]);
   const [raceResults, setRaceResults] = useState([]);
   const [sortedDrivers, setSortedDrivers] = useState([]);
@@ -59,22 +57,15 @@ function ChampionshipPage() {
     );
 
     const racePositions = {};
-    const raceSums = {};
 
     raceResults.forEach((result) => {
       if (!drivers[result.driver]) {
         drivers[result.driver] = { totalPoints: 0 };
       }
 
-      const race = result.race;
-      const raceLabel = race.sprint === "Yes" ? `${race.round} S` : `${race.round}`;
+      const raceLabel = result.race.sprint === "Yes" ? `${result.race.round} S` : `${result.race.round}`;
       drivers[result.driver][raceLabel] = result.points || 0;
       drivers[result.driver].totalPoints += result.points || 0;
-      
-      if (!raceSums[raceLabel]) {
-        raceSums[raceLabel] = 0;
-      }
-      raceSums[raceLabel] += result.points || 0;
 
       if (!racePositions[raceLabel]) {
         racePositions[raceLabel] = {};
@@ -89,24 +80,6 @@ function ChampionshipPage() {
     setSortedDrivers({ drivers: sortedDrivers, raceNumbers, racePositions });
   };
 
-  const handleExportToPng = () => {
-    const tableContainer = document.querySelector(".table-container");
-    if (tableContainer) {
-      toPng(tableContainer, {
-        backgroundColor: window.getComputedStyle(document.body).backgroundColor,
-      })
-        .then((dataUrl) => {
-          const link = document.createElement("a");
-          link.download = `championship-season-${season}-tier-${division}.png`;
-          link.href = dataUrl;
-          link.click();
-        })
-        .catch((error) => {
-          console.error("Error generating PNG:", error);
-        });
-    }
-  };
-
   if (loading) {
     return <div className="loading-bar">Loading Championship Data...</div>;
   }
@@ -116,85 +89,89 @@ function ChampionshipPage() {
   }
 
   return (
-    <div>
-      <button onClick={handleExportToPng} className="export-button">
-        Export to PNG
-      </button>
-      <div className="table-container">
-        <table className="header-table" border="1">
-          <thead>
-            <tr>
-              <th colSpan={(sortedDrivers.raceNumbers?.length || 0) + 2}>
-                Championship - Season {season} - Tier {division}
+    <div className="table-container">
+      {/* Fixed Header Table */}
+      <table className="header-table" border="1">
+        <thead>
+          <tr>
+            <th colSpan={(sortedDrivers.raceNumbers?.length || 0) + 2}>
+              Championship - Season {season} - Tier {division}
+            </th>
+          </tr>
+          <tr>
+            <th>Driver</th>
+            {races.map((race) => (
+              <th key={race.id}>
+                <img
+                  src={`/flags/${race.track.country}.png`}
+                  alt={race.country}
+                  title={race.country}
+                  className="race-flag"
+                />
               </th>
-            </tr>
-            <tr>
-              <th>Driver</th>
-              {sortedDrivers.raceNumbers?.map((race) => (
-                <th key={race}>{race}</th>
-              ))}
-              <th>Total Points</th>
-            </tr>
-          </thead>
-        </table>
-
-        <div className="scrollable-table">
-          <table className="scrollable" border="1">
-            <tbody>
-              {sortedDrivers.drivers?.map(({ driver, totalPoints, ...driversraces }) => (
-                <tr key={driver} className="table-row">
-                  <td>
-                    <Link to={`/STB/Driver/${encodeURIComponent(driver)}`} className="driver-link">
-                      {driver}
-                    </Link>
-                  </td>
-                  {sortedDrivers.raceNumbers?.map((race) => {
-                    const isWinner = sortedDrivers.racePositions?.[race]?.[driver] === 1;
-                    const isSecond = sortedDrivers.racePositions?.[race]?.[driver] === 2;
-                    const isThird = sortedDrivers.racePositions?.[race]?.[driver] === 3;
-                    let RaceId = null; // Use let instead of const
-
-                    for (let i = 0; i < races.length; i++) {
-                      if (race.includes("S")) {
-                        if (races[i].round == race.replace(/\D/g, "") && races[i].sprint == "Yes") {
-                          RaceId = races[i].id;
-                          break; // Exit loop once found
-                        }
-                      } else {
-                        if (races[i].round == race.replace(/\D/g, "") && races[i].sprint == "No") {
-                          RaceId = races[i].id;
-                          break; // Exit loop once found
-                        }
+            ))}
+            <th>Points</th>
+          </tr>
+        </thead>
+      </table>
+  
+      {/* Scrollable Table */}
+      <div className="scrollable-table">
+        <table className="scrollable" border="1">
+          <tbody>
+            {sortedDrivers.drivers?.map(({ driver, totalPoints, ...driversraces }) => (
+              <tr key={driver} className="table-row">
+                <td>
+                  <Link to={`/STB/Driver/${encodeURIComponent(driver)}`} className="driver-link">
+                    {driver}
+                  </Link>
+                </td>
+                {sortedDrivers.raceNumbers?.map((race) => {
+                  const isWinner = sortedDrivers.racePositions?.[race]?.[driver] === 1;
+                  const isSecond = sortedDrivers.racePositions?.[race]?.[driver] === 2;
+                  const isThird = sortedDrivers.racePositions?.[race]?.[driver] === 3;
+                  let RaceId = null;
+  
+                  for (let i = 0; i < races.length; i++) {
+                    if (race.includes("S")) {
+                      if (races[i].round == race.replace(/\D/g, "") && races[i].sprint == "Yes") {
+                        RaceId = races[i].id;
+                        break;
+                      }
+                    } else {
+                      if (races[i].round == race.replace(/\D/g, "") && races[i].sprint == "No") {
+                        RaceId = races[i].id;
+                        break;
                       }
                     }
-                    return (
-                      <td
-                        key={race}
-                        style={{
-                          backgroundColor: isWinner ?"rgb(255, 215, 0)"
-                            : isSecond ?"rgb(211, 211, 211)"
-                            : isThird ?"rgb(165, 107, 49)"
-                            : "transparent",
-                        }}
-                      >
-                      
-                        <Link to={`/STB/Race/${RaceId}`} className="driver-link">
-                          {driversraces[race] ?? "-"}
-                        </Link>
-                      </td>
-                    );
-                  })}
-                  <td>
-                    <strong>{totalPoints}</strong>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  }
+                  return (
+                    <td
+                      key={race}
+                      style={{
+                        backgroundColor: isWinner ? "rgb(255, 215, 0)"
+                          : isSecond ? "rgb(211, 211, 211)"
+                          : isThird ? "rgb(165, 107, 49)"
+                          : "transparent",
+                      }}
+                    >
+                      <Link to={`/STB/Race/${RaceId}`} className="driver-link">
+                        {driversraces[race] ?? "-"}
+                      </Link>
+                    </td>
+                  );
+                })}
+                <td>
+                  <strong>{totalPoints}</strong>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
+  
 }
 
 export default ChampionshipPage;

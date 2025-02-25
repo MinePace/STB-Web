@@ -1,7 +1,14 @@
 .layout-container {
-    display: flex;
-    height: 92vh;
-  }
+  padding-top: 60px; /* Push content below fixed topbar */
+  display: flex;
+}
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 60px; /* Below the topbar */
+  padding-top: 20px;
+}
   
   .content-container {
     margin-left: 100px; /* Zorg voor ruimte naast de sidebar */

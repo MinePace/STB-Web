@@ -17,7 +17,6 @@ function Sidebar() {
 
   return (
     <div className="sidebar">
-      <h2>Data</h2>
       <ul>
         {seasons.map((season) => (
           <li key={season.year} className="season-item">

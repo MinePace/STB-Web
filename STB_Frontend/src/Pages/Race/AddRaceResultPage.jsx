@@ -100,6 +100,48 @@ function AddRaceResults() {
   
       return updatedResults;
     });
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedRace) {
+      console.error("No race selected!");
+      return;
+    }
+  
+    // Add `raceId` and ensure `qualifying` is an integer
+    const raceData = raceResults.map((result) => ({
+      raceId: selectedRace.id, // ✅ Attach raceId to each entry
+      position: result.position,
+      driver: result.driver.trim(),
+      team: result.team.trim(),
+      points: result.points,
+      dnf: result.dnf,
+      qualifying: result.qualifying ? parseInt(result.qualifying, 10) : 0, // ✅ Convert to integer
+      pos_Change: result.pos_Change,
+    }));
+  
+    console.log("🚀 Sending Race Data:", raceData);
+  
+    try {
+      const response = await fetch("http://localhost:5110/api/race/raceresults", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(raceData),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      console.log("✅ Submission Successful:", data);
+      alert(`${data.message}`); // Show success message to user
+    } catch (error) {
+      console.error("❌ Error submitting results:", error);
+      alert("Error submitting results! Check the console for details.");
+    }
   };  
 
   return (
@@ -191,7 +233,7 @@ function AddRaceResults() {
       </div>
 
       {/* Submit Button */}
-      <button onClick={() => console.log("Submit")} disabled={!selectedRace}>
+      <button onClick={handleSubmit} disabled={!selectedRace}>
         Submit All Results
       </button>
     </div>

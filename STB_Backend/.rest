@@ -1,4 +1,8 @@
-GET http://localhost:5110/api/race/championship-races/24/1
+GET http://localhost:5110/api/championship/races/28/1
+
+##########
+
+GET http://localhost:5110/api/championship/28/1
 
 ##########
 
@@ -6,7 +10,7 @@ GET http://localhost:5110/api/race/race/13
 
 ##########
 
-GET http://localhost:5110/api/race/results/22/5/1/Main
+GET http://localhost:5110/api/race/results/32
 
 ##########
 
@@ -39,185 +43,225 @@ GET http://localhost:5110/api/race/raceresults
 POST http://localhost:5110/api/race/raceresults
 Content-Type: application/json
 
-    [
-        {
-            "position": 1,
-            "driver": "Jrepo11",
-            "team": "Alfa Romeo",
-            "points": "25",
-            "dnf": "No",
-            "pos_Change": 0,
-            "qualifying": "1",
-            "raceId": 61
-        },
-        {
-            "position": 2,
-            "driver": "brainycactus30",
-            "team": "Alfa Romeo",
-            "points": "18",
-            "dnf": "No",
-            "pos_Change": 2,
-            "qualifying": "4",
-            "raceId": 61
-        },
-        {
-            "position": 3,
-            "driver": "STB SemmieK",
-            "team": "Red Bull",
-            "points": "15",
-            "dnf": "No",
-            "pos_Change": -1,
-            "qualifying": "2",
-            "raceId": 61
-        },
-        {
-            "position": 4,
-            "driver": "Jsnowyy",
-            "team": "Williams",
-            "points": "12",
-            "dnf": "No",
-            "pos_Change": -1,
-            "qualifying": "3",
-            "raceId": 61
-        },
-        {
-            "position": 5,
-            "driver": "Joey1854",
-            "team": "Alpha Tauri",
-            "points": "10",
-            "dnf": "No",
-            "pos_Change": 5,
-            "qualifying": "10",
-            "raceId": 61
-        },
-        {
-            "position": 6,
-            "driver": "xSk45x",
-            "team": "Alfa Tauri",
-            "points": "8",
-            "dnf": "No",
-            "pos_Change": -1,
-            "qualifying": "5",
-            "raceId": 61
-        },
-        {
-            "position": 7,
-            "driver": "A11ila",
-            "team": "Mercedes",
-            "points": "6",
-            "dnf": "No",
-            "pos_Change": 1,
-            "qualifying": "8",
-            "raceId": 61
-        },
-        {
-            "position": 8,
-            "driver": "Yulian Kalenantovich",
-            "team": "Aston Martin",
-            "points": "4",
-            "dnf": "No",
-            "pos_Change": -1,
-            "qualifying": "7",
-            "raceId": 61
-        },
-        {
-            "position": 9,
-            "driver": "DJ Danny",
-            "team": "Mercedes",
-            "points": "2",
-            "dnf": "No",
-            "pos_Change": 4,
-            "qualifying": "13",
-            "raceId": 61
-        },
-        {
-            "position": 10,
-            "driver": "Kroks",
-            "team": "Red Bull",
-            "points": "2",
-            "dnf": "No",
-            "pos_Change": 2,
-            "qualifying": "12",
-            "raceId": 61
-        },
-        {
-            "position": 11,
-            "driver": "Dmitriy Panteleev",
-            "team": "Haas",
-            "points": "0",
-            "dnf": "No",
-            "pos_Change": 0,
-            "qualifying": "11",
-            "raceId": 61
-        },
-        {
-            "position": 12,
-            "driver": "Kratos",
-            "team": "Ferrari",
-            "points": "0",
-            "dnf": "DNF",
-            "pos_Change": -6,
-            "qualifying": "6",
-            "raceId": 61
-        },
-        {
-            "position": 13,
-            "driver": "II Mafio II",
-            "team": "Williams",
-            "points": "0",
-            "dnf": "DNF",
-            "pos_Change": 1,
-            "qualifying": "14",
-            "raceId": 61
-        },
-        {
-            "position": 14,
-            "driver": "Thalo4",
-            "team": "McLaren",
-            "points": "0",
-            "dnf": "DNF",
-            "pos_Change": 3,
-            "qualifying": "17",
-            "raceId": 61
-        },
-        {
-            "position": 15,
-            "driver": "Kalashni",
-            "team": "Alpine",
-            "points": "0",
-            "dnf": "DNF",
-            "pos_Change": 1,
-            "qualifying": "16",
-            "raceId": 61
-        },
-        {
-            "position": 16,
-            "driver": "Spenny",
-            "team": "McLaren",
-            "points": "0",
-            "dnf": "DNF",
-            "pos_Change": 2,
-            "qualifying": "18",
-            "raceId": 61
-        },
-        {
-            "position": 17,
-            "driver": "Alpha Dan",
-            "team": "Aston Martin",
-            "points": "0",
-            "dnf": "DNF",
-            "pos_Change": -2,
-            "qualifying": "15",
-            "raceId": 61
-        },
-        {
-            "position": 18,
-            "driver": "Darius Cotiga",
-            "team": "Alpine",
-            "points": "0",
-            "dnf": "DNF",
-            "pos_Change": -9,
-            "qualifying": "9",
-            "raceId": 61
-        }
-    ]
+[
+    {
+        "raceId": 55,
+        "position": 1,
+        "driver": "STB SemmieK",
+        "team": "Red Bull",
+        "points": 25,
+        "dnf": "No",
+        "qualifying": 7,
+        "pos_Change": 6,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 2,
+        "driver": "Kroks",
+        "team": "Aston Martin",
+        "points": 19,
+        "dnf": "No",
+        "qualifying": 8,
+        "pos_Change": 6,
+        "fastest_Lap": true
+    },
+    {
+        "raceId": 55,
+        "position": 3,
+        "driver": "xSk45x",
+        "team": "Alpha Tauri",
+        "points": 15,
+        "dnf": "No",
+        "qualifying": 5,
+        "pos_Change": 2,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 4,
+        "driver": "VIF Cxllum",
+        "team": "Williams",
+        "points": 12,
+        "dnf": "No",
+        "qualifying": 12,
+        "pos_Change": 8,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 5,
+        "driver": "Thalo4",
+        "team": "Williams",
+        "points": 10,
+        "dnf": "No",
+        "qualifying": 18,
+        "pos_Change": 13,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 6,
+        "driver": "AdamHUNlul",
+        "team": "McLaren",
+        "points": 8,
+        "dnf": "No",
+        "qualifying": 16,
+        "pos_Change": 10,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 7,
+        "driver": "Darius Cotiga",
+        "team": "Alfa Romeo",
+        "points": 6,
+        "dnf": "No",
+        "qualifying": 11,
+        "pos_Change": 4,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 8,
+        "driver": "A11ila",
+        "team": "Alfa Romeo",
+        "points": 4,
+        "dnf": "No",
+        "qualifying": 1,
+        "pos_Change": -7,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 9,
+        "driver": "SHZ Milan",
+        "team": "Mercedes",
+        "points": 2,
+        "dnf": "No",
+        "qualifying": 2,
+        "pos_Change": -7,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 10,
+        "driver": "brainycactus30",
+        "team": "Mercedes",
+        "points": 1,
+        "dnf": "No",
+        "qualifying": 4,
+        "pos_Change": -6,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 11,
+        "driver": "Joey1854",
+        "team": "Haas",
+        "points": 0,
+        "dnf": "No",
+        "qualifying": 10,
+        "pos_Change": -1,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 12,
+        "driver": "blurlxe",
+        "team": "Red Bull",
+        "points": 0,
+        "dnf": "No",
+        "qualifying": 13,
+        "pos_Change": 1,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 13,
+        "driver": "EQR Pztem",
+        "team": "Ferrari",
+        "points": 0,
+        "dnf": "No",
+        "qualifying": 6,
+        "pos_Change": -7,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 14,
+        "driver": "Spennyy F1",
+        "team": "McLaren",
+        "points": 0,
+        "dnf": "No",
+        "qualifying": 19,
+        "pos_Change": 5,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 15,
+        "driver": "Alex Ferre",
+        "team": "Alpha Tauri",
+        "points": 0,
+        "dnf": "No",
+        "qualifying": 14,
+        "pos_Change": -1,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 16,
+        "driver": "II Mafio II",
+        "team": "Aston Martin",
+        "points": 0,
+        "dnf": "Yes",
+        "qualifying": 17,
+        "pos_Change": 1,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 17,
+        "driver": "Yulian Kalenantovich",
+        "team": "Ferrari",
+        "points": 0,
+        "dnf": "Yes",
+        "qualifying": 9,
+        "pos_Change": -8,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 18,
+        "driver": "CBowers2000",
+        "team": "Alpine",
+        "points": 0,
+        "dnf": "Yes",
+        "qualifying": 3,
+        "pos_Change": -15,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 19,
+        "driver": "Astrief",
+        "team": "Alpine",
+        "points": 0,
+        "dnf": "Yes",
+        "qualifying": 15,
+        "pos_Change": -4,
+        "fastest_Lap": false
+    },
+    {
+        "raceId": 55,
+        "position": 20,
+        "driver": "",
+        "team": "",
+        "points": 0,
+        "dnf": "Yes",
+        "qualifying": 0,
+        "pos_Change": 0,
+        "fastest_Lap": false
+    }
+]

@@ -1,96 +1,62 @@
-/* Hover-effect voor rijen */
-tbody tr:hover {
-  background-color: #636363 !important; /* Donkergrijze hoverkleur */
-  transition: background-color 0.3s ease-in-out;
-  cursor: pointer; /* Pointer bij hover */
-}
-
-/* Stijl de links binnen de tabel */
-.driver-link {
-  color: #ffffff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.driver-link:hover {
-  color: #4caeff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-/* Stijl de eerste en laatste kolom met een andere achtergrondkleur, behalve voor de eerste twee rijen */
-tbody td:first-child, tbody td:last-child {
-  background-color: #9b4040; /* Donkerblauwe kleur */
-}
-
-.header-table thead tr:first-child th {
-  font-weight: bold; /* Maak de tekst dikker */
-  font-size: 2em; /* Maak de tekst iets groter */
-  color: #ffffff; /* Zorg voor contrasterende tekstkleur */
-  text-align: center; /* Centreer de tekst */
-  padding: 15px 0; /* Voeg wat extra padding toe */
-}
-
-/* Maak de bovenste twee rijen vast */
+/* Ensure header stays fixed */
 .header-table {
   position: sticky;
   top: 0;
-  background-color: #0b4e8b; /* Achtergrondkleur vastgezette rijen */
-  z-index: 2;
-  padding: 0; /* Verwijdert padding in de cel */
-  margin: 0; /* Verwijdert marge in de cel */
+  z-index: 100;
+  background-color: #0b4e8b;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  border-collapse: collapse; /* Ensures proper alignment */
 }
 
-.header-logo {
-  width: 50%; /* Vul de volledige breedte */
-  height: 50%; /* Vul de volledige hoogte */
-  object-fit: cover; /* Zorg dat de afbeelding de cel vult, zelfs als verhoudingen worden aangepast */
-  display: block; /* Verwijdert extra witruimte */
-  margin: 0; /* Geen marges rond de afbeelding */
-  padding: 0; /* Geen padding rond de afbeelding */
-  border: none; /* Verwijder ongewenste rand (indien aanwezig) */
+/* Table container must not affect layout */
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* Enables horizontal scrolling if needed */
+  margin-top: 10px;
 }
 
+/* Scrollable table container */
+.scrollable-table {
+  max-height: 70vh; /* Restrict scrolling to data */
+  overflow-y: auto;
+  width: 100%;
+  border-collapse: collapse;
+}
 
+/* Ensure the scrollable table maintains column structure */
 .scrollable {
-  table-layout: fixed; /* Maak de tabelkolommen een vaste breedte */
-  background-color: #1468b6; /* Achtergrondkleur vastgezette rijen */
-  width: 100%; /* Zorg dat beide tabellen even breed zijn */
+  width: 100%;
+  table-layout: fixed; /* Ensures consistent column sizing */
+  border-collapse: collapse;
 }
 
-/* Zorg dat de breedtes consistent zijn tussen de tabellen */
-.header-table th:first-child{
-  width: 18.3%; /* Brede kolom voor de Driver */
+/* Fix column widths */
+.header-table th,
+.scrollable td,
+.scrollable th {
+  width: calc(75% / 20); /* Distribute race columns equally */
+  text-align: center;
+  padding: 8px;
 }
 
-.header-table th:last-child{
-  width: 6.6%; /* Brede kolom voor Total Points */
+/* Ensure header columns match */
+.header-table th:first-child,
+.scrollable td:first-child {
+  width: 18%;
 }
 
-.header-table th:not(:first-child):not(:last-child){
-  width: calc(72% / 20); /* Verdeel resterende breedte over 18 racekolommen */
+.header-table th:last-child,
+.scrollable td:last-child {
+  width: 7%;
 }
 
-/* Zorg voor consistente breedte voor de driver- en puntenkolom */
-.scrollable td:first-child,
-.scrollable th:first-child {
-  width: 20%; /* Brede kolom voor de Driver */
-}
-
-.scrollable td:last-child,
-.scrollable th:last-child {
-  width: 7%; /* Brede kolom voor Total Points */
-}
-
-/* Verdeel de resterende breedte gelijkmatig over de racekolommen */
-.scrollable td:not(:first-child):not(:last-child),
-.scrollable th:not(:first-child):not(:last-child) {
-  width: calc(73% / 20); /* Aanpassen aan het aantal racekolommen */
-}
-
-.page-container {
-  background: linear-gradient(to bottom, #0b4e8b, #093b6d); /* Dynamische gradient */
-  min-height: 100vh; /* Zorg dat het minstens 100% hoogte heeft */
-  padding: 20px;
-  box-sizing: border-box;
+/* Flags inside the table */
+.race-flag {
+  width: 30px; /* Adjust flag size */
+  height: auto;
+  display: block;
+  margin: auto;
+  object-fit: contain;
+  border: none;
 }

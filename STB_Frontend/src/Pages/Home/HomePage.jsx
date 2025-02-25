@@ -34,47 +34,7 @@ function HomePage() {
 
   return (
     <div className="home-container">
-      {/* Topbar met Admin Hub-knop en Logout-knop */}
-      <div className="topbar">
-        {role === "Admin" && (
-          <button onClick={handleAdminHub} className="admin-hub-button">
-            Admin Hub
-          </button>
-        )}
-        {isLoggedIn && (
-          <button onClick={handleLogout} className="logout-button">
-            Logout
-          </button>
-        )}
-      </div>
-
-      {/* Zijbalk */}
-      <div className="sidebar">
-        <h2>Data</h2>
-        <ul>
-          {seasons.map((season) => (
-            <li key={season.year} className="season-item">
-              {/* Hoofdseizoenlink */}
-              <span className="season-label">Season {season.year}</span>
-              
-              {/* Divisies dropdown */}
-              <ul className="division-dropdown">
-                {season.divisions.map((division) => (
-                  <li key={division}>
-                    <Link
-                      to={`/STB/Championship/${season.year}/${division}`}
-                      className="division-link"
-                    >
-                      Division {division}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </div>
-
+      
       {/* Hoofdcontent */}
       <div className="main-content">
         <h1>Welcome to the Championship App</h1>
