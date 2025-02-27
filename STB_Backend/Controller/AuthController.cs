@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
         user.LoginCount++; // Verhoog login teller
         _context.SaveChanges();
 
-        return Ok(new { message = "Login successful", loginCount = user.LoginCount, role = user.Role });
+        return Ok(new { message = "Login successful", loginCount = user.LoginCount, role = user.Role, name = user.Username });
     }
 
     // 🔹 Register endpoint

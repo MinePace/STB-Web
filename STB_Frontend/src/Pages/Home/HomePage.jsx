@@ -37,7 +37,7 @@ function HomePage() {
       
       {/* Hoofdcontent */}
       <div className="main-content">
-        <h1>Welcome to the Championship App</h1>
+        <h1>Welcome to the STB Website</h1>
         <p>Hover over a season to select a division.</p>
       </div>
     </div>

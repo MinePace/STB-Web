@@ -68,6 +68,7 @@ function RaceResultPage() {
     "Sauber": "rgb(18, 79, 160)",
     "Force India": "rgb(255, 130, 234)",
     "Toro Rosso": "rgb(0, 44, 238)",
+    "Racing Bulls": "rgb(245, 245, 245)",
   };
 
   return (

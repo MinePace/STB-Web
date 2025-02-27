@@ -20,9 +20,9 @@
 
   .video-player {
     position: absolute;
+    margin: 0px;
     top: 10%;
     left: 10%;
-    width: 400px; /* Adjust width as needed */
+    width: 375px; /* Adjust width as needed */
     height: 180px; /* Adjust height as needed */
-    z-index: 1000; /* Ensures it stays on top */
   }

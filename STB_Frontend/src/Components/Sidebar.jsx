@@ -6,7 +6,7 @@ function Sidebar() {
   const seasons = [
     { year: 28, divisions: ["1", "2", "3"]},
     { year: 25, divisions: ["1"] },
-    { year: 24, divisions: ["1"] },
+    { year: 24, divisions: ["1", "2"] },
     { year: 23, divisions: ["1"] },
     { year: 22, divisions: ["1", "2", "3"] },
     { year: 21, divisions: ["1", "2"] },

@@ -120,37 +120,6 @@ public class RaceController : ControllerBase
         return Ok(race );
     }
 
-    [HttpGet("driver/stats/{driverName}")]
-    public IActionResult GetDriverStats(string driverName)
-    {
-        var driverResults = _context.RaceResults
-            .Where(r => r.Driver == driverName)
-            .ToList();
-
-        if (!driverResults.Any())
-            return NotFound(new { message = "Driver not found" });
-
-        var totalPoints = driverResults.Sum(r => r.Points);
-        var poles = driverResults.Count(r => r.Qualifying == 1);
-        var wins = driverResults.Count(r => r.Position == 1);
-        var podiums = driverResults.Count(r => r.Position <= 3);
-        var averagePosition = driverResults.Average(r => r.Position);
-        var races = driverResults.Count();
-
-        var stats = new
-        {
-            driver = driverName,
-            totalPoints,
-            poles,
-            wins,
-            podiums,
-            averagePosition,
-            races
-        };
-
-        return Ok(stats);
-    }
-
     [HttpGet("results/{raceId}")]
     public IActionResult GetRaceResults(int raceId)
     {

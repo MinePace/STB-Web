@@ -1,9 +1,47 @@
 /* Ensure the table header stays fixed */
 .header-table {
   position: sticky;
-  background-color: rgba(0, 76, 169, 0.715);
+  background-color: rgb(0, 76, 169);
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
 }
+
+/* Wrapper to control scrollbar placement */
+.scrollable-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-y: auto; /* Ensure vertical scrolling */
+  max-height: 60vh; /* Prevent it from taking full screen */
+  margin: 0 auto; /* Center the table */
+}
+
+/* Apply to the wrapper to control scrollbar appearance */
+.scrollable-wrapper::-webkit-scrollbar {
+  width: 1px; /* Super thin vertical scrollbar */
+}
+
+/* The track (background of the scrollbar) */
+.scrollable-wrapper::-webkit-scrollbar-track {
+  background: transparent; /* Make it blend in */
+}
+
+/* The draggable scrollbar itself */
+.scrollable-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.381); /* Light scrollbar */
+  border-radius: 3px;
+}
+
+/* On hover, slightly darken the scrollbar */
+.scrollable-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* Keep scrollbar outside table */
+.scrollable-table {
+  background: linear-gradient(to bottom, rgb(0, 90, 199), rgb(0, 50, 110)); 
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+  display: block; /* Ensures proper rendering */
+}
+
 
 /* Ensure fixed width for all table columns */
 .header-table th,
@@ -38,6 +76,14 @@
   background-color: rgb(147, 59, 59)
 }
 
+/* Target only the first row in the table body */
+/* Target only the first cell (first column) of the first row */
+.scrollable-table tbody tr:first-child td:first-child {
+  color: rgb(255, 215, 0) !important; /* Black text */
+  font-weight: bold; /* Make the text bold */
+}
+
+
 /* Ensure flags scale properly */
 .race-flag {
   width: 100%; /* Ensure flag takes full column width */
@@ -51,4 +97,39 @@
 .scrollable-table tbody tr:hover {
   background-color: rgba(200, 200, 200, 0.6); /* Light gray background */
   transition: background-color 0.3s ease-in-out; /* Smooth fade effect */
+}
+
+/* General button styling */
+.download-button {
+  background-color: #004ca9; /* Default button color */
+  color: white; /* Text color */
+  font-size: 16px; /* Adjust font size */
+  font-weight: bold;
+  padding: 10px 20px; /* Add padding */
+  border: none; /* Remove border */
+  border-radius: 8px; /* Rounded corners */
+  cursor: pointer; /* Indicate clickable button */
+  transition: all 0.3s ease-in-out; /* Smooth transition for hover effects */
+  display: block;
+  margin: 15px auto; /* Center button */
+  text-align: center;
+}
+
+/* Hover effect */
+.download-button:hover {
+  background-color: #003b85; /* Darker blue */
+  transform: scale(1.05); /* Slightly increase size */
+}
+
+/* Active (click) effect */
+.download-button:active {
+  background-color: #002a5f; /* Even darker blue */
+  transform: scale(0.95); /* Slightly shrink */
+}
+
+/* Disabled state */
+.download-button:disabled {
+  background-color: #7a7a7a; /* Gray color when disabled */
+  cursor: not-allowed; /* Change cursor */
+  opacity: 0.6;
 }

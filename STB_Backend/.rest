@@ -1,4 +1,9 @@
-GET http://localhost:5110/api/championship/races/28/1
+Put http://localhost:5110/api/driver/claim/97
+Content-Type: application/json
+
+{
+    "username": "Brainy"
+}
 
 ##########
 
@@ -52,8 +57,7 @@ Content-Type: application/json
         "points": 25,
         "dnf": "No",
         "qualifying": 7,
-        "pos_Change": 6,
-        "fastest_Lap": false
+        "pos_Change": 6
     },
     {
         "raceId": 55,
@@ -63,8 +67,7 @@ Content-Type: application/json
         "points": 19,
         "dnf": "No",
         "qualifying": 8,
-        "pos_Change": 6,
-        "fastest_Lap": true
+        "pos_Change": 6
     },
     {
         "raceId": 55,
@@ -74,8 +77,7 @@ Content-Type: application/json
         "points": 15,
         "dnf": "No",
         "qualifying": 5,
-        "pos_Change": 2,
-        "fastest_Lap": false
+        "pos_Change": 2
     },
     {
         "raceId": 55,
@@ -85,8 +87,7 @@ Content-Type: application/json
         "points": 12,
         "dnf": "No",
         "qualifying": 12,
-        "pos_Change": 8,
-        "fastest_Lap": false
+        "pos_Change": 8
     },
     {
         "raceId": 55,
@@ -96,8 +97,7 @@ Content-Type: application/json
         "points": 10,
         "dnf": "No",
         "qualifying": 18,
-        "pos_Change": 13,
-        "fastest_Lap": false
+        "pos_Change": 13
     },
     {
         "raceId": 55,
@@ -107,8 +107,7 @@ Content-Type: application/json
         "points": 8,
         "dnf": "No",
         "qualifying": 16,
-        "pos_Change": 10,
-        "fastest_Lap": false
+        "pos_Change": 10
     },
     {
         "raceId": 55,
@@ -118,8 +117,7 @@ Content-Type: application/json
         "points": 6,
         "dnf": "No",
         "qualifying": 11,
-        "pos_Change": 4,
-        "fastest_Lap": false
+        "pos_Change": 4
     },
     {
         "raceId": 55,
@@ -129,8 +127,7 @@ Content-Type: application/json
         "points": 4,
         "dnf": "No",
         "qualifying": 1,
-        "pos_Change": -7,
-        "fastest_Lap": false
+        "pos_Change": -7
     },
     {
         "raceId": 55,
@@ -140,8 +137,7 @@ Content-Type: application/json
         "points": 2,
         "dnf": "No",
         "qualifying": 2,
-        "pos_Change": -7,
-        "fastest_Lap": false
+        "pos_Change": -7
     },
     {
         "raceId": 55,
@@ -151,8 +147,7 @@ Content-Type: application/json
         "points": 1,
         "dnf": "No",
         "qualifying": 4,
-        "pos_Change": -6,
-        "fastest_Lap": false
+        "pos_Change": -6
     },
     {
         "raceId": 55,
@@ -162,8 +157,7 @@ Content-Type: application/json
         "points": 0,
         "dnf": "No",
         "qualifying": 10,
-        "pos_Change": -1,
-        "fastest_Lap": false
+        "pos_Change": -1
     },
     {
         "raceId": 55,
@@ -173,8 +167,7 @@ Content-Type: application/json
         "points": 0,
         "dnf": "No",
         "qualifying": 13,
-        "pos_Change": 1,
-        "fastest_Lap": false
+        "pos_Change": 1
     },
     {
         "raceId": 55,
@@ -184,8 +177,7 @@ Content-Type: application/json
         "points": 0,
         "dnf": "No",
         "qualifying": 6,
-        "pos_Change": -7,
-        "fastest_Lap": false
+        "pos_Change": -7
     },
     {
         "raceId": 55,
@@ -195,8 +187,7 @@ Content-Type: application/json
         "points": 0,
         "dnf": "No",
         "qualifying": 19,
-        "pos_Change": 5,
-        "fastest_Lap": false
+        "pos_Change": 5
     },
     {
         "raceId": 55,
@@ -206,8 +197,7 @@ Content-Type: application/json
         "points": 0,
         "dnf": "No",
         "qualifying": 14,
-        "pos_Change": -1,
-        "fastest_Lap": false
+        "pos_Change": -1
     },
     {
         "raceId": 55,
@@ -217,8 +207,7 @@ Content-Type: application/json
         "points": 0,
         "dnf": "Yes",
         "qualifying": 17,
-        "pos_Change": 1,
-        "fastest_Lap": false
+        "pos_Change": 1
     },
     {
         "raceId": 55,
@@ -228,8 +217,7 @@ Content-Type: application/json
         "points": 0,
         "dnf": "Yes",
         "qualifying": 9,
-        "pos_Change": -8,
-        "fastest_Lap": false
+        "pos_Change": -8
     },
     {
         "raceId": 55,
@@ -239,8 +227,7 @@ Content-Type: application/json
         "points": 0,
         "dnf": "Yes",
         "qualifying": 3,
-        "pos_Change": -15,
-        "fastest_Lap": false
+        "pos_Change": -15
     },
     {
         "raceId": 55,
@@ -250,8 +237,7 @@ Content-Type: application/json
         "points": 0,
         "dnf": "Yes",
         "qualifying": 15,
-        "pos_Change": -4,
-        "fastest_Lap": false
+        "pos_Change": -4
     },
     {
         "raceId": 55,
@@ -261,7 +247,6 @@ Content-Type: application/json
         "points": 0,
         "dnf": "Yes",
         "qualifying": 0,
-        "pos_Change": 0,
-        "fastest_Lap": false
+        "pos_Change": 0
     }
 ]

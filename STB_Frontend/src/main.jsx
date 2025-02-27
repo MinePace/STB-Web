@@ -26,7 +26,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/STB/Driver/:driverName" element={<Layout showSidebar={true}><DriverPage /></Layout>} />
       <Route path="/STB/Race/:raceId" element={<Layout showSidebar={true}><RaceResultPage /></Layout>} />
       <Route path="/admin" element={<AdminPage />} />
-      <Route path="/login" element={<Layout showSidebar={false}><LoginPage /></Layout>} />
+      <Route path="/login" element={<Layout showSidebar={true}><LoginPage /></Layout>} />
       <Route path="/STB/Add/RaceResults" element={<Layout showSidebar={true}><AddRaceResultPage /></Layout>} />
       <Route path="/STB/Add/Track" element={<AddTrackPage />} />
       <Route path="/STB/Add/Race" element={<AddRacePage />} />

@@ -9,6 +9,7 @@ public class DataContext : DbContext
     public DbSet<RaceResult> RaceResults { get; set; }
     public DbSet<Race> Races { get; set; }
     public DbSet<Track> Tracks { get; set; }
+    public DbSet<Driver> Drivers { get; set; }
 }
 
 public class RaceResult
@@ -58,4 +59,13 @@ public class Track{
     public int Id { get; set; }
     public string Name { get; set; }
     public string Country { get; set; }
+}
+
+public class Driver{
+    [Key]
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string? Country { get; set; }
+    public User? User { get; set; }
+    public int? UserId { get; set; }
 }

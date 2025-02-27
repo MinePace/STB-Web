@@ -1,0 +1,34 @@
+/* General button styling */
+.claim-button {
+    background-color: #004ca9; /* Default button color */
+    color: white; /* Text color */
+    font-size: 16px; /* Adjust font size */
+    font-weight: bold;
+    padding: 10px 20px; /* Add padding */
+    border: none; /* Remove border */
+    border-radius: 8px; /* Rounded corners */
+    cursor: pointer; /* Indicate clickable button */
+    transition: all 0.3s ease-in-out; /* Smooth transition for hover effects */
+    display: block;
+    margin: 15px auto; /* Center button */
+    text-align: center;
+  }
+  
+  /* Hover effect */
+  .claim-button:hover {
+    background-color: #004190; /* Darker blue */
+    transform: scale(1.05); /* Slightly increase size */
+  }
+  
+  /* Active (click) effect */
+  .claim-button:active {
+    background-color: #002a5f; /* Even darker blue */
+    transform: scale(0.95); /* Slightly shrink */
+  }
+  
+  /* Disabled state */
+  .claim-button:disabled {
+    background-color: #7a7a7a; /* Gray color when disabled */
+    cursor: not-allowed; /* Change cursor */
+    opacity: 0.6;
+  }

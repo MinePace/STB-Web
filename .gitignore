@@ -1,3 +1,6 @@
 /STB_Backend/obj
 /STB_Backend/obj/Debug
 /STB_Backend/obj/Debug/net8.0
+*.dll
+*.pdb
+/STB_Backend/obj/Debug/net8.0

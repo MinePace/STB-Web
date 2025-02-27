@@ -14,13 +14,20 @@ function LoginPage() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/"); // Stuur ingelogde gebruiker direct naar home
+      navigate("/"); // Redirect logged-in users to home
     }
   }, [isLoggedIn, navigate]);
 
   const toggleForm = () => setIsRegistering(!isRegistering);
 
-  // 🔹 Registreren
+  // 🔹 Handle Enter key press for login/register
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      isRegistering ? handleRegister() : handleLogin();
+    }
+  };
+
+  // 🔹 Register
   const handleRegister = async () => {
     const response = await fetch("http://localhost:5110/api/auth/register", {
       method: "POST",
@@ -32,7 +39,7 @@ function LoginPage() {
     alert(data.message);
   };
 
-  // 🔹 Inloggen
+  // 🔹 Login
   const handleLogin = async () => {
     const response = await fetch("http://localhost:5110/api/auth/login", {
       method: "POST",
@@ -46,23 +53,24 @@ function LoginPage() {
     if (response.ok) {
       alert("Login successful");
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role); // Admin of user opslaan
+      localStorage.setItem("role", data.role);
+      localStorage.setItem("name", data.name);
       setIsLoggedIn(true);
       setRole(data.role);
-      navigate("/"); // Navigeer naar de homepage
+      navigate("/"); // Redirect to homepage
     } else {
       alert(data.message);
     }
   };
 
-  // 🔹 Uitloggen
+  // 🔹 Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
     setIsLoggedIn(false);
     setRole("user");
     alert("Logged out");
-    navigate("/login"); // Terug naar loginpagina na uitloggen
+    navigate("/login");
   };
 
   return (
@@ -77,15 +85,30 @@ function LoginPage() {
           <>
             <h1>{isRegistering ? "Register" : "Login"}</h1>
             <label>Username</label>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+            <input 
+              type="text" 
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)} 
+              onKeyDown={handleKeyDown} 
+            />
 
             <label>Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              onKeyDown={handleKeyDown} 
+            />
 
             {isRegistering && (
               <>
                 <label>Email</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <input 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  onKeyDown={handleKeyDown} 
+                />
               </>
             )}
 
