@@ -20,6 +20,13 @@ function EditRacePage() {
     trackCountry: "",
   });
 
+  useEffect(() => {
+      const role = localStorage.getItem("role");
+      if (role !== "Admin") {
+        navigate("/"); // Stuur terug naar homepage als geen admin
+      }
+    }, [navigate]);
+
   // Haal beschikbare seizoenen op bij het laden van de pagina
   useEffect(() => {
     fetch(`http://localhost:5110/api/race/seasons`)

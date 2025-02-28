@@ -39,6 +39,7 @@ public class User
     public string Email { get; set; }
     public string Role { get; set; } = "User"; // Standaard rol
     public int LoginCount { get; set; } = 0; // Hoe vaak ingelogd
+    public bool DriverClaimed { get; set; } // Heeft een driver geclaimed
 }
 
 public class Race{

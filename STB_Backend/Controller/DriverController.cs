@@ -17,14 +17,43 @@ public class DriverController : ControllerBase
     }
 
     [HttpGet("{name}")]
-    public IActionResult GetDriver(string name)
+    public IActionResult GetDriverByName(string name)
     {
         var driver  = _context.Drivers
             .Where(d => d.Name == name)
-            .FirstOrDefaultAsync();
+            .Include(d => d.User)
+            .FirstOrDefault();
 
         if (driver == null)
         return NotFound(new { message = "No driver was found with this name." });
+
+        return Ok(driver);
+    }
+
+    [HttpGet("id/{id}")]
+    public IActionResult GetDriverById(int id)
+    {
+        var driver  = _context.Drivers
+            .Where(d => d.Id == id)
+            .Include(d => d.User)
+            .FirstOrDefault();
+
+        if (driver == null)
+        return NotFound(new { message = "No driver was found with this id." });
+
+        return Ok(driver);
+    }
+
+    [HttpGet("user/{userName}")]
+    public IActionResult GetDriverByUserId(string userName)
+    {
+        var driver  = _context.Drivers
+            .Include(d => d.User)
+            .Where(d => d.User.Username == userName)
+            .FirstOrDefault();
+
+        if (driver == null)
+        return NotFound(new { message = "No driver was found with this userName." });
 
         return Ok(driver);
     }
@@ -55,19 +84,19 @@ public class DriverController : ControllerBase
             podiums,
             averagePosition,
             races,
-            driverOBJ = _context.Drivers.Where(d => d.Name == driverName).FirstOrDefault()
+            driverOBJ = _context.Drivers.Where(d => d.Name == driverName).Include(d => d.User).FirstOrDefault()
         };
 
         return Ok(stats);
     }
 
-    [HttpPut("claim/{driverId}")]
-    public IActionResult ClaimDriver(int driverId, [FromBody] ClaimDriverRequest request)
+    [HttpPut("claim/{driverName}")]
+    public IActionResult ClaimDriver(string driverName, [FromBody] ClaimDriverRequest request)
     {
         if (request == null || string.IsNullOrEmpty(request.Username))
             return BadRequest(new { message = "Username is required" });
 
-        var driver = _context.Drivers.FirstOrDefault(d => d.Id == driverId);
+        var driver = _context.Drivers.FirstOrDefault(d => d.Name == driverName);
         if (driver == null)
             return NotFound(new { message = "Driver not found" });
 
@@ -77,10 +106,32 @@ public class DriverController : ControllerBase
 
         driver.UserId = user.Id;
         driver.User = user;
+        user.DriverClaimed = true;
+
         _context.Drivers.Update(driver);
+        _context.Users.Update(user);
+
         _context.SaveChanges();
 
         return Ok(new { message = "Driver claimed", driver });
+    }
+
+    [HttpPut("update/{driverId}")]
+    public IActionResult UpdateDriver(int driverId, [FromBody] DriverRequest request)
+    {
+        var driver = _context.Drivers.FirstOrDefault(d => d.Id == driverId);
+        if (driver == null)
+            return NotFound(new { message = "Driver not found" });
+
+        var user = _context.Users.FirstOrDefault(u => u.Id == request.UserId);
+        if (user == null)
+            return NotFound(new { message = "User not found" });
+
+        driver.User = user;
+        _context.Drivers.Update(driver);
+        _context.SaveChanges();
+
+        return Ok(new { message = "Driver Updated", driver });
     }
 
     public class ClaimDriverRequest
@@ -88,4 +139,11 @@ public class DriverController : ControllerBase
         public string Username { get; set; } // ✅ Define the username field correctly
     }
 
+    public class DriverRequest
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string? Country { get; set; }
+        public int? UserId { get; set; }
+    }
 }

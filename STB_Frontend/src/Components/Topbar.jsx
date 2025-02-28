@@ -1,15 +1,32 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Topbar.css";
 
 function Topbar() {
+  const [claimedDriver, setClaimedDriver] = useState(null);
   const isLoggedIn = localStorage.getItem("token") !== null;
+  const username = localStorage.getItem("name") || "";
   const role = localStorage.getItem("role") || "user";
   const navigate = useNavigate();
+
+  // ✅ Fetch the claimed driver when component mounts
+  useEffect(() => {
+    if (isLoggedIn && username) {
+      fetch(`http://localhost:5110/api/driver/user/${username}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data) {
+            setClaimedDriver(data);
+          }
+        })
+        .catch((err) => console.error("Error fetching claimed driver:", err));
+    }
+  }, [isLoggedIn, username]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
+    localStorage.removeItem("name");
     alert("Logged out");
     navigate("/login");
   };
@@ -31,7 +48,17 @@ function Topbar() {
               <Link to="/admin" className="nav-link">Admin Hub</Link>
             </li>
           )}
-          {!isLoggedIn && (
+          {isLoggedIn && claimedDriver ? (
+            <li>
+              <Link to={`/STB/Driver/${claimedDriver.name}`} className="nav-link">
+                My Driver
+              </Link>
+            </li>
+          ) : isLoggedIn ? (
+            <li>
+              <span className="no-driver-message">You need to claim a driver first!</span>
+            </li>
+          ) : (
             <li>
               <Link to="/login" className="nav-link">Login</Link>
             </li>

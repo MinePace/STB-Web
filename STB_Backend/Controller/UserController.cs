@@ -27,4 +27,30 @@ public class UserController : ControllerBase
 
         return Ok(driver);
     }
+
+    [HttpPut("update/{id}")]
+    public IActionResult UpdateUser(int id, [FromBody] UserRequest userDTO)
+    {
+        var user = _context.Users.FirstOrDefault(u => u.Id == id);
+        if (user == null)
+            return NotFound(new { message = "User not found" });
+
+        user.Username = userDTO.Username;
+        user.Email = userDTO.Email;
+        user.Role = userDTO.Role;
+        user.DriverClaimed = userDTO.DriverClaimed;
+
+        _context.SaveChanges();
+
+        return Ok(user);
+    }
+
+    public class UserRequest
+    {
+        public int Id { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; }
+        public bool DriverClaimed { get; set; }
+    }
 }

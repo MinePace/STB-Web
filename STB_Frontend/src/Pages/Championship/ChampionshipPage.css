@@ -10,6 +10,7 @@
   width: 100%;
   max-width: 100%;
   overflow-y: auto; /* Ensure vertical scrolling */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
   max-height: 60vh; /* Prevent it from taking full screen */
   margin: 0 auto; /* Center the table */
 }

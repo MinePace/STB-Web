@@ -1,13 +1,29 @@
-Put http://localhost:5110/api/driver/claim/97
+Put http://localhost:5110/api/driver/update/97
 Content-Type: application/json
 
 {
-    "username": "Brainy"
+  "id": 97,
+  "name": "brainyCactus30",
+  "country": null,
+  "userId": 5
 }
 
 ##########
 
-GET http://localhost:5110/api/championship/28/1
+GET http://localhost:5110/api/driver/id/97
+
+##########
+
+Put http://localhost:5110/api/user/update/5
+Content-Type: application/json
+
+{
+  "id": 5,
+  "userName": "Brainy",
+  "email": "BrainyC@gmail.com",
+  "role": "user",
+  "driverClaimed": true
+}
 
 ##########
 

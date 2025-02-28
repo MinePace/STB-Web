@@ -1,0 +1,39 @@
+.edit-race-results-container {
+    text-align: center;
+    color: white;
+  }
+  
+  .race-results-table {
+    width: 90%;
+    margin: 20px auto;
+    border-collapse: collapse;
+  }
+  
+  .race-results-table th, .race-results-table td {
+    padding: 8px;
+    border: 1px solid white;
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+  .compact-input, .compact-select {
+    width: 80px;
+    text-align: center;
+  }
+  
+  .save-btn {
+    background-color: green;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .cancel-btn {
+    background-color: red;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+  

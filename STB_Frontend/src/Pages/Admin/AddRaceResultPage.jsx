@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 // Points Table for Main and Sprint Races
 const MAIN_RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -10,8 +11,16 @@ function AddRaceResults() {
   const [existingResults, setExistingResults] = useState(new Set()); // Store race IDs that have results
   const [selectedRace, setSelectedRace] = useState(null);
   const [raceResults, setRaceResults] = useState([]);
+  const navigate = useNavigate();
 
   const driverInputRef = useRef(null);
+
+  useEffect(() => {
+      const role = localStorage.getItem("role");
+      if (role !== "Admin") {
+        navigate("/"); // Stuur terug naar homepage als geen admin
+      }
+    }, [navigate]);
 
   // Fetch races and existing results
   useEffect(() => {

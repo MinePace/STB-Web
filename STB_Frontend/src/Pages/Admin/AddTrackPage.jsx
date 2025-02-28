@@ -1,7 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 function AddTrackPage() {
   const [track, setTrack] = useState({ name: "", country: "" });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+        const role = localStorage.getItem("role");
+        if (role !== "Admin") {
+          navigate("/"); // Stuur terug naar homepage als geen admin
+        }
+      }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

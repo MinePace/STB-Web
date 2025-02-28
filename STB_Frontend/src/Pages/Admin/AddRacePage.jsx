@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
 function AddRacePage() {
   const [race, setRace] = useState({
@@ -12,6 +13,14 @@ function AddRacePage() {
     youtubeLink: "",
   });
   const [tracks, setTracks] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+      const role = localStorage.getItem("role");
+      if (role !== "Admin") {
+        navigate("/"); // Stuur terug naar homepage als geen admin
+      }
+    }, [navigate]);
 
   useEffect(() => {
     // Haal beschikbare tracks op
