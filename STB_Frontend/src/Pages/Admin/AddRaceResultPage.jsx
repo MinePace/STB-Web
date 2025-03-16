@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import CreatableSelect from "react-select/creatable";
 
 // Points Table for Main and Sprint Races
 const MAIN_RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -226,7 +225,7 @@ function AddRaceResults() {
 
       {/* Results Form */}
       <div className="result-form">
-        <h2>Add Results for {selectedRace.track.raceName}</h2>
+        <h2>Add Results for {selectedRace?.track?.raceName}</h2>
         <table>
         <thead>
           <tr>

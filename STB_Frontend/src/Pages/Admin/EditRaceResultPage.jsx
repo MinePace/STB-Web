@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./EditRaceResultPage.css";
 
 function EditRaceResults() {
@@ -118,7 +119,34 @@ function EditRaceResults() {
     } else {
       alert("Failed to delete result.");
     }
-  };  
+  };
+  
+  const handleDragEnd = (result) => {
+    if (!result.destination) return; // If dropped outside the list, do nothing
+  
+    setRaceResults((prevResults) => {
+      // Clone the array to avoid mutating state directly
+      const updatedResults = [...prevResults];
+  
+      // Move the dragged row to the new position
+      const [movedRow] = updatedResults.splice(result.source.index, 1);
+      updatedResults.splice(result.destination.index, 0, movedRow);
+  
+      // ✅ Recalculate positions **before updating state**
+      updatedResults.forEach((row, index) => {
+        row.position = index + 1; // Assign new position
+      });
+  
+      return updatedResults;
+    });
+  
+    // ✅ Immediately update `editedResults` using `handleInputChange`
+    setTimeout(() => {
+      raceResults.forEach((row) => {
+        handleInputChange(row.id, "position", row.position);
+      });
+    }, 0); // ✅ Runs after `setRaceResults` to ensure fresh data
+  };    
 
   return (
     <div className="edit-race-results-container">
@@ -173,67 +201,71 @@ function EditRaceResults() {
                 <th>Actions</th>
               </tr>
             </thead>
-            <tbody>
-              {raceResults.map((result) => (
-                <tr key={result.id}>
-                  <td>
-                    <input
-                      type="number"
-                      className="compact-input"
-                      value={editedResults[result.id]?.position || result.position}
-                      onChange={(e) => handleInputChange(result.id, "position", parseInt(e.target.value))}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="compact-input"
-                      value={editedResults[result.id]?.driver || result.driver}
-                      onChange={(e) => handleInputChange(result.id, "driver", e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="compact-input"
-                      value={editedResults[result.id]?.team || result.team}
-                      onChange={(e) => handleInputChange(result.id, "team", e.target.value)}
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      className="compact-input"
-                      value={editedResults[result.id]?.points || result.points}
-                      onChange={(e) => handleInputChange(result.id, "points", parseInt(e.target.value))}
-                    />
-                  </td>
-                  <td>
-                    <select
-                      className="compact-select"
-                      value={editedResults[result.id]?.dnf || result.dnf}
-                      onChange={(e) => handleInputChange(result.id, "dnf", e.target.value)}
-                    >
-                      <option value="No">No</option>
-                      <option value="Yes">Yes</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input
-                      type="number"
-                      className="compact-input"
-                      value={editedResults[result.id]?.qualifying || result.qualifying}
-                      onChange={(e) => handleInputChange(result.id, "qualifying", parseInt(e.target.value))}
-                    />
-                  </td>
-                  <td>{editedResults[result.id]?.pos_Change ?? result.pos_Change}</td>
-                  <td>
-                    <button className="save-btn" onClick={() => handleSave(result.id)}>Save</button>
-                    <button className="delete-btn" onClick={() => handleDelete(result.id)}>Delete</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="raceResults">
+                {(provided) => (
+                  <tbody ref={provided.innerRef} {...provided.droppableProps}>
+                    {raceResults.map((result, index) => (
+                      <Draggable key={result.id} draggableId={result.id.toString()} index={index}>
+                        {(provided) => (
+                          <tr ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                            <td>{result.position}</td>
+                            <td>
+                              <input
+                                type="text"
+                                className="compact-input"
+                                value={editedResults[result.id]?.driver || result.driver}
+                                onChange={(e) => handleInputChange(result.id, "driver", e.target.value)}
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="text"
+                                className="compact-input"
+                                value={editedResults[result.id]?.team || result.team}
+                                onChange={(e) => handleInputChange(result.id, "team", e.target.value)}
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="number"
+                                className="compact-input"
+                                value={editedResults[result.id]?.points || result.points}
+                                onChange={(e) => handleInputChange(result.id, "points", parseInt(e.target.value))}
+                              />
+                            </td>
+                            <td>
+                              <select
+                                className="compact-select"
+                                value={editedResults[result.id]?.dnf || result.dnf}
+                                onChange={(e) => handleInputChange(result.id, "dnf", e.target.value)}
+                              >
+                                <option value="No">No</option>
+                                <option value="Yes">Yes</option>
+                              </select>
+                            </td>
+                            <td>
+                              <input
+                                type="number"
+                                className="compact-input"
+                                value={editedResults[result.id]?.qualifying || result.qualifying}
+                                onChange={(e) => handleInputChange(result.id, "qualifying", parseInt(e.target.value))}
+                              />
+                            </td>
+                            <td>{editedResults[result.id]?.pos_Change ?? result.pos_Change}</td>
+                            <td>
+                              <button className="save-btn" onClick={() => handleSave(result.id)}>Save</button>
+                              <button className="delete-btn" onClick={() => handleDelete(result.id)}>Delete</button>
+                            </td>
+                          </tr>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </tbody>
+                )}
+              </Droppable>
+            </DragDropContext>
           </table>
           <button className="cancel-btn" onClick={() => navigate(-1)}>Cancel</button>
         </>
