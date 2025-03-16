@@ -1,26 +1,17 @@
-import sqlite3
+import pandas as pd
+from sqlalchemy import create_engine
 
-# Path to SQLite database
-db_path = "C:/Users/joeyz/Documents/GitHub/STB-Web/STB_Backend/Data.db"
+# Define the database connection (for SQLite)
+DATABASE_PATH = "C:/Users/joeyz/Documents/GitHub/STB-Web/STB_Backend/Data.db"
+engine = create_engine(f"sqlite:///{DATABASE_PATH}")
 
-# Connect to the database
-conn = sqlite3.connect(db_path)
-cursor = conn.cursor()
+# Load CSV file
+CSV_FILE_PATH = "C:/Users/joeyz/Documents/GitHub/STB-Web/STB_Backend/STB Season 21 - Tier 1 - Results2.csv"  # Change this to your actual CSV file path
 
-# Step 1: Fetch unique driver names from RaceResults
-cursor.execute("SELECT DISTINCT Driver FROM RaceResults;")
-drivers = cursor.fetchall()  # List of tuples
+# Read CSV into Pandas DataFrame
+df = pd.read_csv(CSV_FILE_PATH)
 
-# Step 2: Insert driver names into Drivers if they don't already exist
-for (driver_name,) in drivers:
-    cursor.execute("SELECT COUNT(*) FROM Drivers WHERE Name = ?;", (driver_name,))
-    exists = cursor.fetchone()[0]
+# Insert data into the database
+df.to_sql("RaceResults", con=engine, if_exists="append", index=False)
 
-    if exists == 0:  # If driver does not exist, insert it
-        cursor.execute("INSERT INTO Drivers (Name) VALUES (?);", (driver_name,))
-
-# Commit changes and close connection
-conn.commit()
-conn.close()
-
-print("Driver names transferred successfully.")
+print("Data inserted successfully!")

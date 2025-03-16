@@ -45,7 +45,6 @@ public class User
 public class Race{
     [Key]
     public int Id { get; set; }
-    public string Name { get; set; }
     public int F1_Game { get; set; }
     public int Season { get; set; }
     public int Division { get; set; }
@@ -59,6 +58,7 @@ public class Track{
     [Key]
     public int Id { get; set; }
     public string Name { get; set; }
+    public string RaceName { get; set; }
     public string Country { get; set; }
 }
 

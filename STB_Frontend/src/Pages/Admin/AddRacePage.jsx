@@ -5,7 +5,6 @@ function AddRacePage() {
   const [race, setRace] = useState({
     game: "",
     season: "",
-    name: "",
     division: "",
     round: "",
     sprint: "",
@@ -46,30 +45,31 @@ function AddRacePage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     // Verstuur racegegevens naar de backend
     const response = await fetch("http://localhost:5110/api/race", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(race),
     });
-    console.log(race);   
+  
     if (response.ok) {
       alert("Race added successfully!");
-      setRace({
-        game: "",
-        season: "",
-        name: "",
-        division: "",
-        round: "",
-        sprint: "",
-        trackId: null,
+      
+      // Reset alleen de velden die je wilt resetten
+      setRace((prev) => ({
+        game: prev.game, // Blijft hetzelfde
+        season: prev.season, // Blijft hetzelfde
+        division: prev.division, // Blijft hetzelfde
+        round: parseInt(prev.round, 10) + 1,
+        sprint: prev.sprint,
+        trackId: "",
         youtubeLink: "",
-      }); // Reset het formulier
+      }));
     } else {
       alert("Failed to add race. Please try again.");
     }
-  };
+  };  
 
   return (
     <div className="add-race-page">
@@ -88,14 +88,6 @@ function AddRacePage() {
           name="season"
           placeholder="Season"
           value={race.season}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="text"
-          name="name"
-          placeholder="Name"
-          value={race.name}
           onChange={handleInputChange}
           required
         />

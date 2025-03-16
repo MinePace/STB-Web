@@ -32,13 +32,14 @@ public class RaceController : ControllerBase
     public IActionResult GetAllRaces()
     {
         var races  = _context.Races
+            .Include(r => r.Track)
             .ToList();
 
         if (!races.Any())
         return NotFound(new { message = "No races were found." });
 
         foreach(var race in races){
-            var track = _context.Tracks.FirstOrDefault(t => t.Id == race.Id);
+            var track = _context.Tracks.FirstOrDefault(t => t.Id == race.Track.Id);
             race.Track = track;
         }
 
@@ -152,7 +153,29 @@ public class RaceController : ControllerBase
 
         foreach (var result in raceResults)
         {
+
             if(!string.IsNullOrWhiteSpace(result.Driver)){
+
+                var existingDriver = await _context.Drivers.FirstOrDefaultAsync(d => d.Name == result.Driver);
+
+                if (existingDriver == null)
+                {
+                    existingDriver = new Driver
+                    {
+                        Country = null,
+                        Name = result.Driver,
+                        UserId = null
+                    };
+
+                    _context.Drivers.Add(existingDriver);
+                    await _context.SaveChangesAsync();
+                }  
+
+                if (result.DNF == "Yes")
+                {
+                    result.Points = 0;
+                }
+
                 var NewResult = new RaceResult
                 {
                     RaceId = result.RaceId,
@@ -232,7 +255,6 @@ public class RaceController : ControllerBase
         }
 
         var Race = new Race{
-            Name = race.Name,
             F1_Game = race.Game,
             Season = race.Season,
             Division = race.Division,
@@ -246,7 +268,7 @@ public class RaceController : ControllerBase
         _context.Races.Add(Race);
         await _context.SaveChangesAsync();
 
-        return Ok(new { message = $"{race.Name} added successfully!" });
+        return Ok(new { message = $"{race.Round} added successfully!" });
     }
 
     [HttpPut("update/{id}")]
@@ -257,7 +279,6 @@ public class RaceController : ControllerBase
         if (race == null)
             return NotFound("Race not found.");
 
-        race.Name = updatedRace.Name;
         race.F1_Game = updatedRace.F1_Game;
         race.Season = updatedRace.Season;
         race.Division = updatedRace.Division;
@@ -308,7 +329,6 @@ public class RaceController : ControllerBase
 
 public class RaceRequest{
     public int Id { get; set; }
-    public string Name { get; set; }
     public int Game { get; set; }
     public int Season { get; set; }
     public int Division { get; set; }

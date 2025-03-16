@@ -59,31 +59,66 @@ function EditRaceResults() {
 
   const handleInputChange = (id, field, value) => {
     setEditedResults((prev) => {
-      const updatedResult = { ...prev[id], [field]: value };
-      if (field === "position" || field === "qualifying") {
-        updatedResult.pos_Change = (updatedResult.qualifying || 0) - (updatedResult.position || 0);
+      const existingResult = prev[id] || raceResults.find((r) => r.id === id) || {};
+  
+      const updatedResult = { ...existingResult, [field]: value };
+  
+      // Ensure both position and qualifying are considered
+      const position = updatedResult.position !== undefined ? updatedResult.position : existingResult.position;
+      const qualifying = updatedResult.qualifying !== undefined ? updatedResult.qualifying : existingResult.qualifying;
+  
+      if (position !== undefined && qualifying !== undefined) {
+        updatedResult.pos_Change = qualifying - position;
       }
+  
       return { ...prev, [id]: updatedResult };
     });
-  };
+  };  
 
   const handleSave = async (id) => {
     const updatedResult = editedResults[id];
     if (!updatedResult) return;
-
-    const response = await fetch(`http://localhost:5110/api/race/result/${id}`, {
+  
+    // Constructing the RaceResultDTO object
+    const raceResultDTO = {
+      Driver: updatedResult.driver || raceResults.find(r => r.id === id).driver,
+      Team: updatedResult.team || raceResults.find(r => r.id === id).team,
+      Points: updatedResult.points || raceResults.find(r => r.id === id).points,
+      DNF: updatedResult.dnf || raceResults.find(r => r.id === id).dnf,
+      Qualifying: updatedResult.qualifying !== undefined ? updatedResult.qualifying : raceResults.find(r => r.id === id).qualifying,
+      Pos_Change: updatedResult.pos_Change !== undefined ? updatedResult.pos_Change : raceResults.find(r => r.id === id).pos_Change
+    };
+  
+    console.log("Sending Data:", raceResultDTO);
+  
+    const response = await fetch(`http://localhost:5110/api/raceresult/update/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updatedResult),
+      body: JSON.stringify(raceResultDTO),
     });
-
+  
     if (response.ok) {
       alert("Race result updated successfully!");
-      navigate(-1);
     } else {
       alert("Failed to update result.");
     }
   };
+
+  const handleDelete = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this result?");
+    if (!confirmDelete) return;
+  
+    const response = await fetch(`http://localhost:5110/api/raceresult/delete/${id}`, {
+      method: "DELETE",
+    });
+  
+    if (response.ok) {
+      alert("Race result deleted successfully!");
+      setRaceResults((prevResults) => prevResults.filter((result) => result.id !== id)); // Remove from UI
+    } else {
+      alert("Failed to delete result.");
+    }
+  };  
 
   return (
     <div className="edit-race-results-container">
@@ -114,7 +149,7 @@ function EditRaceResults() {
             <option value="">-- Select Race --</option>
             {races.map((r) => (
               <option key={r.id} value={r.id}>
-                {r.name}
+                Round: {r.round} - T{r.division}
               </option>
             ))}
           </select>
@@ -194,6 +229,7 @@ function EditRaceResults() {
                   <td>{editedResults[result.id]?.pos_Change ?? result.pos_Change}</td>
                   <td>
                     <button className="save-btn" onClick={() => handleSave(result.id)}>Save</button>
+                    <button className="delete-btn" onClick={() => handleDelete(result.id)}>Delete</button>
                   </td>
                 </tr>
               ))}

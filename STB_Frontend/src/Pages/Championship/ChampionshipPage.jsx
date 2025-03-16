@@ -64,64 +64,66 @@ function ChampionshipPage() {
     const drivers = {};
     const raceNumbers = [];
     const racePositions = {};
-
+  
     // Group races by round (merge sprint and main race)
     const groupedRaces = {};
     races.forEach((race) => {
-        const roundKey = `${race.round}`;
-        if (!groupedRaces[roundKey]) {
-            groupedRaces[roundKey] = { mainRace: null, sprintRace: null };
-        }
-        if (race.sprint === "Yes") {
-            groupedRaces[roundKey].sprintRace = race;
-        } else {
-            groupedRaces[roundKey].mainRace = race;
-        }
+      const roundKey = `${race.round}`;
+      if (!groupedRaces[roundKey]) {
+        groupedRaces[roundKey] = { mainRace: null, sprintRace: null };
+      }
+      if (race.sprint === "Yes") {
+        groupedRaces[roundKey].sprintRace = race;
+      } else {
+        groupedRaces[roundKey].mainRace = race;
+      }
     });
-
+  
     Object.keys(groupedRaces).forEach((roundKey) => {
-        raceNumbers.push(roundKey);
+      raceNumbers.push(roundKey);
     });
-
+  
     raceResults.forEach((result) => {
-        const roundKey = `${result.race.round}`;
-
-        // Ensure driver exists in object
-        if (!drivers[result.driver]) {
-            drivers[result.driver] = { totalPoints: 0 };
-        }
-        if (!drivers[result.driver][roundKey]) {
-            drivers[result.driver][roundKey] = 0;
-        }
-
-        // Prioritize main race position for racePositions
-        const raceId = result.race.id;
-        const mainRaceId = groupedRaces[roundKey]?.mainRace?.id;
-        const sprintRaceId = groupedRaces[roundKey]?.sprintRace?.id;
-
-        if (!racePositions[roundKey]) {
-            racePositions[roundKey] = {};
-        }
-
-        if (raceId === mainRaceId) {
-            // Store only main race position
-            racePositions[roundKey][result.driver] = result.position;
-        } else if (!mainRaceId && raceId === sprintRaceId) {
-            // Only use sprint race position if there is NO main race
-            racePositions[roundKey][result.driver] = result.position;
-        }
-
-        // Sum points from both races (since sprint race points still count)
+      const roundKey = `${result.race.round}`;
+  
+      // Ensure driver exists in object
+      if (!drivers[result.driver]) {
+        drivers[result.driver] = { totalPoints: 0 };
+      }
+      if (!drivers[result.driver][roundKey]) {
+        drivers[result.driver][roundKey] = 0;
+      }
+  
+      // Prioritize main race position for racePositions
+      const raceId = result.race.id;
+      const mainRaceId = groupedRaces[roundKey]?.mainRace?.id;
+      const sprintRaceId = groupedRaces[roundKey]?.sprintRace?.id;
+  
+      if (!racePositions[roundKey]) {
+        racePositions[roundKey] = {};
+      }
+  
+      if (raceId === mainRaceId) {
+        racePositions[roundKey][result.driver] = result.position;
+      } else if (!mainRaceId && raceId === sprintRaceId) {
+        racePositions[roundKey][result.driver] = result.position;
+      }
+  
+      // Check if driver DNF'd and set 'DNF' instead of points
+      if (result.dnf === "Yes" || result.dnf === "DNF") {
+        drivers[result.driver][roundKey] = "DNF";
+      } else {
         drivers[result.driver][roundKey] += result.points || 0;
         drivers[result.driver].totalPoints += result.points || 0;
+      }
     });
-
+  
     const sortedDrivers = Object.entries(drivers)
-        .map(([driver, races]) => ({ driver, ...races }))
-        .sort((a, b) => b.totalPoints - a.totalPoints);
-
+      .map(([driver, races]) => ({ driver, ...races }))
+      .sort((a, b) => b.totalPoints - a.totalPoints);
+  
     setSortedDrivers({ drivers: sortedDrivers, raceNumbers, racePositions, groupedRaces });
-  };
+  };  
 
   // Function to download table as an image
   const downloadTableAsImage = () => {
@@ -176,14 +178,14 @@ function ChampionshipPage() {
         <table className="header-table" border="1">
           <thead>
             <tr>
-              <th colSpan={(sortedDrivers.raceNumbers?.length || 0) + 2}>
+              <th colSpan={(sortedDrivers.raceNumbers?.length || 0) + 3}>
                 Championship - Season {season} - Tier {division}
               </th>
             </tr>
             <tr>
+              <th><strong>#</strong></th> {/* New Position Column */}
               <th>Driver</th>
               {sortedDrivers.raceNumbers?.map((round) => {
-                // Ensure groupedRaces exists before accessing properties
                 const groupedRace = sortedDrivers.groupedRaces?.[round];
                 const country = groupedRace?.mainRace?.track?.country || groupedRace?.sprintRace?.track?.country;
 
@@ -212,8 +214,9 @@ function ChampionshipPage() {
           <div className="scrollable-table">
             <table className="scrollable" border="1">
               <tbody>
-                {sortedDrivers.drivers?.map(({ driver, totalPoints, ...driversraces }) => (
+                {sortedDrivers.drivers?.map(({ driver, totalPoints, ...driversraces }, index) => (
                   <tr key={driver} className="table-row">
+                    <td><strong>{index + 1}</strong></td> {/* Position column added */}
                     <td>
                       <Link to={`/STB/Driver/${encodeURIComponent(driver)}`} className="driver-link">
                         {driver}
@@ -221,8 +224,6 @@ function ChampionshipPage() {
                     </td>
                     {sortedDrivers.raceNumbers?.map((round) => {
                       const groupedRace = sortedDrivers.groupedRaces?.[round];
-
-                      // Determine the correct RaceId (use mainRace if available, otherwise sprintRace)
                       let RaceId = groupedRace?.mainRace?.id || groupedRace?.sprintRace?.id;
 
                       const isWinner = sortedDrivers.racePositions?.[round]?.[driver] === 1;
@@ -239,7 +240,9 @@ function ChampionshipPage() {
                               : "transparent",
                           }}
                         >
-                          {RaceId ? (
+                          {driversraces[round] === "DNF" ? ( // Check if DNF
+                            <span style={{ color: "rgb(200, 50, 50)", fontWeight: "bold" }}>DNF</span> // Red-ish color
+                          ) : RaceId ? (
                             <Link to={`/STB/Race/${RaceId}`} className="driver-link">
                               {driversraces[round] ?? "-"}
                             </Link>
@@ -249,16 +252,13 @@ function ChampionshipPage() {
                         </td>
                       );
                     })}
-                    <td>
-                      <strong>{totalPoints}</strong>
-                    </td>
+                    <td><strong>{totalPoints}</strong></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
-        
+        </div>        
       </div>
     </div>
   );

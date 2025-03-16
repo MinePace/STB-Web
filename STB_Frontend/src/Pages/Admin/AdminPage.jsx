@@ -35,6 +35,9 @@ function AdminHub() {
             <Link to="/STB/Edit/RaceResults">Edit Race Results</Link>
           </li>
           <li>
+            <Link to="/STB/Edit/Tracks">Edit Exiting Tracks</Link>
+          </li>
+          <li>
             <Link to="/STB/Add/CSV">Add a Race with .CSV</Link>
           </li>
         </ul>

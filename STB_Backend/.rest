@@ -1,16 +1,13 @@
-Put http://localhost:5110/api/driver/update/97
+Put http://localhost:5110/api/driver/claim/Joey1854
 Content-Type: application/json
 
 {
-  "id": 97,
-  "name": "brainyCactus30",
-  "country": null,
-  "userId": 5
+  "userName": "MinePace"
 }
 
 ##########
 
-GET http://localhost:5110/api/driver/id/97
+GET http://localhost:5110/api/driver/user/MinePace
 
 ##########
 
@@ -18,20 +15,20 @@ Put http://localhost:5110/api/user/update/5
 Content-Type: application/json
 
 {
-  "id": 5,
-  "userName": "Brainy",
-  "email": "BrainyC@gmail.com",
-  "role": "user",
-  "driverClaimed": true
+    "Driver": "LND Miquel_RDGZ",
+    "Team": "RB",
+    "DNF": "Yes",
+    "Qualifying": 18,
+    "Pos_Change": 2
 }
 
 ##########
 
-GET http://localhost:5110/api/race/race/13
+GET http://localhost:5110/api/race/results/13
 
 ##########
 
-GET http://localhost:5110/api/race/results/32
+GET http://localhost:5110/api/race/seasons
 
 ##########
 

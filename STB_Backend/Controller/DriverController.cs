@@ -90,6 +90,22 @@ public class DriverController : ControllerBase
         return Ok(stats);
     }
 
+    [HttpGet("season/{season}")]
+    public IActionResult GetDriversBySeason(int season)
+    {
+        var driver  = _context.RaceResults
+            .Where(d => d.Race.Season == season)
+            .Where(d => d.Driver != null)
+            .Select(d => d.Driver) // Only get the driver names
+            .Distinct()
+            .ToList();
+
+        if (driver == null)
+        return NotFound(new { message = "No driver was found with this id." });
+
+        return Ok(driver);
+    }
+
     [HttpPut("claim/{driverName}")]
     public IActionResult ClaimDriver(string driverName, [FromBody] ClaimDriverRequest request)
     {

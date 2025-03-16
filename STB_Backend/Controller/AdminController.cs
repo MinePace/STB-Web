@@ -64,14 +64,12 @@ public class AdminController : ControllerBase
                         r.Division == division &&
                         r.Round == round &&
                         r.Sprint == sprint &&
-                        r.Name == raceName &&
                         r.Track.Id == track.Id);
 
                     if (race == null)
                     {
                         race = new Race
                         {
-                            Name = raceName,
                             F1_Game = f1Game,
                             Season = season,
                             Division = division,

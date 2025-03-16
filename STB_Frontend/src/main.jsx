@@ -17,6 +17,7 @@ import AddTrackPage from "./Pages/Admin/AddTrackPage";
 import AddRacePage from "./Pages/Admin/AddRacePage";
 import CSVUploadPage from "./Pages/Admin/CSVUploadPage";
 import EditRacePage from "./Pages/Admin/EditRacePage";
+import EditTrackPage from "./Pages/Admin/EditTrackPage";
 
 import Layout from "./Components/Layout";
 import "./index.css";
@@ -38,6 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
 
       <Route path="/STB/Edit/Race" element={<EditRacePage />} />
       <Route path="/STB/Edit/RaceResults" element={<Layout showSidebar={true}><EditRaceResultPage /></Layout>} />
+      <Route path="/STB/Edit/Tracks" element={<Layout showSidebar={true}><EditTrackPage /></Layout>} />
     </Routes>
   </Router>
 );

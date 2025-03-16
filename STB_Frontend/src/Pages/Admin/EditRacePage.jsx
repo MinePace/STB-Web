@@ -9,7 +9,6 @@ function EditRacePage() {
   const [races, setRaces] = useState([]); // Opslag voor races in het geselecteerde seizoen
   const [selectedRace, setSelectedRace] = useState(""); // Geselecteerde race
   const [formData, setFormData] = useState({
-    name: "",
     f1_Game: "",
     season: "",
     division: "",
@@ -18,6 +17,7 @@ function EditRacePage() {
     youtubeLink: "",
     trackName: "",
     trackCountry: "",
+    trackRaceName: "",
   });
 
   useEffect(() => {
@@ -52,7 +52,6 @@ function EditRacePage() {
         .then((res) => res.json())
         .then((data) => {
           setFormData({
-            name: data.name,
             f1_Game: data.f1_Game,
             season: data.season,
             division: data.division,
@@ -61,6 +60,7 @@ function EditRacePage() {
             youtubeLink: data.youtubeLink || "",
             trackName: data.track.name,
             trackCountry: data.track.country,
+            trackRaceName: data.track.raceName || "",
           });
         })
         .catch((err) => console.error("Error fetching race data:", err));
@@ -85,6 +85,7 @@ function EditRacePage() {
         track: {
           name: formData.trackName,
           country: formData.trackCountry,
+          racename: formData.trackRaceName,
         },
       }),
     })
@@ -144,16 +145,6 @@ function EditRacePage() {
       {/* Formulier om de race te bewerken */}
       {selectedRace && (
         <form onSubmit={handleSubmit}>
-          <label>
-            Name:
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-            />
-          </label>
           <label>
             F1 Game:
             <input
@@ -232,6 +223,16 @@ function EditRacePage() {
               type="text"
               name="trackCountry"
               value={formData.trackCountry}
+              onChange={handleInputChange}
+              required
+            />
+          </label>
+          <label>
+            Track RaceName:
+            <input
+              type="text"
+              name="trackRaceName"
+              value={formData.trackRaceName}
               onChange={handleInputChange}
               required
             />

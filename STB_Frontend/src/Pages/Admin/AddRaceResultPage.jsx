@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import CreatableSelect from "react-select/creatable";
 
 // Points Table for Main and Sprint Races
 const MAIN_RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -11,6 +12,7 @@ function AddRaceResults() {
   const [existingResults, setExistingResults] = useState(new Set()); // Store race IDs that have results
   const [selectedRace, setSelectedRace] = useState(null);
   const [raceResults, setRaceResults] = useState([]);
+  const [driversList, setDriversList] = useState([]);
   const navigate = useNavigate();
 
   const driverInputRef = useRef(null);
@@ -48,6 +50,19 @@ function AddRaceResults() {
       .catch((err) => console.error("Error fetching existing results:", err));
   };
 
+  useEffect(() => {
+    if (selectedRace) {
+      fetch(`http://localhost:5110/api/driver/season/${selectedRace.season}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (Array.isArray(data)) {
+            setDriversList(data); // Store list of names directly as strings
+          }
+        })
+        .catch((err) => console.error("Error fetching drivers:", err));
+    }
+  }, [selectedRace]);  
+
   const handleRaceSelect = (e) => {
     const raceId = e.target.value;
     const race = filteredRaces.find((race) => race.id.toString() === raceId);
@@ -77,8 +92,11 @@ function AddRaceResults() {
   const handleResultChange = (index, field, value) => {
     setRaceResults((prevResults) => {
       const updatedResults = [...prevResults];
+  
+      // ✅ Ensure only the correct row is updated
       updatedResults[index] = { ...updatedResults[index], [field]: value };
   
+      // ✅ Update position change calculation
       if (field === "position" || field === "qualifying") {
         updatedResults[index].pos_Change =
           updatedResults[index].qualifying && updatedResults[index].position
@@ -86,6 +104,7 @@ function AddRaceResults() {
             : 0;
       }
   
+      // ✅ If DNF is set to "Yes", set all remaining rows to DNF
       if (field === "dnf" && value === "Yes") {
         for (let i = index; i < updatedResults.length; i++) {
           updatedResults[i].dnf = "Yes";
@@ -109,7 +128,37 @@ function AddRaceResults() {
   
       return updatedResults;
     });
+  };  
+
+  const handleDriverKeyDown = (e, index) => {
+    if (e.key === "Tab") {
+      e.preventDefault(); // Prevent default tabbing behavior
+  
+      // Select only driver input fields
+      const driverInputs = Array.from(document.querySelectorAll(".driver-input"));
+      const nextIndex = (index + 1) % driverInputs.length;
+      driverInputs[nextIndex].focus();
+    }
   };
+  const handleTeamKeyDown = (e, index) => {
+    if (e.key === "Tab") {
+      e.preventDefault(); // Prevent default tabbing behavior
+  
+      const teamInputs = Array.from(document.querySelectorAll(".team-input"));
+      const nextIndex = (index + 1) % teamInputs.length;
+      teamInputs[nextIndex].focus();
+    }
+  };
+
+  const handleQualiKeyDown = (e, index) => {
+    if (e.key === "Tab") {
+      e.preventDefault(); // Prevent default tabbing behavior
+  
+      const qualiInputs = Array.from(document.querySelectorAll(".quali-input"));
+      const nextIndex = (index + 1) % qualiInputs.length;
+      qualiInputs[nextIndex].focus();
+    }
+  };   
 
   const handleSubmit = async () => {
     if (!selectedRace) {
@@ -177,7 +226,7 @@ function AddRaceResults() {
 
       {/* Results Form */}
       <div className="result-form">
-        <h2>Add Results</h2>
+        <h2>Add Results for {selectedRace.track.raceName}</h2>
         <table>
         <thead>
           <tr>
@@ -188,7 +237,7 @@ function AddRaceResults() {
             <th>DNF</th>
             <th>Qualifying</th>
             <th>Position Change</th>
-            <th>Fastest Lap</th> {/* ✅ Always visible */}
+            <th>Fastest Lap</th>
           </tr>
         </thead>
           <tbody>
@@ -198,16 +247,26 @@ function AddRaceResults() {
                 <td>
                   <input
                     type="text"
+                    list="drivers-list"
+                    className="driver-input"
                     value={result.driver}
                     onChange={(e) => handleResultChange(index, "driver", e.target.value)}
-                    ref={index === 0 ? driverInputRef : null}
+                    onKeyDown={(e) => handleDriverKeyDown(e, index)}
+                    placeholder="Select or type driver..."
                   />
+                  <datalist id="drivers-list">
+                    {driversList.map((driver, i) => (
+                      <option key={i} value={driver} />
+                    ))}
+                  </datalist>
                 </td>
                 <td>
                   <input
                     type="text"
+                    className="team-input" // Add class for easier selection
                     value={result.team}
                     onChange={(e) => handleResultChange(index, "team", e.target.value)}
+                    onKeyDown={(e) => handleTeamKeyDown(e, index)}
                   />
                 </td>
                 <td>{result.points}</td>
@@ -223,8 +282,10 @@ function AddRaceResults() {
                 <td>
                   <input
                     type="number"
+                    className="quali-input" // Add class for easier selection
                     value={result.qualifying}
                     onChange={(e) => handleResultChange(index, "qualifying", e.target.value)}
+                    onKeyDown={(e) => handleQualiKeyDown(e, index)}
                   />
                 </td>
                 <td>{result.pos_Change}</td>

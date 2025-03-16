@@ -36,4 +36,19 @@
     border: none;
     cursor: pointer;
   }
+
+  .delete-btn {
+    background-color: rgb(200, 50, 50);
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-left: 5px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  
+  .delete-btn:hover {
+    background-color: rgb(180, 30, 30);
+  }
+  
   

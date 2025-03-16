@@ -1,28 +1,110 @@
 .result-table {
-    position: sticky;
-    top: 0;
-    background-color: #0b4e8b; /* Achtergrondkleur vastgezette rijen */
-    z-index: 2;
-  }
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
 
-  /* Stijl de links binnen de tabel */
+/* Sticky Header */
+.result-table thead {
+  position: sticky;
+  top: 0;
+  background-color: #0b4e8b;
+  color: white;
+  z-index: 2;
+}
+
+.result-table th, .result-table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Zebra Striping */
+.result-table tbody tr:nth-child(odd) {
+  background-color: #383535;
+}
+
+.result-table tbody tr:nth-child(even) {
+  background-color: #3c3c3c;
+}
+
+.result-table tbody tr:hover {
+  background-color: rgb(11, 77, 139);
+}
+
+/* Title Row (Season & Round) */
+.table-title {
+  background-color: #003566;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 12px;
+  text-align: center;
+}
+
+/* Subtitle Row (Race Name) */
+.table-subtitle {
+  background-color: #003566;
+  color: white;
+  font-size: 1.3rem;
+  font-weight: bold;
+  padding: 10px;
+  text-align: center;
+}
+
+/* Stijl de links binnen de tabel */
 .driver-link {
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .driver-link:hover {
-    color: #4caeff;
-    text-decoration: none;
-    font-weight: bold;
-  }
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+}
 
-  .video-player {
-    position: absolute;
-    margin: 0px;
-    top: 10%;
-    left: 10%;
-    width: 375px; /* Adjust width as needed */
-    height: 180px; /* Adjust height as needed */
-  }
+.driver-link:hover {
+  color: #4caeff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.video-player {
+  position: absolute;
+  margin: 0px;
+  top: 10%;
+  left: 10%;
+  width: 300px; /* Adjust width as needed */
+  height: 180px; /* Adjust height as needed */
+}
+
+/* Screenshot Button */
+.screenshot-btn {
+  background-color: #0b4e8b;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.screenshot-btn:hover {
+  background-color: #1462aa;
+}
+
+/* Style for DNF Cell */
+.dnf-cell {
+  background-color: #ffb3b3; /* Light red background */
+  font-weight: bold;
+  color: #800000; /* Dark red text */
+  text-align: center;
+}
+
+.team-name {
+  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.6); /* White glow effect */
+  font-weight: bold; /* Make text stand out */
+}
+
