@@ -2,24 +2,30 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Voeg de databasecontext toe aan de DI-container
+// Set up the database context
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("sqlite")));
 
-// CORS Configuratie ➜ **Hier toevoegen**
+builder.Services.AddControllers();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
 });
 
-builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// ✅ Apply Migrations on Startup
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
+    dbContext.Database.Migrate();  // **Ensure database is up to date**
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -28,13 +34,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Activeer CORS in de pipeline ➜ **Hier toevoegen**
 app.UseCors("AllowAllOrigins");
-
 app.UseAuthorization();
 app.MapControllers();
 
-// ✅ Fix for Render’s dynamic port assignment
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5110"; // Render assigns PORT dynamically
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5110";
 app.Run($"http://0.0.0.0:{port}");
