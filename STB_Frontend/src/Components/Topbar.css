@@ -82,4 +82,31 @@
   .logout-button:hover {
     background-color: darkred;
   }
+
+  .social-link {
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+  }
+  
+  .youtube-icon {
+    width: 32px; /* Adjust size as needed */
+    height: 24px;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .youtube-icon:hover {
+    transform: scale(1.2);
+  }
+
+  .discord-icon {
+    width: 24px; /* Adjust size as needed */
+    height: 24px;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .discord-icon:hover {
+    transform: scale(1.2);
+  }
+  
   

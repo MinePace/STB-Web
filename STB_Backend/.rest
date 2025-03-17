@@ -7,11 +7,11 @@ Content-Type: application/json
 
 ##########
 
-GET http://localhost:5110/api/driver/user/MinePace
+GET http://localhost:5110/api/driver/season/21
 
 ##########
 
-Put http://localhost:5110/api/user/update/5
+Put http://localhost:5110/api/raceresult/update/1314
 Content-Type: application/json
 
 {
@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ##########
 
-GET http://localhost:5110/api/race/results/13
+GET http://localhost:5110/api/race/races
 
 ##########
 

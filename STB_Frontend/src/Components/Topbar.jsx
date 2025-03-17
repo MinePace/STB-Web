@@ -43,6 +43,26 @@ function Topbar() {
           <li>
             <Link to="/" className="nav-link">Home</Link>
           </li>
+          <li>
+            <a 
+              href="https://www.youtube.com/@stbracingleague" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="social-link"
+            >
+              <img src="/youtube.png" alt="YouTube" className="youtube-icon" />
+            </a>
+          </li>
+          <li>
+            <a 
+              href="https://discord.gg/CCa6Xdwn" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="social-link"
+            >
+              <img src="/discord.png" alt="Discord" className="discord-icon" />
+            </a>
+          </li>
           {role === "Admin" && (
             <li>
               <Link to="/admin" className="nav-link">Admin Hub</Link>
