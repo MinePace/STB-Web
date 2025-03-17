@@ -4,4 +4,3 @@
 *.dll
 *.pdb
 /STB_Backend/obj/Debug/net8.0
-STB_Frontend/build/
