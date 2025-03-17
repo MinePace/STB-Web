@@ -1,12 +1,12 @@
-# Use .NET 8.0 SDK for building the application
+# Use .NET 8.0 SDK to build the app
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
-# Copy everything and restore dependencies
+# Copy the project file and restore dependencies
 COPY *.csproj ./
 RUN dotnet restore
 
-# Copy everything and publish
+# Copy the rest of the source code and build
 COPY . .
 RUN dotnet publish -c Release -o out
 
