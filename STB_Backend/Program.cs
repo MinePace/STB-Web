@@ -35,4 +35,6 @@ app.UseCors("AllowAllOrigins");
 app.UseAuthorization();
 app.MapControllers();
 
-app.Run();
+// ✅ Fix for Render’s dynamic port assignment
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5110"; // Render assigns PORT dynamically
+app.Run($"http://0.0.0.0:{port}");
