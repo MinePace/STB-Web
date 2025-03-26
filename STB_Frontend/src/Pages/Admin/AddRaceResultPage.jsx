@@ -7,8 +7,8 @@ const SPRINT_RACE_POINTS = [8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 function AddRaceResults() {
   const [races, setRaces] = useState([]);
-  const [filteredRaces, setFilteredRaces] = useState([]); // Filtered list
-  const [existingResults, setExistingResults] = useState(new Set()); // Store race IDs that have results
+  const [filteredRaces, setFilteredRaces] = useState([]);
+  const [existingResults, setExistingResults] = useState(new Set());
   const [selectedRace, setSelectedRace] = useState(null);
   const [raceResults, setRaceResults] = useState([]);
   const [driversList, setDriversList] = useState([]);
@@ -17,11 +17,11 @@ function AddRaceResults() {
   const driverInputRef = useRef(null);
 
   useEffect(() => {
-      const role = localStorage.getItem("role");
-      if (role !== "Admin") {
-        navigate("/"); // Stuur terug naar homepage als geen admin
-      }
-    }, [navigate]);
+    const role = localStorage.getItem("role");
+    if (role !== "Admin") {
+      navigate("/"); // Redirect if not admin
+    }
+  }, [navigate]);
 
   // Fetch races and existing results
   useEffect(() => {
@@ -34,15 +34,13 @@ function AddRaceResults() {
       .catch((err) => console.error("Error fetching races:", err));
   }, []);
 
-  // Fetch existing race results
   const fetchExistingResults = (allRaces) => {
     fetch("http://localhost:5110/api/race/raceresults")
       .then((res) => res.json())
       .then((data) => {
-        const raceIdsWithResults = new Set(data.map((result) => result.raceId)); // Extract race IDs that have results
+        const raceIdsWithResults = new Set(data.map((result) => result.raceId));
         setExistingResults(raceIdsWithResults);
 
-        // Filter races that do not have results
         const availableRaces = allRaces.filter((race) => !raceIdsWithResults.has(race.id));
         setFilteredRaces(availableRaces);
       })
@@ -55,12 +53,12 @@ function AddRaceResults() {
         .then((res) => res.json())
         .then((data) => {
           if (Array.isArray(data)) {
-            setDriversList(data); // Store list of names directly as strings
+            setDriversList(data);
           }
         })
         .catch((err) => console.error("Error fetching drivers:", err));
     }
-  }, [selectedRace]);  
+  }, [selectedRace]);
 
   const handleRaceSelect = (e) => {
     const raceId = e.target.value;
@@ -83,7 +81,8 @@ function AddRaceResults() {
         dnf: "No",
         pos_Change: 0,
         qualifying: "",
-        fastestLap: false, // Default to false
+        fastestLap: false,
+        raceTime: "", // New field for race time
       }))
     );
   };
@@ -91,94 +90,58 @@ function AddRaceResults() {
   const handleResultChange = (index, field, value) => {
     setRaceResults((prevResults) => {
       const updatedResults = [...prevResults];
-  
-      // ✅ Ensure only the correct row is updated
+
       updatedResults[index] = { ...updatedResults[index], [field]: value };
-  
-      // ✅ Update position change calculation
+
       if (field === "position" || field === "qualifying") {
         updatedResults[index].pos_Change =
           updatedResults[index].qualifying && updatedResults[index].position
             ? updatedResults[index].qualifying - updatedResults[index].position
             : 0;
       }
-  
-      // ✅ If DNF is set to "Yes", set all remaining rows to DNF
+
       if (field === "dnf" && value === "Yes") {
         for (let i = index; i < updatedResults.length; i++) {
           updatedResults[i].dnf = "Yes";
         }
       }
-  
-      // ✅ Ensure only one driver gets Fastest Lap
+
       if (field === "fastestLap") {
         updatedResults.forEach((row, i) => {
-          if (i !== index) row.fastestLap = false; // Uncheck others
+          if (i !== index) row.fastestLap = false;
         });
-  
-        // ✅ Recalculate points and only add +1 in non-sprint races
+
         updatedResults.forEach((row, i) => {
           row.points = selectedRace?.sprint === "Yes" ? SPRINT_RACE_POINTS[i] || 0 : MAIN_RACE_POINTS[i] || 0;
           if (row.fastestLap === true && row.position <= 10 && selectedRace?.sprint !== "Yes") {
-            row.points += 1; // ✅ Add fastest lap bonus only for main races
+            row.points += 1;
           }
         });
       }
-  
+
       return updatedResults;
     });
-  };  
-
-  const handleDriverKeyDown = (e, index) => {
-    if (e.key === "Tab") {
-      e.preventDefault(); // Prevent default tabbing behavior
-  
-      // Select only driver input fields
-      const driverInputs = Array.from(document.querySelectorAll(".driver-input"));
-      const nextIndex = (index + 1) % driverInputs.length;
-      driverInputs[nextIndex].focus();
-    }
   };
-  const handleTeamKeyDown = (e, index) => {
-    if (e.key === "Tab") {
-      e.preventDefault(); // Prevent default tabbing behavior
-  
-      const teamInputs = Array.from(document.querySelectorAll(".team-input"));
-      const nextIndex = (index + 1) % teamInputs.length;
-      teamInputs[nextIndex].focus();
-    }
-  };
-
-  const handleQualiKeyDown = (e, index) => {
-    if (e.key === "Tab") {
-      e.preventDefault(); // Prevent default tabbing behavior
-  
-      const qualiInputs = Array.from(document.querySelectorAll(".quali-input"));
-      const nextIndex = (index + 1) % qualiInputs.length;
-      qualiInputs[nextIndex].focus();
-    }
-  };   
 
   const handleSubmit = async () => {
     if (!selectedRace) {
       console.error("No race selected!");
       return;
     }
-  
-    // Add `raceId` and ensure `qualifying` is an integer
+
     const raceData = raceResults.map((result) => ({
-      raceId: selectedRace.id, // ✅ Attach raceId to each entry
+      raceId: selectedRace.id,
       position: result.position,
       driver: result.driver.trim(),
       team: result.team.trim(),
       points: result.points,
       dnf: result.dnf,
-      qualifying: result.qualifying ? parseInt(result.qualifying, 10) : 0, // ✅ Convert to integer
+      qualifying: result.qualifying ? parseInt(result.qualifying, 10) : 0,
       pos_Change: result.pos_Change,
+      fastestLap: result.fastestLap,
+      Time: result.raceTime.trim(), // Save race time as a string
     }));
-  
-    console.log("🚀 Sending Race Data:", raceData);
-  
+
     try {
       const response = await fetch("http://localhost:5110/api/race/raceresults", {
         method: "POST",
@@ -187,19 +150,31 @@ function AddRaceResults() {
         },
         body: JSON.stringify(raceData),
       });
-  
+      console.log(raceData)
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
       }
-  
+
       const data = await response.json();
-      console.log("✅ Submission Successful:", data);
-      alert(`${data.message}`); // Show success message to user
+      alert(`${data.message}`);
     } catch (error) {
       console.error("❌ Error submitting results:", error);
       alert("Error submitting results! Check the console for details.");
     }
-  };  
+  };
+
+  // Handle Tab key press to move down between inputs
+  const handleTabKeyDown = (e, index, type) => {
+    if (e.key === "Tab") {
+      e.preventDefault(); // Prevent default tabbing behavior
+
+      const inputClass = `${type}-input`; // Determine the class based on field type
+      const inputs = Array.from(document.querySelectorAll(`.${inputClass}`));
+      const nextIndex = (index + 1) % inputs.length;
+      inputs[nextIndex].focus();
+    }
+  };
 
   return (
     <div className="add-race-results-container">
@@ -227,18 +202,19 @@ function AddRaceResults() {
       <div className="result-form">
         <h2>Add Results for {selectedRace?.track?.raceName}</h2>
         <table>
-        <thead>
-          <tr>
-            <th>Position</th>
-            <th>Driver</th>
-            <th>Team</th>
-            <th>Points</th>
-            <th>DNF</th>
-            <th>Qualifying</th>
-            <th>Position Change</th>
-            <th>Fastest Lap</th>
-          </tr>
-        </thead>
+          <thead>
+            <tr>
+              <th>Position</th>
+              <th>Driver</th>
+              <th>Team</th>
+              <th>Points</th>
+              <th>DNF</th>
+              <th>Qualifying</th>
+              <th>Position Change</th>
+              <th>Fastest Lap</th>
+              <th>Race Time</th> {/* New column for Race Time */}
+            </tr>
+          </thead>
           <tbody>
             {raceResults.map((result, index) => (
               <tr key={index}>
@@ -247,11 +223,11 @@ function AddRaceResults() {
                   <input
                     type="text"
                     list="drivers-list"
-                    className="driver-input"
                     value={result.driver}
                     onChange={(e) => handleResultChange(index, "driver", e.target.value)}
-                    onKeyDown={(e) => handleDriverKeyDown(e, index)}
+                    onKeyDown={(e) => handleTabKeyDown(e, index, "driver")}
                     placeholder="Select or type driver..."
+                    className="driver-input"
                   />
                   <datalist id="drivers-list">
                     {driversList.map((driver, i) => (
@@ -262,10 +238,10 @@ function AddRaceResults() {
                 <td>
                   <input
                     type="text"
-                    className="team-input" // Add class for easier selection
                     value={result.team}
                     onChange={(e) => handleResultChange(index, "team", e.target.value)}
-                    onKeyDown={(e) => handleTeamKeyDown(e, index)}
+                    onKeyDown={(e) => handleTabKeyDown(e, index, "team")}
+                    className="team-input"
                   />
                 </td>
                 <td>{result.points}</td>
@@ -281,10 +257,10 @@ function AddRaceResults() {
                 <td>
                   <input
                     type="number"
-                    className="quali-input" // Add class for easier selection
                     value={result.qualifying}
                     onChange={(e) => handleResultChange(index, "qualifying", e.target.value)}
-                    onKeyDown={(e) => handleQualiKeyDown(e, index)}
+                    onKeyDown={(e) => handleTabKeyDown(e, index, "quali")}
+                    className="quali-input"
                   />
                 </td>
                 <td>{result.pos_Change}</td>
@@ -293,6 +269,16 @@ function AddRaceResults() {
                     type="checkbox"
                     checked={result.fastestLap}
                     onChange={(e) => handleResultChange(index, "fastestLap", e.target.checked)}
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    value={result.raceTime}
+                    onChange={(e) => handleResultChange(index, "raceTime", e.target.value)}
+                    onKeyDown={(e) => handleTabKeyDown(e, index, "time")}
+                    placeholder="Enter race time"
+                    className="time-input"
                   />
                 </td>
               </tr>

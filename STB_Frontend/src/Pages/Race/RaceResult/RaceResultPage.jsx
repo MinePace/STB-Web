@@ -125,43 +125,56 @@ function RaceResultPage() {
                   </tr>
                   <tr>
                     <th colSpan="5" className="table-subtitle">
-                      {race ? race.track.raceName : "Loading..."}
+                      {race ? (
+                        <>
+                          {race.track.raceName} 
+                          {race.track.country && (
+                            <img
+                              src={`/flags/${race.track.country}.png`} // Path to the flags stored in the public folder
+                              alt={race.track.country}
+                              className="country-flag"
+                              title={race.track.country} // Tooltip with the country code/name
+                            />
+                          )}
+                        </>
+                      ) : (
+                        "Loading..."
+                      )}
                     </th>
                   </tr>
-
                   {/* Column Headers */}
                   <tr>
-                    <th>Position</th>
+                    <th>Pos</th>
                     <th>Driver</th>
                     <th>Team</th>
                     <th>Points</th>
-                    <th>Qualifying</th>
+                    <th>Grid</th>
                   </tr>
                 </thead>
                 <tbody>
-  {raceResults.map((row, index) => {
-    const isDNF = row.dnf === "Yes" || row.dnf === "DNF";
-    return (
-      <tr key={index}>
-        <td 
-          className={isDNF ? "dnf-cell" : ""} // Apply the special CSS class if DNF
-        >
-          {isDNF ? "DNF" : row.position}
-        </td>
-        <td>
-          <Link to={`/STB/Driver/${encodeURIComponent(row.driver)}`} className="driver-link">
-            {row.driver}
-          </Link>
-        </td>
-        <td className="team-name" style={{ color: teamColors[row.team] || "white" }}>
-          {row.team}
-        </td>
-        <td>{row.points}</td>
-        <td>{row.qualifying}</td>
-      </tr>
-    );
-  })}
-</tbody>
+                  {raceResults.map((row, index) => {
+                    const isDNF = row.dnf === "Yes" || row.dnf === "DNF";
+                    return (
+                      <tr key={index}>
+                        <td 
+                          className={isDNF ? "dnf-cell" : ""} // Apply the special CSS class if DNF
+                        >
+                          {isDNF ? "DNF" : row.position}
+                        </td>
+                        <td>
+                          <Link to={`/STB/Driver/${encodeURIComponent(row.driver)}`} className="driver-link">
+                            {row.driver}
+                          </Link>
+                        </td>
+                        <td className="team-name" style={{ color: teamColors[row.team] || "white" }}>
+                          {row.team}
+                        </td>
+                        <td>{row.points}</td>
+                        <td>{row.qualifying}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
               </table>
             </div>
           </div>

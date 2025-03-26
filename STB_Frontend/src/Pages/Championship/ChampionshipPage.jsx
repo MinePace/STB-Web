@@ -9,6 +9,7 @@ function ChampionshipPage() {
   const [races, setRaces] = useState([]);
   const [raceResults, setRaceResults] = useState([]);
   const [sortedDrivers, setSortedDrivers] = useState([]);
+  const [fastestLapData, setFastestLapData] = useState([]); // New state for fastest lap data
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const tableRef = useRef(null);
@@ -33,7 +34,7 @@ function ChampionshipPage() {
             setRaceResults(Array.isArray(resultData) ? resultData : []);
 
             if (Array.isArray(resultData) && resultData.length > 0) {
-              transformData(raceData, resultData);
+              transformData(raceData, resultData); // Ensure data is transformed before state update
             } else {
               setSortedDrivers({
                 drivers: [],
@@ -42,7 +43,17 @@ function ChampionshipPage() {
               });
             }
 
-            setLoading(false);
+            // Fetch fastest lap data for the championship
+            fetch(`http://localhost:5110/api/fastestlap/${season}/${division}`)
+              .then((res) => res.json())
+              .then((fastestLapData) => {
+                setFastestLapData(fastestLapData);
+                setLoading(false); // Only stop loading when all data is fetched and transformed
+              })
+              .catch(() => {
+                setFastestLapData([]);
+                setLoading(false);
+              });
           })
           .catch(() => {
             setRaceResults([]);
@@ -64,7 +75,7 @@ function ChampionshipPage() {
     const drivers = {};
     const raceNumbers = [];
     const racePositions = {};
-  
+
     // Group races by round (merge sprint and main race)
     const groupedRaces = {};
     races.forEach((race) => {
@@ -78,14 +89,15 @@ function ChampionshipPage() {
         groupedRaces[roundKey].mainRace = race;
       }
     });
-  
+
     Object.keys(groupedRaces).forEach((roundKey) => {
       raceNumbers.push(roundKey);
     });
-  
+
+    // Iterate through race results to build driver data
     raceResults.forEach((result) => {
       const roundKey = `${result.race.round}`;
-  
+
       // Ensure driver exists in object
       if (!drivers[result.driver]) {
         drivers[result.driver] = { totalPoints: 0 };
@@ -93,22 +105,22 @@ function ChampionshipPage() {
       if (!drivers[result.driver][roundKey]) {
         drivers[result.driver][roundKey] = 0;
       }
-  
+
       // Prioritize main race position for racePositions
       const raceId = result.race.id;
       const mainRaceId = groupedRaces[roundKey]?.mainRace?.id;
       const sprintRaceId = groupedRaces[roundKey]?.sprintRace?.id;
-  
+
       if (!racePositions[roundKey]) {
         racePositions[roundKey] = {};
       }
-  
+
       if (raceId === mainRaceId) {
         racePositions[roundKey][result.driver] = result.position;
       } else if (!mainRaceId && raceId === sprintRaceId) {
         racePositions[roundKey][result.driver] = result.position;
       }
-  
+
       // Check if driver DNF'd and set 'DNF' instead of points
       if (result.dnf === "Yes" || result.dnf === "DNF") {
         drivers[result.driver][roundKey] = "DNF";
@@ -117,29 +129,56 @@ function ChampionshipPage() {
         drivers[result.driver].totalPoints += result.points || 0;
       }
     });
-  
+
+    // Mark the driver with the fastest lap in each race and apply color
+    if (fastestLapData.length > 0) {
+      fastestLapData.forEach((fastestLap) => {
+        const raceId = fastestLap.raceId;
+        const fastestLapDriver = fastestLap.driver.name;
+
+        Object.keys(groupedRaces).forEach((roundKey) => {
+          const groupedRace = groupedRaces[roundKey];
+          const mainRaceId = groupedRace?.mainRace?.id;
+          const sprintRaceId = groupedRace?.sprintRace?.id;
+
+          if (raceId === mainRaceId || raceId === sprintRaceId) {
+            // Check if the driver has the fastest lap and apply purple color
+            if (drivers[fastestLapDriver]) {
+              const driverIndex = drivers[fastestLapDriver];
+              driverIndex[roundKey] = (
+                <span style={{ color: "rgb(163, 35, 255)", fontWeight: "bold" }}>
+                  {driverIndex[roundKey]}
+                </span>
+              );
+            }
+          }
+        });
+      });
+    }
+
+    // Sort drivers by total points
     const sortedDrivers = Object.entries(drivers)
       .map(([driver, races]) => ({ driver, ...races }))
       .sort((a, b) => b.totalPoints - a.totalPoints);
-  
+
     setSortedDrivers({ drivers: sortedDrivers, raceNumbers, racePositions, groupedRaces });
-  };  
+  };
 
   // Function to download table as an image
   const downloadTableAsImage = () => {
     if (tableRef.current) {
       const scrollableWrapper = document.querySelector(".scrollable-wrapper");
-  
+
       // Backup original styles
       const originalOverflow = scrollableWrapper.style.overflow;
       const originalMaxHeight = scrollableWrapper.style.maxHeight;
       const originalVisibility = scrollableWrapper.style.visibility;
-  
+
       // Hide the scrollbar but keep content visible
       scrollableWrapper.style.overflow = "hidden"; // Prevent scrollbar from appearing
       scrollableWrapper.style.maxHeight = "none"; // Allow full capture
       scrollableWrapper.style.visibility = "visible"; // Ensure it's not hidden
-  
+
       html2canvas(tableRef.current, {
         scale: 2, // High quality
         useCORS: true,
@@ -150,14 +189,14 @@ function ChampionshipPage() {
         link.href = canvas.toDataURL("image/png");
         link.download = `Championship_Season_${season}_Tier_${division}.png`;
         link.click();
-  
+
         // Restore the original styles
         scrollableWrapper.style.overflow = originalOverflow;
         scrollableWrapper.style.maxHeight = originalMaxHeight;
         scrollableWrapper.style.visibility = originalVisibility;
       });
     }
-  };  
+  };
 
   if (loading) {
     return <div className="loading-bar">Loading Championship Data...</div>;

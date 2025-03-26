@@ -17,7 +17,7 @@ function EditRaceResults() {
   useEffect(() => {
       const role = localStorage.getItem("role");
       if (role !== "Admin") {
-        navigate("/"); // Stuur terug naar homepage als geen admin
+        navigate("/"); // Redirect to homepage if not admin
       }
     }, [navigate]);
 
@@ -87,7 +87,8 @@ function EditRaceResults() {
       Points: updatedResult.points || raceResults.find(r => r.id === id).points,
       DNF: updatedResult.dnf || raceResults.find(r => r.id === id).dnf,
       Qualifying: updatedResult.qualifying !== undefined ? updatedResult.qualifying : raceResults.find(r => r.id === id).qualifying,
-      Pos_Change: updatedResult.pos_Change !== undefined ? updatedResult.pos_Change : raceResults.find(r => r.id === id).pos_Change
+      Pos_Change: updatedResult.pos_Change !== undefined ? updatedResult.pos_Change : raceResults.find(r => r.id === id).pos_Change,
+      Time: updatedResult.time || raceResults.find(r => r.id === id).time
     };
   
     console.log("Sending Data:", raceResultDTO);
@@ -198,6 +199,7 @@ function EditRaceResults() {
                 <th>DNF</th>
                 <th>Quali</th>
                 <th>Pos Δ</th>
+                <th>Time</th> {/* Add Time column */}
                 <th>Actions</th>
               </tr>
             </thead>
@@ -253,6 +255,14 @@ function EditRaceResults() {
                               />
                             </td>
                             <td>{editedResults[result.id]?.pos_Change ?? result.pos_Change}</td>
+                            <td>
+                              <input
+                                type="text" // Editable race time
+                                className="compact-input"
+                                value={editedResults[result.id]?.time || result.time}
+                                onChange={(e) => handleInputChange(result.id, "time", e.target.value)}
+                              />
+                            </td>
                             <td>
                               <button className="save-btn" onClick={() => handleSave(result.id)}>Save</button>
                               <button className="delete-btn" onClick={() => handleDelete(result.id)}>Delete</button>

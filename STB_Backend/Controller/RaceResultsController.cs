@@ -49,6 +49,7 @@ public class RaceResultController : ControllerBase
         result.DNF = newResult.DNF; // Ensure DNF is stored as string or change model to bool
         result.Qualifying = newResult.Qualifying;
         result.Pos_Change = newResult.Pos_Change;
+        result.Time = newResult.Time;
 
         try
         {
@@ -86,5 +87,6 @@ public class RaceResultController : ControllerBase
         public string DNF { get; set; }
         public int Qualifying { get; set; }
         public int Pos_Change { get; set; }
+        public string Time { get; set; }
     }
 }

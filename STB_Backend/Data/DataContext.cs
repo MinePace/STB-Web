@@ -10,6 +10,7 @@ public class DataContext : DbContext
     public DbSet<Race> Races { get; set; }
     public DbSet<Track> Tracks { get; set; }
     public DbSet<Driver> Drivers { get; set; }
+    public DbSet<FastestLap> FastestLaps { get; set; }
 }
 
 public class RaceResult
@@ -25,6 +26,7 @@ public class RaceResult
     public string DNF { get; set; }
     public int Pos_Change { get; set; }
     public int Qualifying { get; set; }
+    public string? Time { get; set; }
 }
 
 public class User
@@ -69,4 +71,13 @@ public class Driver{
     public string? Country { get; set; }
     public User? User { get; set; }
     public int? UserId { get; set; }
+}
+
+public class FastestLap{
+    [Key]
+    public int Id { get; set; }
+    public int DriverId { get; set; }
+    public int RaceId { get; set; }
+    public Driver Driver { get; set; }
+    public Race Race { get; set; }
 }

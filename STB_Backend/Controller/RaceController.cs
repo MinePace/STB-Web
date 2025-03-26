@@ -176,6 +176,20 @@ public class RaceController : ControllerBase
                     result.Points = 0;
                 }
 
+                if (result.FastestLap)
+                {
+                    var FastestLap = new FastestLap
+                    {
+                        RaceId = result.RaceId,
+                        DriverId = _context.Drivers.Where(d => d.Name == result.Driver).Select(d => d.Id).FirstOrDefault(),
+                        Race = await _context.Races.FindAsync(result.RaceId),
+                        Driver = _context.Drivers.Where(d => d.Name == result.Driver).FirstOrDefault(),
+                    };
+
+                    _context.FastestLaps.AddRange(FastestLap);
+                    await _context.SaveChangesAsync();
+                }
+
                 var NewResult = new RaceResult
                 {
                     RaceId = result.RaceId,
@@ -186,7 +200,8 @@ public class RaceController : ControllerBase
                     Points = result.Points,
                     DNF = result.DNF,
                     Pos_Change = result.Pos_Change,
-                    Qualifying = result.Qualifying
+                    Qualifying = result.Qualifying,
+                    Time = result.Time
                 };
 
                 _context.RaceResults.AddRange(NewResult);
@@ -348,4 +363,6 @@ public class RaceResultRequest{
     public string DNF { get; set; }
     public int Pos_Change { get; set; }
     public int Qualifying { get; set; }
+    public string? Time { get; set; }
+    public bool FastestLap { get; set; }
 }

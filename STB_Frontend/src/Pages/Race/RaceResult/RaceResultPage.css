@@ -108,3 +108,13 @@
   font-weight: bold; /* Make text stand out */
 }
 
+.country-flag {
+  width: 60px; /* Adjust size of the flag */
+  height: auto; /* Maintain aspect ratio */
+  margin-top: -9px;
+  margin-bottom: -9px;
+  margin-left: 10px; /* Space between race name and flag */
+  vertical-align: middle; /* Vertically align the flag with the text */
+}
+
+
