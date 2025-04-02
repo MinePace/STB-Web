@@ -312,6 +312,20 @@ public class RaceController : ControllerBase
         return Ok("Race updated successfully.");
     }
 
+    [HttpDelete("delete/{id}")]
+    public async Task<IActionResult> DeleteRace(int id)
+    {
+        var race = await _context.Races.Include(r => r.Track).FirstOrDefaultAsync(r => r.Id == id);
+
+        if (race == null)
+            return NotFound("Race not found.");
+
+        _context.Races.Remove(race);
+        await _context.SaveChangesAsync();
+        
+        return Ok("Race deleted successfully.");
+    }
+
     // 🔹 GET: api/race/raceresults
     [HttpGet("raceresults")]
     public async Task<ActionResult<RaceResult>> GetAllRaceResults()
@@ -339,7 +353,6 @@ public class RaceController : ControllerBase
 
         return Ok(raceResults);
     }
-
 }
 
 public class RaceRequest{

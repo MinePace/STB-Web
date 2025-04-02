@@ -6,11 +6,13 @@ import "./EditRaceResultPage.css";
 function EditRaceResults() {
   const { season: paramSeason, round: paramRound, division, type } = useParams();
   const navigate = useNavigate();
+  const pointsForPosition = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
   
   const [seasons, setSeasons] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState(paramSeason || "");
   const [races, setRaces] = useState([]);
   const [selectedRace, setSelectedRace] = useState(paramRound || "");
+  const [FastestLap, setFastestLap] = useState("");
   const [raceResults, setRaceResults] = useState([]);
   const [editedResults, setEditedResults] = useState({});
 
@@ -56,7 +58,18 @@ function EditRaceResults() {
     } else {
       setRaceResults([]);
     }
-  }, [selectedSeason, selectedRace, division, type]);
+  }, [selectedSeason, selectedRace]);
+
+  useEffect(() => {
+    if (selectedSeason && selectedRace) {
+      fetch(`http://localhost:5110/api/fastestlap/${selectedRace}`)
+        .then((res) => res.text())
+        .then((data) => setFastestLap(data))
+        .catch((err) => console.error("Error fetching race results:", err));
+    } else {
+      setRaceResults([]);
+    }
+  }, [selectedSeason, selectedRace]);
 
   const handleInputChange = (id, field, value) => {
     setEditedResults((prev) => {
@@ -82,6 +95,7 @@ function EditRaceResults() {
   
     // Constructing the RaceResultDTO object
     const raceResultDTO = {
+      Position: updatedResult.position || raceResults.find(r => r.id === id).position,
       Driver: updatedResult.driver || raceResults.find(r => r.id === id).driver,
       Team: updatedResult.team || raceResults.find(r => r.id === id).team,
       Points: updatedResult.points || raceResults.find(r => r.id === id).points,
@@ -125,28 +139,39 @@ function EditRaceResults() {
   const handleDragEnd = (result) => {
     if (!result.destination) return; // If dropped outside the list, do nothing
   
-    setRaceResults((prevResults) => {
-      // Clone the array to avoid mutating state directly
-      const updatedResults = [...prevResults];
+    const updatedResults = [...raceResults];
+    const [movedRow] = updatedResults.splice(result.source.index, 1);
+    updatedResults.splice(result.destination.index, 0, movedRow);
   
-      // Move the dragged row to the new position
-      const [movedRow] = updatedResults.splice(result.source.index, 1);
-      updatedResults.splice(result.destination.index, 0, movedRow);
-  
-      // ✅ Recalculate positions **before updating state**
-      updatedResults.forEach((row, index) => {
-        row.position = index + 1; // Assign new position
-      });
-  
-      return updatedResults;
+    // Recalculate positions and points
+    updatedResults.forEach((row, index) => {
+      row.position = index + 1; // New position
+      // Update points based on the new position
+      row.points = pointsForPosition[row.position - 1] || 0; // Set points based on position
     });
   
-    // ✅ Immediately update `editedResults` using `handleInputChange`
-    setTimeout(() => {
-      raceResults.forEach((row) => {
-        handleInputChange(row.id, "position", row.position);
+    // Check if the FastestLap driver is within the top 10 and add 1 point if applicable
+    if (FastestLap) {
+      const fastestDriverIndex = updatedResults.findIndex((row) => row.driver === FastestLap);
+      if (fastestDriverIndex !== -1 && updatedResults[fastestDriverIndex].position <= 10) {
+        updatedResults[fastestDriverIndex].points += 1; // Add 1 point to the fastest lap driver
+      }
+    }
+  
+    setRaceResults(updatedResults);
+  
+    // Update the `editedResults` with the new positions and recalculated points
+    setEditedResults((prev) => {
+      const updatedResultsObj = {};
+      updatedResults.forEach((row, index) => {
+        updatedResultsObj[row.id] = {
+          ...prev[row.id], // Retain other fields
+          position: row.position, // Update position
+          points: row.points, // Update points
+        };
       });
-    }, 0); // ✅ Runs after `setRaceResults` to ensure fresh data
+      return updatedResultsObj;
+    });
   };    
 
   return (

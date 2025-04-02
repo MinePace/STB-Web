@@ -49,6 +49,7 @@ function AddRaceResults() {
 
   useEffect(() => {
     if (selectedRace) {
+      console.log(selectedRace);
       fetch(`http://localhost:5110/api/driver/season/${selectedRace.season}`)
         .then((res) => res.json())
         .then((data) => {
@@ -168,13 +169,26 @@ function AddRaceResults() {
   const handleTabKeyDown = (e, index, type) => {
     if (e.key === "Tab") {
       e.preventDefault(); // Prevent default tabbing behavior
-
+  
+      // Check if Shift key is pressed
+      const isShiftPressed = e.shiftKey;
+  
       const inputClass = `${type}-input`; // Determine the class based on field type
       const inputs = Array.from(document.querySelectorAll(`.${inputClass}`));
-      const nextIndex = (index + 1) % inputs.length;
+  
+      let nextIndex;
+  
+      if (isShiftPressed) {
+        // Move one row up if Shift is pressed
+        nextIndex = index === 0 ? inputs.length - 1 : index - 1;
+      } else {
+        // Move one row down if Shift is not pressed
+        nextIndex = (index + 1) % inputs.length;
+      }
+  
       inputs[nextIndex].focus();
     }
-  };
+  };  
 
   return (
     <div className="add-race-results-container">
@@ -188,7 +202,7 @@ function AddRaceResults() {
           {filteredRaces.length > 0 ? (
             filteredRaces.map((race) => (
               <option key={race.id} value={race.id}>
-                {race.name} - Season {race.season}, Round {race.round}, Division {race.division}{" "}
+                {race.name} - Season {race.season}, Round {race.round}, Div {race.division}{" "}
                 {race.sprint === "Yes" ? "(Sprint)" : ""}
               </option>
             ))

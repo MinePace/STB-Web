@@ -43,4 +43,19 @@ public class FastestlapController : ControllerBase
 
         return Ok(fastestlaps);
     }
+
+    [HttpGet("{raceId}")]
+    public IActionResult GetFastestlap(int raceId)
+    {
+        var fastestlaps  = _context.FastestLaps
+            .Where(f => f.RaceId == raceId)
+            .Include(f => f.Driver)
+            .Select(f => f.Driver.Name)
+            .FirstOrDefault();
+
+        if (fastestlaps == null)
+        return NotFound(new { message = "No Fastestlap was found." });
+
+        return Ok(fastestlaps);
+    }
 }
