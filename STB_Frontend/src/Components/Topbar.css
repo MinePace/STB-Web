@@ -26,7 +26,7 @@
     height: 60px; /* Adjust based on your logo size */
     width: auto; /* Keeps aspect ratio */
     margin-left: 0; /* Ensures no unintended margin */
-    padding: 0px 0px; /* Adds spacing inside the topbar */
+    padding: 0px 10px; /* Adds spacing inside the topbar */
   }
   
   .nav-container {

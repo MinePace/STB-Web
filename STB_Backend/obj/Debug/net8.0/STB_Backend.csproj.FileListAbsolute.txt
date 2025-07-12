@@ -311,9 +311,12 @@ C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\staticwebas
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.STB_Backend.props
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\staticwebassets.pack.json
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\scopedcss\bundle\STB_Backend.styles.css
-C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\STB_Backend.csproj.CopyComplete
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\STB_Backend.dll
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\refint\STB_Backend.dll
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\STB_Backend.pdb
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\STB_Backend.genruntimeconfig.cache
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\ref\STB_Backend.dll
+C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\STB_Backend.staticwebassets.endpoints.json
+C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\staticwebassets\msbuild.STB_Backend.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\obj\Debug\net8.0\STB_Back.BEA14278.Up2Date

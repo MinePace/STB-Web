@@ -1,6 +1,7 @@
 .home-container {
     display: flex;
-    height: 100vh;
+    min-height: 100vh; /* allow content to grow */
+    overflow: hidden; /* prevent scrollbar from tiny overflow */
 }
 
 /* Zorg dat de topbar items zich aanpassen binnen het beschikbare scherm */
@@ -37,10 +38,134 @@
 
 /* Zorg dat de hoofdinhoud naast de sidebar wordt weergegeven */
 .main-content {
-    margin-left: 200px; /* Laat ruimte voor de zijbalk */
+    margin: 0 auto;
     padding: 20px;
-    flex-grow: 1; /* Vul de resterende ruimte */
+    flex-grow: 1;
+    min-height: calc(100vh - 60px);
     overflow-y: auto;
+    max-width: 1200px; /* Optional: limit max width */
+}
+
+.info-blocks {
+  display: flex;
+  flex-wrap: wrap; /* Wrap to next line on small screens */
+  justify-content: center;
+  gap: 20px; /* Space between blocks */
+  margin-top: 30px;
+}
+
+.info-block {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 15px;
+  padding: 25px;
+  flex: 1 1 300px; /* Grow, shrink, min width */
+  max-width: 400px; /* Optional: prevent them from stretching too much */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  text-align: left;
+  color: #fff;
+  transition: transform 0.2s ease;
+}
+
+.info-block:hover {
+  transform: translateY(-5px);
+}
+
+.info-block h2 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: #ffd700; /* Gold accent */
+}
+
+.info-block p,
+.info-block li,
+.info-block a {
+  font-size: 1rem;
+  margin: 5px 0;
+}
+
+.info-block ol {
+  list-style: decimal inside;
+  padding-left: 0;
+}
+
+.info-block ul {
+  list-style: none;
+  padding: 0;
+}
+
+a {
+  color: #00bfff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.carousel-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.carousel-controls button {
+  background: rgba(204, 166, 166, 0.15);
+  border: none;
+  color: #0084ff;
+  font-size: 1rem;      /* smaller text size */
+  margin: 0 5px;        /* less space between buttons */
+  padding: 4px 8px;     /* tighter button padding */
+  border-radius: 50%;   /* circular buttons */
+  width: 30px;          /* fixed size */
+  height: 30px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.carousel-controls button:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+
+.carousel-controls span {
+  color: #ffd700;
+  font-weight: bold;
+}
+
+.tier-slider-wrapper {
+  display: inline-block;
+  overflow: hidden;
+  width: 80px; /* Adjust width to fit your tier names */
+  vertical-align: middle;
+}
+
+.tier-slider {
+  display: flex;
+  transition: transform 0.4s ease-in-out;
+}
+
+.tier-slide {
+  min-width: 80px; /* Match wrapper width */
+  text-align: left;
+}
+
+/* Standings content slider */
+.standings-slider-wrapper {
+  overflow: hidden;
+  width: 100%;
+}
+
+.standings-slider {
+  display: flex;
+  transition: transform 0.4s ease-in-out;
+}
+
+.standings-slide {
+  width: 100%;
+  flex-shrink: 0;
 }
 
 @media (max-width: 768px) {

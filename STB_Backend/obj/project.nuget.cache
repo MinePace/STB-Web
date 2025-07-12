@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "j4G9NyQm3mc6GNirpRJTOcp31t0sA0rAdd/+YVShclmPs/lb4eLWkjF85/UP32UVIZSVn2iUuua9aPp5yepZ5A==",
+  "dgSpecHash": "O45KGPl8fyo=",
   "success": true,
   "projectFilePath": "C:\\Users\\joeyz\\Documents\\GitHub\\STB-Web\\STB_Backend\\STB_Backend.csproj",
   "expectedPackageFiles": [
@@ -59,7 +59,11 @@
     "C:\\Users\\joeyz\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\joeyz\\.nuget\\packages\\system.text.encodings.web\\9.0.1\\system.text.encodings.web.9.0.1.nupkg.sha512",
     "C:\\Users\\joeyz\\.nuget\\packages\\system.text.json\\9.0.1\\system.text.json.9.0.1.nupkg.sha512",
-    "C:\\Users\\joeyz\\.nuget\\packages\\system.threading.channels\\7.0.0\\system.threading.channels.7.0.0.nupkg.sha512"
+    "C:\\Users\\joeyz\\.nuget\\packages\\system.threading.channels\\7.0.0\\system.threading.channels.7.0.0.nupkg.sha512",
+    "C:\\Users\\joeyz\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.15\\microsoft.netcore.app.ref.8.0.15.nupkg.sha512",
+    "C:\\Users\\joeyz\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.15\\microsoft.windowsdesktop.app.ref.8.0.15.nupkg.sha512",
+    "C:\\Users\\joeyz\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.15\\microsoft.aspnetcore.app.ref.8.0.15.nupkg.sha512",
+    "C:\\Users\\joeyz\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.15\\microsoft.netcore.app.host.win-x64.8.0.15.nupkg.sha512"
   ],
   "logs": []
 }
