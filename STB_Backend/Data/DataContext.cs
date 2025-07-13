@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 public class DataContext : DbContext
 {
@@ -53,6 +54,9 @@ public class Race{
     public int Round { get; set; }
     public string Sprint { get; set; }
     public Track Track { get; set; }
+
+    [JsonIgnore] // 👈 ignore back-reference
+    public List<RaceResult> RaceResults { get; set; }
     public string? YoutubeLink { get; set; }
 }
 

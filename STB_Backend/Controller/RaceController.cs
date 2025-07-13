@@ -19,63 +19,65 @@ public class RaceController : ControllerBase
     [HttpGet("tracks")]
     public IActionResult GetAllTracks()
     {
-        var tracks  = _context.Tracks
+        var tracks = _context.Tracks
             .ToList();
 
         if (!tracks.Any())
-        return NotFound(new { message = "No tracks were found." });
+            return NotFound(new { message = "No tracks were found." });
 
-        return Ok(tracks );
+        return Ok(tracks);
     }
 
     [HttpGet("races")]
     public IActionResult GetAllRaces()
     {
-        var races  = _context.Races
+        var races = _context.Races
             .Include(r => r.Track)
             .ToList();
 
         if (!races.Any())
-        return NotFound(new { message = "No races were found." });
+            return NotFound(new { message = "No races were found." });
 
-        foreach(var race in races){
+        foreach (var race in races)
+        {
             var track = _context.Tracks.FirstOrDefault(t => t.Id == race.Track.Id);
             race.Track = track;
         }
 
-        return Ok(races );
+        return Ok(races);
     }
 
     [HttpGet("races/{season}")]
     public IActionResult GetRacesBySeason(int season)
     {
-        var races  = _context.Races
+        var races = _context.Races
             .Where(r => r.Season == season)
             .ToList();
 
         if (!races.Any())
-        return NotFound(new { message = "No races were found." });
+            return NotFound(new { message = "No races were found." });
 
-        foreach(var race in races){
+        foreach (var race in races)
+        {
             var track = _context.Tracks.FirstOrDefault(t => t.Id == race.Id);
             race.Track = track;
         }
 
-        return Ok(races );
+        return Ok(races);
     }
 
     [HttpGet("race/{id}")]
     public IActionResult GetRacesById(int id)
     {
-        var race  = _context.Races
+        var race = _context.Races
             .Where(r => r.Id == id)
             .Include(r => r.Track)
             .FirstOrDefault();
 
         if (race is null)
-        return NotFound(new { message = "No races were found." });
+            return NotFound(new { message = "No races were found." });
 
-        return Ok(race );
+        return Ok(race);
     }
 
     [HttpGet("seasons")]
@@ -109,16 +111,17 @@ public class RaceController : ControllerBase
             Type = "Yes";
         }
 
-        var race  = _context.Races
+        var race = _context.Races
             .Where(r => r.Season == season && r.Division == division && r.Round == round && r.Sprint == Type)
             .Include(r => r.Track)
             .FirstAsync();
 
-        if (race == null){
+        if (race == null)
+        {
             return NotFound(new { message = "No races were found." });
         }
 
-        return Ok(race );
+        return Ok(race);
     }
 
     [HttpGet("results/{raceId}")]
@@ -154,7 +157,8 @@ public class RaceController : ControllerBase
         foreach (var result in raceResults)
         {
 
-            if(!string.IsNullOrWhiteSpace(result.Driver)){
+            if (!string.IsNullOrWhiteSpace(result.Driver))
+            {
 
                 var existingDriver = await _context.Drivers.FirstOrDefaultAsync(d => d.Name == result.Driver);
 
@@ -169,7 +173,7 @@ public class RaceController : ControllerBase
 
                     _context.Drivers.Add(existingDriver);
                     await _context.SaveChangesAsync();
-                }  
+                }
 
                 if (result.DNF == "Yes")
                 {
@@ -214,7 +218,7 @@ public class RaceController : ControllerBase
     }
 
     // 🔹 GET: api/raceresults/{id} (optioneel)
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<RaceResult>> GetRaceResultById(int id)
     {
         var raceResult = await _context.RaceResults.FindAsync(id);
@@ -224,6 +228,55 @@ public class RaceController : ControllerBase
         }
 
         return Ok(raceResult);
+    }
+
+    [HttpGet("latest")]
+    public IActionResult GetLatestRace()
+    {
+        // Get latest race including track and race results
+        var latestRace = _context.Races
+            .Include(r => r.Track)
+            .Include(r => r.RaceResults.OrderBy(rr => rr.Position))
+            .Where(r => r.RaceResults.Any()) // 👈 only races with results
+            .OrderByDescending(r => r.Season)
+            .ThenByDescending(r => r.Round)
+            .FirstOrDefault();
+
+        if (latestRace == null)
+            return NotFound(new { message = "Race not found" });
+
+        // Shape the response
+        var response = new
+        {
+            Race = new
+            {
+                latestRace.Id,
+                latestRace.Season,
+                latestRace.Division,
+                latestRace.Round,
+                latestRace.Sprint,
+                Track = new
+                {
+                    latestRace.Track.Id,
+                    latestRace.Track.Name,
+                    latestRace.Track.Country
+                },
+                latestRace.YoutubeLink
+            },
+            Results = latestRace.RaceResults.Select(rr => new
+            {
+                rr.Position,
+                rr.Driver,
+                rr.Team,
+                rr.Points,
+                rr.Time,
+                rr.DNF,
+                rr.Qualifying,
+                rr.Pos_Change
+            }).ToList()
+        };
+
+        return Ok(response);
     }
 
     [HttpPost("track")]
@@ -269,7 +322,8 @@ public class RaceController : ControllerBase
             return BadRequest("Track not found.");
         }
 
-        var Race = new Race{
+        var Race = new Race
+        {
             F1_Game = race.Game,
             Season = race.Season,
             Division = race.Division,
@@ -278,7 +332,7 @@ public class RaceController : ControllerBase
             Track = existingTrack,
             YoutubeLink = race.YoutubeLink
         };
-        
+
         // Voeg de race toe en sla op
         _context.Races.Add(Race);
         await _context.SaveChangesAsync();
@@ -322,7 +376,7 @@ public class RaceController : ControllerBase
 
         _context.Races.Remove(race);
         await _context.SaveChangesAsync();
-        
+
         return Ok("Race deleted successfully.");
     }
 
@@ -337,6 +391,98 @@ public class RaceController : ControllerBase
         }
 
         return Ok(raceResult);
+    }
+
+    [HttpGet("stats/league")]
+    public IActionResult GetLeagueStats()
+    {
+        var totalSeasons = _context.Races
+            .Select(r => r.Season)
+            .Distinct()
+            .Count();
+
+        var totalRaces = _context.Races.Count();
+
+        var totalDrivers = _context.Drivers.Count();
+
+        // Driver with most wins (Position == 1)
+        var mostWins = _context.RaceResults
+            .Where(rr => rr.Position == 1)
+            .GroupBy(rr => rr.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Wins = g.Count()
+            })
+            .OrderByDescending(g => g.Wins)
+            .FirstOrDefault();
+
+        // Driver with most race participations
+        var mostRaces = _context.RaceResults
+            .GroupBy(rr => rr.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Races = g.Count()
+            })
+            .OrderByDescending(g => g.Races)
+            .FirstOrDefault();
+
+        var leagueStats = new
+        {
+            TotalSeasons = totalSeasons,
+            TotalRaces = totalRaces,
+            TotalDrivers = totalDrivers,
+            MostWins = mostWins != null ? new { mostWins.Driver, mostWins.Wins } : null,
+            MostRaces = mostRaces != null ? new { mostRaces.Driver, mostRaces.Races } : null
+        };
+
+        if (totalSeasons == 0 && totalRaces == 0 && totalDrivers == 0)
+            return NotFound(new { message = "No league stats found." });
+
+        return Ok(leagueStats);
+    }
+
+    [HttpGet("stats/season/{season}")]
+    public IActionResult GetSeasonStats(int season)
+    {
+        var totalRaces = _context.Races
+            .Where(r => r.Season == season)
+            .Count();
+
+        var racesCompleted = _context.Races
+            .Include(r => r.RaceResults)
+            .Where(r => r.Season == season)
+            .Where(r => r.RaceResults.Any())
+            .OrderByDescending(r => r.Round)
+            .Count();
+
+        var mostPodium = _context.RaceResults
+            .Include(rr => rr.Race)
+            .Where(rr => 
+                    (rr.Position == 1 || rr.Position == 2 || rr.Position == 3) 
+                    && rr.Race.Season == season
+                )
+            .GroupBy(rr => rr.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Podium = g.Count()
+            })
+            .OrderByDescending(g => g.Podium)
+            .FirstOrDefault();
+
+        var seasonStats = new
+        {
+            TotalRaces = totalRaces,
+            RacesCompleted = racesCompleted,
+            MostPodium = mostPodium != null ? new { mostPodium.Driver, mostPodium.Podium } : null
+        };
+
+        if (totalRaces == 0 && racesCompleted == 0)
+            return NotFound(new { message = "No season stats found." });
+
+        return Ok(seasonStats);
     }
 
     [HttpGet("test/{raceId}")]

@@ -10,25 +10,96 @@ function HomePage() {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
 
-  // Mock Data
-  const latestRace = {
-    id: 89,
-    name: "Silverstone GP",
-    season: 28,
-    date: "July 2, 2025",
-    top3: [
-      { position: 1, name: "John Doe", team: "Red Bull", points: 25 },
-      { position: 2, name: "Jane Smith", team: "Ferrari", points: 18 },
-      { position: 3, name: "Max Johnson", team: "Mercedes", points: 15 },
-    ],
-  };
+  const [latestRace, setLatestRace] = useState(null); // 👈 use state for API data
+  const [loadingLatest, setLoadingLatest] = useState(true);
+  const [latestError, setLatestError] = useState(null);
 
-  const stats = {
-    totalRaces: 235,
-    totalDrivers: 87,
-    mostWins: { name: "John Doe", count: 45 },
-    mostPodiums: { name: "Jane Doe", count: 103 },
-  };
+  const [leagueStats, setLeagueStats] = useState(null);
+  const [seasonStats, setSeasonStats] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [statsError, setStatsError] = useState(null);
+
+  // Latest Race
+  useEffect(() => {
+    const fetchLatestRace = async () => {
+      try {
+        const response = await fetch("http://localhost:5110/api/race/latest");
+        if (!response.ok) {
+          throw new Error("Failed to fetch latest race.");
+        }
+        const data = await response.json();
+        // Shape data for UI
+        setLatestRace({
+          id: data.race.id,
+          name: `${data.race.track.name}`,
+          country: data.race.track.country,
+          season: data.race.season,
+          division: data.race.division,
+          date: new Date().toLocaleDateString(), // You could add date in API later
+          top3: data.results.slice(0, 3).map((r, idx) => ({
+            position: r.position,
+            name: r.driver,
+            team: r.team,
+            points: r.points,
+          })),
+        });
+      } catch (err) {
+        console.error(err);
+        setLatestError(err.message);
+      } finally { 
+        setLoadingLatest(false);
+      }
+    };
+
+    fetchLatestRace();
+  }, []);
+
+  useEffect(() => {
+    const fetchLeagueStats = async () => {
+      try {
+        const response = await fetch("http://localhost:5110/api/race/stats/league");
+        if (!response.ok) {
+          throw new Error("Failed to fetch league stats.");
+        }
+        const data = await response.json();
+        setLeagueStats({
+          totalSeasons: data.totalSeasons,
+          totalRaces: data.totalRaces,
+          totalDrivers: data.totalDrivers,
+          mostWins: {
+            name: data.mostWins.driver,
+            count: data.mostWins.wins,
+          },
+          mostRaces: {
+            name: data.mostRaces.driver,
+            count: data.mostRaces.races,
+          },
+        });
+
+        const currentSeasonResponse = await fetch("http://localhost:5110/api/race/stats/season/28");
+        if (!currentSeasonResponse.ok) {
+          throw new Error("Failed to fetch current season stats.");
+        }
+        const currentSeasonData = await currentSeasonResponse.json();
+        setSeasonStats({
+          seasonTotalRaces: currentSeasonData.totalRaces,
+          racesCompleted: currentSeasonData.racesCompleted,
+          seasonMostPodium: {
+            name: currentSeasonData.mostPodium.driver,
+            count: currentSeasonData.mostPodium.podium,
+          },
+        });
+
+      } catch (err) {
+        console.error(err);
+        setStatsError(err.message);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    fetchLeagueStats();
+  }, []);
 
   const nextRace = {
     name: "Monza GP",
@@ -129,25 +200,35 @@ function HomePage() {
 
           {/* Latest Race Block */}
           <div className="info-block">
-            <h2>🏁 Latest Race: {latestRace.name}</h2>
-            <p>{latestRace.date} - Season {latestRace.season}</p>
-            <ul>
-              {latestRace.top3.map(driver => {
-                let medal;
-                if (driver.position === 1) medal = "🥇";
-                else if (driver.position === 2) medal = "🥈";
-                else if (driver.position === 3) medal = "🥉";
+            {loadingLatest ? (
+              <p>Loading latest race...</p>
+            ) : latestError ? (
+              <p style={{ color: "red" }}>Error: {latestError}</p>
+            ) : latestRace ? (
+              <>
+                <h2 style={{ marginBottom: "0.2em" }}>🏁 Latest Race</h2>
+                <h3 style={{ marginTop: "0", color: "#FFD700" }}>{latestRace.name} - {latestRace.country} - Tier {latestRace.division}</h3>
+                <ul>
+                  {latestRace.top3.map(driver => {
+                    let medal;
+                    if (driver.position === 1) medal = "🥇";
+                    else if (driver.position === 2) medal = "🥈";
+                    else if (driver.position === 3) medal = "🥉";
 
-                return (
-                  <li key={driver.position}>
-                    {medal} {driver.name} - {driver.team} ({driver.points} pts)
-                  </li>
-                );
-              })}
-            </ul>
-            <Link to={`/STB/race/${latestRace.id}`}>
-              View Full Results
-            </Link>
+                    return (
+                      <li key={driver.position}>
+                        {medal} {driver.name} - {driver.team} ({driver.points} pts)
+                      </li>
+                    );
+                  })}
+                </ul>
+                <Link to={`/STB/race/${latestRace.id}`}>
+                  View Full Results
+                </Link>
+              </>
+            ) : (
+              <p>No latest race data available.</p>
+            )}
           </div>
 
           {/* League Stats Block */}
@@ -168,24 +249,41 @@ function HomePage() {
               >
                 {/* League Stats */}
                 <div className="standings-slide">
-                  <ul>
-                    <li>📅 Total Seasons: 28</li>
-                    <li>🏁 Total Races: 235</li>
-                    <li>🧑‍🚀 Drivers: 87</li>
-                    <li>🏆 Most Wins: John Doe (102)</li>
-                    <li>🔥 Longest Streak: Jane Smith (8)</li>
-                  </ul>
+                  {loadingStats ? (
+                    <p>📊 Loading League Stats...</p>
+                  ) : statsError ? (
+                    <p style={{ color: "red" }}>Error: {statsError}</p>
+                  ) : leagueStats ? (
+                    <ul>
+                      <li>📅 Total Seasons: {leagueStats.totalSeasons}</li>
+                      <li>🏁 Total Races: {leagueStats.totalRaces}</li>
+                      <li>🧑‍🚀 Drivers: {leagueStats.totalDrivers}</li>
+                      <li>
+                        🏆 Most Wins: {leagueStats.mostWins.name} ({leagueStats.mostWins.count})
+                      </li>
+                      <li>
+                        🚦 Most Races: {leagueStats.mostRaces.name} ({leagueStats.mostRaces.count})
+                      </li>
+                    </ul>
+                  ) : (
+                    <p>No league stats available.</p>
+                  )}
                 </div>
 
                 {/* Season Stats */}
                 <div className="standings-slide">
+                  {loadingStats ? (
+                    <p>📊 Loading League Stats...</p>
+                  ) : statsError ? (
+                    <p style={{ color: "red" }}>Error: {statsError}</p>
+                  ) : leagueStats ? (
                   <ul>
-                    <li>📅 Current Season: 29</li>
-                    <li>🏁 Races Completed: 7/15</li>
-                    <li>🏎️ Avg Lap: 1:31.456</li>
-                    <li>🥇 Wins Leader: Jane Smith (4)</li>
-                    <li>🏆 Points Leader: John Doe (192 pts)</li>
+                    <li>🏁 Races Completed: {seasonStats.racesCompleted}/{seasonStats.seasonTotalRaces}</li>
+                    <li>🏆 Points Podium: {seasonStats.seasonMostPodium.name} ({seasonStats.seasonMostPodium.count})</li>
                   </ul>
+                  ) : (
+                    <p>No league stats available.</p>
+                  )}
                 </div>
               </div>
             </div>
