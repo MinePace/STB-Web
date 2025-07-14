@@ -4,6 +4,7 @@ import "./Sidebar.css"; // Zorg dat je een aparte CSS hebt voor de Sidebar
 
 function Sidebar() {
   const seasons = [
+    { year: 29, divisions: ["1", "2", "3", "4"] },
     { year: 28, divisions: ["1", "2", "3"] },
     { year: 25, divisions: ["1", "2", "3"] },
     { year: 24, divisions: ["1", "2", "3"] },

@@ -1,34 +1,110 @@
-/* General button styling */
+/* DriverPage.css - Updated for blue background and compact design */
+
+body {
+  background: linear-gradient(180deg, #0a4e91 0%, #042d52 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+.driver-card {
+  max-width: 600px;
+  min-width: 300px;
+  margin: 50px auto;
+  background-color: rgb(72, 115, 235);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  padding: 20px;
+  text-align: center;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.driver-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.driver-avatar {
+  background-color: #0077cc;
+  color: #fff;
+  font-size: 30px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.claimed-by {
+  color: #555;
+  font-style: italic;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.driver-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.stat-item {
+  background: #e6f0fa;
+  border-radius: 6px; /* slightly smaller radius */
+  padding: 6px; /* reduced padding */
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.05);
+}
+
+.stat-value {
+  font-size: 16px; /* smaller font */
+  font-weight: 600;
+  color: #005fa3;
+}
+
+.stat-label {
+  display: block;
+  font-size: 11px; /* smaller font */
+  color: #444;
+  margin-top: 2px; /* reduced margin */
+}
+
 .claim-button {
-    background-color: #004ca9; /* Default button color */
-    color: white; /* Text color */
-    font-size: 16px; /* Adjust font size */
-    font-weight: bold;
-    padding: 10px 20px; /* Add padding */
-    border: none; /* Remove border */
-    border-radius: 8px; /* Rounded corners */
-    cursor: pointer; /* Indicate clickable button */
-    transition: all 0.3s ease-in-out; /* Smooth transition for hover effects */
-    display: block;
-    margin: 15px auto; /* Center button */
-    text-align: center;
-  }
-  
-  /* Hover effect */
-  .claim-button:hover {
-    background-color: #004190; /* Darker blue */
-    transform: scale(1.05); /* Slightly increase size */
-  }
-  
-  /* Active (click) effect */
-  .claim-button:active {
-    background-color: #002a5f; /* Even darker blue */
-    transform: scale(0.95); /* Slightly shrink */
-  }
-  
-  /* Disabled state */
-  .claim-button:disabled {
-    background-color: #7a7a7a; /* Gray color when disabled */
-    cursor: not-allowed; /* Change cursor */
-    opacity: 0.6;
-  }
+  margin-top: 20px;
+  background-color: #ff3b30;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+
+.claim-button:hover {
+  background-color: #d93025;
+}
+
+.spinner {
+  text-align: center;
+  font-size: 18px;
+  color: #fff;
+  margin-top: 100px;
+}
+
+.error {
+  text-align: center;
+  color: #ff3b30;
+  font-weight: bold;
+  margin-top: 100px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

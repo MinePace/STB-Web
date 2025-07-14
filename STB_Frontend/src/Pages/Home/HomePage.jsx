@@ -19,6 +19,9 @@ function HomePage() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState(null);
 
+  const [nextRace, setNextRace] = useState(null); // 👈 fetched from API
+  const [timeLeft, setTimeLeft] = useState("");
+
   // Latest Race
   useEffect(() => {
     const fetchLatestRace = async () => {
@@ -76,7 +79,7 @@ function HomePage() {
           },
         });
 
-        const currentSeasonResponse = await fetch("http://localhost:5110/api/race/stats/season/28");
+        const currentSeasonResponse = await fetch("http://localhost:5110/api/race/stats/season/29");
         if (!currentSeasonResponse.ok) {
           throw new Error("Failed to fetch current season stats.");
         }
@@ -84,10 +87,15 @@ function HomePage() {
         setSeasonStats({
           seasonTotalRaces: currentSeasonData.totalRaces,
           racesCompleted: currentSeasonData.racesCompleted,
-          seasonMostPodium: {
-            name: currentSeasonData.mostPodium.driver,
-            count: currentSeasonData.mostPodium.podium,
-          },
+          seasonMostPodium: currentSeasonData.mostPodium
+            ? {
+                name: currentSeasonData.mostPodium.driver,
+                count: currentSeasonData.mostPodium.podium,
+              }
+            : {
+                name: "N/A",
+                count: 0,
+              },
         });
 
       } catch (err) {
@@ -100,11 +108,6 @@ function HomePage() {
 
     fetchLeagueStats();
   }, []);
-
-  const nextRace = {
-    name: "Monza GP",
-    date: new Date("2025-07-15T14:00:00"), // Example date
-  };
 
   const standings = [
     {
@@ -133,27 +136,50 @@ function HomePage() {
     },
   ];
 
-  const [timeLeft, setTimeLeft] = useState("");
-
   useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date();
-      const distance = nextRace.date - now;
+    const fetchNextRace = async () => {
+      try {
+        const response = await fetch("http://localhost:5110/api/race/nextrace");
+        if (!response.ok) throw new Error("Failed to fetch next race.");
+        const data = await response.json();
 
-      if (distance <= 0) {
-        setTimeLeft("Race is live!");
-        clearInterval(timer);
-      } else {
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-        const minutes = Math.floor((distance / (1000 * 60)) % 60);
-        const seconds = Math.floor((distance / 1000) % 60);
-        setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+        // Convert API date to JS Date
+        const raceDate = new Date(data.date);
+
+        setNextRace({
+          name: data.track.raceName,
+          country: data.track.country,
+          division: data.division,
+          track: data.track.name,
+          date: raceDate,
+        });
+
+        // Start countdown timer
+        const timer = setInterval(() => {
+          const now = new Date();
+          const distance = raceDate - now;
+
+          if (distance <= 0) {
+            setTimeLeft("🏁 Race is live!");
+            clearInterval(timer);
+          } else {
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+            const minutes = Math.floor((distance / (1000 * 60)) % 60);
+            const seconds = Math.floor((distance / 1000) % 60);
+            setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+          }
+        }, 1000);
+
+        return () => clearInterval(timer);
+      } catch (err) {
+        console.error(err);
+        setTimeLeft("❌ Could not load race timer");
       }
-    }, 1000);
+    };
 
-    return () => clearInterval(timer);
-  }, [nextRace.date]);
+    fetchNextRace();
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -193,9 +219,18 @@ function HomePage() {
         <div className="info-blocks">
           {/* Next Race Block */}
           <div className="info-block">
-            <h2>⏱ Next Race: {nextRace.name}</h2>
-            <p>{nextRace.date.toLocaleString()}</p>
-            <p><strong>Starts In:</strong> {timeLeft}</p>
+            {nextRace ? (
+              <>
+                <h2 style={{ marginBottom: "0.2em" }}>🏁 Next Race</h2>
+                <h3 style={{ marginTop: "0", color: "#FFD700" }}>{nextRace.name} - Tier {nextRace.division}</h3>
+                <ul>
+                  <li><strong>Track:</strong> {nextRace.track} ({nextRace.country})</li>
+                  <li><strong>Starts In:</strong> {timeLeft}</li>
+                </ul>
+              </>
+            ) : (
+              <p>Loading next race...</p> // 👈 fallback while waiting for API
+            )}
           </div>
 
           {/* Latest Race Block */}

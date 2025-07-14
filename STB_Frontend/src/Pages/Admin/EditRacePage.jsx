@@ -18,6 +18,7 @@ function EditRacePage() {
     trackName: "",
     trackCountry: "",
     trackRaceName: "",
+    date: "",
   });
 
   useEffect(() => {
@@ -61,6 +62,7 @@ function EditRacePage() {
             trackName: data.track.name,
             trackCountry: data.track.country,
             trackRaceName: data.track.raceName || "",
+      date: data.date ? data.date.split("T")[0] : "",
           });
         })
         .catch((err) => console.error("Error fetching race data:", err));
@@ -196,6 +198,15 @@ function EditRacePage() {
               <option value="Yes">Yes</option>
               <option value="No">No</option>
             </select>
+          </label>
+          <label>
+            Race Date:
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+            />
           </label>
           <label>
             YouTube Link:

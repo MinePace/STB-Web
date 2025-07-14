@@ -54,9 +54,10 @@ public class Race{
     public int Round { get; set; }
     public string Sprint { get; set; }
     public Track Track { get; set; }
+    public DateTime? Date { get; set; }
 
     [JsonIgnore] // 👈 ignore back-reference
-    public List<RaceResult> RaceResults { get; set; }
+    public List<RaceResult>? RaceResults { get; set; }
     public string? YoutubeLink { get; set; }
 }
 

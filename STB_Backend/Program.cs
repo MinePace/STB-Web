@@ -24,7 +24,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-    dbContext.Database.Migrate();  // **Ensure database is up to date**
+        dbContext.Database.EnsureCreated(); // 👈 faster, no migrations
 }
 
 if (app.Environment.IsDevelopment())

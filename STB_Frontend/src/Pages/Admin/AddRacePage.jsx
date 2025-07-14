@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function AddRacePage() {
   const [race, setRace] = useState({
@@ -10,19 +10,20 @@ function AddRacePage() {
     sprint: "",
     trackId: "",
     youtubeLink: "",
+    date: "", // 👈 Add date field to state
   });
   const [tracks, setTracks] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-      const role = localStorage.getItem("role");
-      if (role !== "Admin") {
-        navigate("/"); // Stuur terug naar homepage als geen admin
-      }
-    }, [navigate]);
+    const role = localStorage.getItem("role");
+    if (role !== "Admin") {
+      navigate("/"); // Redirect non-admins
+    }
+  }, [navigate]);
 
   useEffect(() => {
-    // Haal beschikbare tracks op
+    // Fetch available tracks
     fetch("http://localhost:5110/api/race/tracks")
       .then((res) => res.json())
       .then((data) => setTracks(data))
@@ -38,38 +39,53 @@ function AddRacePage() {
     const trackId = e.target.value;
     setRace((prev) => ({
       ...prev,
-      trackId: trackId !== "" ? Number(trackId) : "", // Zorg dat het een nummer is
+      trackId: trackId !== "" ? Number(trackId) : "",
     }));
   };
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Verstuur racegegevens naar de backend
+
+    const payload = {
+      ...race,
+      date: race.date ? race.date : null, // Send date or null
+    };
+
     const response = await fetch("http://localhost:5110/api/race", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(race),
+      body: JSON.stringify(payload),
     });
-  
+
     if (response.ok) {
       alert("Race added successfully!");
-      
-      // Reset alleen de velden die je wilt resetten
-      setRace((prev) => ({
-        game: prev.game, // Blijft hetzelfde
-        season: prev.season, // Blijft hetzelfde
-        division: prev.division, // Blijft hetzelfde
-        round: parseInt(prev.round, 10) + 1,
-        sprint: prev.sprint,
-        trackId: "",
-        youtubeLink: "",
-      }));
+      // Reset fields except persistent ones
+      setRace((prev) => {
+        // If there's already a date, add 7 days to it
+        const nextDate = prev.date
+          ? new Date(prev.date) // parse existing date
+          : new Date();         // or use today if no date yet
+
+        nextDate.setDate(nextDate.getDate() + 7); // add 7 days
+
+        // Format as YYYY-MM-DD for input value
+        const formattedNextDate = nextDate.toISOString().split("T")[0];
+
+        return {
+          game: prev.game,
+          season: prev.season,
+          division: prev.division,
+          round: parseInt(prev.round, 10) + 1,
+          sprint: prev.sprint,
+          trackId: "",
+          youtubeLink: "",
+          date: formattedNextDate, // 👈 set next date
+        };
+      });
     } else {
       alert("Failed to add race. Please try again.");
     }
-  };  
+  };
 
   return (
     <div className="add-race-page">
@@ -119,7 +135,8 @@ function AddRacePage() {
         </select>
         <select
           name="trackId"
-          onChange={handleTrackChange} // Aangepaste handler voor tracks
+          onChange={handleTrackChange}
+          value={race.trackId}
           required
         >
           <option value="">Select Track</option>
@@ -134,6 +151,14 @@ function AddRacePage() {
           name="youtubeLink"
           placeholder="YouTube Link (optional)"
           value={race.youtubeLink}
+          onChange={handleInputChange}
+        />
+        {/* 👇 Date Picker */}
+        <input
+          type="date"
+          name="date"
+          placeholder="Race Date"
+          value={race.date}
           onChange={handleInputChange}
         />
         <button type="submit">Add Race</button>

@@ -330,7 +330,8 @@ public class RaceController : ControllerBase
             Round = race.Round,
             Sprint = race.Sprint,
             Track = existingTrack,
-            YoutubeLink = race.YoutubeLink
+            YoutubeLink = race.YoutubeLink,
+            Date = race.Date
         };
 
         // Voeg de race toe en sla op
@@ -354,6 +355,7 @@ public class RaceController : ControllerBase
         race.Round = updatedRace.Round;
         race.Sprint = updatedRace.Sprint;
         race.YoutubeLink = updatedRace.YoutubeLink;
+        race.Date = updatedRace.Date;
 
         // Update track details
         if (updatedRace.Track != null)
@@ -485,6 +487,20 @@ public class RaceController : ControllerBase
         return Ok(seasonStats);
     }
 
+    [HttpGet("nextrace")]
+    public IActionResult GetNextRace()
+    {
+        var nextRace = _context.Races
+            .Include(r => r.Track)
+            .Where(r => r.Date > DateTime.Now) // Filter
+            .OrderBy(r => r.Date)
+            .FirstOrDefault();
+        if (nextRace == null)
+            return NotFound(new { message = "No upcoming Races found." });
+        // Shape the response
+        return Ok(nextRace);
+    }
+
     [HttpGet("test/{raceId}")]
     public IActionResult GetTest(int raceId)
     {
@@ -501,7 +517,8 @@ public class RaceController : ControllerBase
     }
 }
 
-public class RaceRequest{
+public class RaceRequest
+{
     public int Id { get; set; }
     public int Game { get; set; }
     public int Season { get; set; }
@@ -510,6 +527,7 @@ public class RaceRequest{
     public string Sprint { get; set; }
     public int TrackId { get; set; }
     public string YoutubeLink { get; set; }
+    public DateTime? Date { get; set; }
 }
 
 public class RaceResultRequest{
