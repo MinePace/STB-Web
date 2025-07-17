@@ -53,3 +53,7 @@ GET http://localhost:5110/api/race/latest
 ##########
 
 GET http://localhost:5110/api/championship/28/1
+
+##########
+
+GET http://localhost:5110/api/race/stats/season/29

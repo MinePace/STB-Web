@@ -279,15 +279,21 @@ function ChampionshipPage() {
                               : "transparent",
                           }}
                         >
-                          {driversraces[round] === "DNF" ? ( // Check if DNF
-                            <span style={{ color: "rgb(200, 50, 50)", fontWeight: "bold" }}>DNF</span> // Red-ish color
+                          {driversraces[round] === "DNF" ? (
+                            <Link
+                              to={`/STB/Race/${RaceId}`}
+                              className="driver-link"
+                              style={{ color: "rgb(200, 50, 50)", fontWeight: "bold" }}
+                            >
+                              DNF
+                            </Link>
                           ) : RaceId ? (
                             <Link to={`/STB/Race/${RaceId}`} className="driver-link">
                               {driversraces[round] ?? "-"}
                             </Link>
                           ) : (
-                            driversraces[round] ?? "-" // No link if no RaceId
-                          )}
+                            driversraces[round] ?? "-"
+                        )}
                         </td>
                       );
                     })}
