@@ -78,14 +78,24 @@ function DriverPage() {
     <div className="driver-card">
       <div className="driver-header">
         <div className="driver-avatar">{driverStats.driver.charAt(0)}</div>
-        <h1>{driverStats.driver}</h1>
-        <p className="claimed-by">
-          {driverStats.driverOBJ?.user?.username
-            ? `Claimed by: ${driverStats.driverOBJ.user.username}`
-            : "🚨 Unclaimed"}
-        </p>
+        <h1 className="driver-header">
+          {driverStats.driverOBJ?.country && (
+            <img
+              src={`/flags/${driverStats.driverOBJ.country}.png`}
+              alt={`${driverStats.driverOBJ.country} flag`}
+              title={driverStats.driverOBJ.country}
+              className="country-flag"
+              aria-hidden="true"
+            />
+          )}
+          <span>{driverStats.driver}</span>
+        </h1>
       </div>
-
+      <p className="claimed-by">
+        {driverStats.driverOBJ?.user?.username
+          ? `Claimed by: ${driverStats.driverOBJ.user.username}`
+          : "🚨 Unclaimed"}
+      </p>
       <div className="driver-stats-grid">
         <div className="stat-item">
           <span className="stat-value">{driverStats.totalPoints}</span>

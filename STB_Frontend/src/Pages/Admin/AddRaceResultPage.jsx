@@ -49,7 +49,6 @@ function AddRaceResults() {
 
   useEffect(() => {
     if (selectedRace) {
-      console.log(selectedRace);
       fetch(`http://localhost:5110/api/driver/season/${selectedRace.season}`)
         .then((res) => res.json())
         .then((data) => {
@@ -83,7 +82,7 @@ function AddRaceResults() {
         pos_Change: 0,
         qualifying: "",
         fastestLap: false,
-        raceTime: "", // New field for race time
+        raceTime: "",
       }))
     );
   };
@@ -95,9 +94,10 @@ function AddRaceResults() {
       updatedResults[index] = { ...updatedResults[index], [field]: value };
 
       if (field === "position" || field === "qualifying") {
+        const q = parseInt(updatedResults[index].qualifying, 10);
         updatedResults[index].pos_Change =
-          updatedResults[index].qualifying && updatedResults[index].position
-            ? updatedResults[index].qualifying - updatedResults[index].position
+          Number.isFinite(q) && updatedResults[index].position
+            ? q - updatedResults[index].position
             : 0;
       }
 
@@ -140,7 +140,7 @@ function AddRaceResults() {
       qualifying: result.qualifying ? parseInt(result.qualifying, 10) : 0,
       pos_Change: result.pos_Change,
       fastestLap: result.fastestLap,
-      Time: result.raceTime.trim(), // Save race time as a string
+      Time: result.raceTime.trim(),
     }));
 
     try {
@@ -151,7 +151,6 @@ function AddRaceResults() {
         },
         body: JSON.stringify(raceData),
       });
-      console.log(raceData)
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -168,27 +167,81 @@ function AddRaceResults() {
   // Handle Tab key press to move down between inputs
   const handleTabKeyDown = (e, index, type) => {
     if (e.key === "Tab") {
-      e.preventDefault(); // Prevent default tabbing behavior
-  
-      // Check if Shift key is pressed
+      e.preventDefault();
+
       const isShiftPressed = e.shiftKey;
-  
-      const inputClass = `${type}-input`; // Determine the class based on field type
+      const inputClass = `${type}-input`;
       const inputs = Array.from(document.querySelectorAll(`.${inputClass}`));
-  
+
       let nextIndex;
-  
+
       if (isShiftPressed) {
-        // Move one row up if Shift is pressed
         nextIndex = index === 0 ? inputs.length - 1 : index - 1;
       } else {
-        // Move one row down if Shift is not pressed
         nextIndex = (index + 1) % inputs.length;
       }
-  
+
       inputs[nextIndex].focus();
     }
-  };  
+  };
+
+  // NEW: Paste handler to fill down a column from the focused row
+  const handleColumnPaste = (e, startIndex, field) => {
+    const text = e.clipboardData?.getData("text");
+    if (!text) return;
+
+    // Split into non-empty lines
+    const lines = text
+      .split(/\r?\n/)
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
+
+    // If it’s just a single line, let the native paste happen (so single-cell paste works).
+    if (lines.length <= 1) return;
+
+    // We’re handling it — stop the default paste
+    e.preventDefault();
+
+    setRaceResults((prev) => {
+      const updated = [...prev];
+
+      const toBool = (raw) => {
+        const v = String(raw).toLowerCase();
+        return v === "1" || v === "true" || v === "yes" || v === "y";
+      };
+      const toYesNo = (raw) => (toBool(raw) ? "Yes" : "No");
+
+      for (let i = 0; i < lines.length; i++) {
+        const idx = startIndex + i;
+        if (idx >= updated.length) break;
+
+        // Take the first token on the line (so tab/comma-separated still works)
+        const firstCell = lines[i].split(/\t|,/)[0]?.trim() ?? "";
+
+        let value = firstCell;
+        if (field === "qualifying") {
+          const n = parseInt(firstCell, 10);
+          value = Number.isFinite(n) ? n : "";
+        } else if (field === "dnf") {
+          value = toYesNo(firstCell);
+        } else if (field === "fastestLap") {
+          value = toBool(firstCell);
+        }
+
+        const row = { ...updated[idx], [field]: value };
+
+        // Keep Position Change in sync when qualifying changes
+        if (field === "qualifying") {
+          const q = parseInt(row.qualifying, 10);
+          row.pos_Change = Number.isFinite(q) ? q - row.position : 0;
+        }
+
+        updated[idx] = row;
+      }
+
+      return updated;
+    });
+  };
 
   return (
     <div className="add-race-results-container">
@@ -215,6 +268,10 @@ function AddRaceResults() {
       {/* Results Form */}
       <div className="result-form">
         <h2>Add Results for {selectedRace?.track?.raceName}</h2>
+        <p style={{ fontSize: 12, color: "#444951ff" }}>
+          Tip: You can paste multiple rows from Excel/Sheets. Focus a cell in Driver, Team, Qualifying or Race Time,
+          then paste — it fills down from the focused row.
+        </p>
         <table>
           <thead>
             <tr>
@@ -226,7 +283,7 @@ function AddRaceResults() {
               <th>Qualifying</th>
               <th>Position Change</th>
               <th>Fastest Lap</th>
-              <th>Race Time</th> {/* New column for Race Time */}
+              <th>Race Time</th>
             </tr>
           </thead>
           <tbody>
@@ -240,6 +297,7 @@ function AddRaceResults() {
                     value={result.driver}
                     onChange={(e) => handleResultChange(index, "driver", e.target.value)}
                     onKeyDown={(e) => handleTabKeyDown(e, index, "driver")}
+                    onPaste={(e) => handleColumnPaste(e, index, "driver")} // NEW
                     placeholder="Select or type driver..."
                     className="driver-input"
                   />
@@ -255,6 +313,7 @@ function AddRaceResults() {
                     value={result.team}
                     onChange={(e) => handleResultChange(index, "team", e.target.value)}
                     onKeyDown={(e) => handleTabKeyDown(e, index, "team")}
+                    onPaste={(e) => handleColumnPaste(e, index, "team")} // NEW
                     className="team-input"
                   />
                 </td>
@@ -263,6 +322,7 @@ function AddRaceResults() {
                   <select
                     value={result.dnf}
                     onChange={(e) => handleResultChange(index, "dnf", e.target.value)}
+                    // Note: native select doesn't have a paste UX, so we skip onPaste here.
                   >
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
@@ -274,6 +334,7 @@ function AddRaceResults() {
                     value={result.qualifying}
                     onChange={(e) => handleResultChange(index, "qualifying", e.target.value)}
                     onKeyDown={(e) => handleTabKeyDown(e, index, "quali")}
+                    onPaste={(e) => handleColumnPaste(e, index, "qualifying")} // NEW
                     className="quali-input"
                   />
                 </td>
@@ -283,6 +344,8 @@ function AddRaceResults() {
                     type="checkbox"
                     checked={result.fastestLap}
                     onChange={(e) => handleResultChange(index, "fastestLap", e.target.checked)}
+                    // If you want to support pasting booleans here, you could add:
+                    // onPaste={(e) => handleColumnPaste(e, index, "fastestLap")}
                   />
                 </td>
                 <td>
@@ -291,6 +354,7 @@ function AddRaceResults() {
                     value={result.raceTime}
                     onChange={(e) => handleResultChange(index, "raceTime", e.target.value)}
                     onKeyDown={(e) => handleTabKeyDown(e, index, "time")}
+                    onPaste={(e) => handleColumnPaste(e, index, "raceTime")} // NEW
                     placeholder="Enter race time"
                     className="time-input"
                   />

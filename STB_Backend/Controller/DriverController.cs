@@ -139,11 +139,8 @@ public class DriverController : ControllerBase
         if (driver == null)
             return NotFound(new { message = "Driver not found" });
 
-        var user = _context.Users.FirstOrDefault(u => u.Id == request.UserId);
-        if (user == null)
-            return NotFound(new { message = "User not found" });
+        driver.Country = request.Country;
 
-        driver.User = user;
         _context.Drivers.Update(driver);
         _context.SaveChanges();
 

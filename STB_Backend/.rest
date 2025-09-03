@@ -44,7 +44,7 @@ GET http://localhost:5110/api/race/raceresults
 
 ##########
 
-GET http://localhost:5110/api/race/race/17
+GET http://localhost:5110/api/driver/season/29
 
 ##########
 
@@ -56,4 +56,15 @@ GET http://localhost:5110/api/championship/28/1
 
 ##########
 
-GET http://localhost:5110/api/race/stats/season/29
+GET http://localhost:5110/api/race/results/214
+
+##########
+
+PUT http://localhost:5110/api/driver/update/97
+Content-Type: application/json
+
+{
+    "Id": 97,
+    "Name": "brainyCactus30",
+    "Country": "Great Britain"
+}

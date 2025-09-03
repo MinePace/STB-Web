@@ -90,6 +90,14 @@ body {
   background-color: #d93025;
 }
 
+.country-flag {
+  height: 1em;               /* scales with the H1 font size */
+  width: auto;
+  object-fit: contain;
+  flex: 0 0 auto;
+  display: block;
+}
+
 .spinner {
   text-align: center;
   font-size: 18px;
