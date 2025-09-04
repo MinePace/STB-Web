@@ -8,49 +8,62 @@ function RaceResultPage() {
   const { raceId } = useParams(); // Haal "type" op uit de URL
   const [raceResults, setRaceResults] = useState([]);
   const [race, setRaceData] = useState();
+const [fastestLap, setFastestLap] = useState(null);
   const [embedUrl, setEmbedUrl] = useState(""); // Opslag voor de embed-URL
 
+  // 🎥 turn any YouTube URL into an <iframe> embed URL
+  const extractYouTubeEmbed = (url) => {
+    try {
+      const u = new URL(url);
+      // already an /embed/ url
+      if (u.hostname.includes("youtube") && u.pathname.startsWith("/embed/")) {
+        setEmbedUrl(u.toString());
+        return;
+      }
+
+      // standard watch?v=ID
+      let id = u.searchParams.get("v");
+
+      // youtu.be/ID or /shorts/ID or /v/ID
+      if (!id) {
+        const m =
+          u.pathname.match(/^\/(?:shorts|v|embed)\/([A-Za-z0-9_-]{11})/) ||
+          u.pathname.match(/^\/([A-Za-z0-9_-]{11})/); // youtu.be/ID
+        id = m?.[1] || null;
+      }
+
+      if (id) {
+        setEmbedUrl(`https://www.youtube.com/embed/${id}`);
+      } else {
+        // not a valid YouTube URL
+        setEmbedUrl("");
+        console.warn("extractYouTubeEmbed: no video id in", url);
+      }
+    } catch (e) {
+      // invalid URL string
+      setEmbedUrl("");
+      console.warn("extractYouTubeEmbed: invalid URL", url);
+    }
+  };
+
   useEffect(() => {
-    // Fetch race results
-    fetch(`http://localhost:5110/api/race/results/${raceId}`)
+    fetch(`http://localhost:5110/api/race/race/${raceId}`)
       .then((res) => res.json())
       .then((data) => {
-        setRaceResults(data); 
-        console.log("Race Results:", data);
+        // support either: { race, fastestLap } OR a race object with raceResults [+ optional fastestLap]
+        const raceObj = data?.race ?? data;
+        const flObj = data?.fastestLap ?? raceObj?.fastestLap ?? null;
 
-        if (data.length > 0) {
-          const raceId = data[0].race.id; // Haal de raceId van de eerste race-resultaten
-          fetchRaceInfo(raceId); // Gebruik raceId om race-informatie op te halen
+        setRaceData(raceObj);
+        setRaceResults(raceObj?.raceResults ?? []);
+        setFastestLap(flObj);
+
+        if (raceObj?.youtubeLink) {
+          extractYouTubeEmbed(raceObj.youtubeLink);
         }
       })
       .catch((err) => console.error("Error fetching race results:", err));
   }, [raceId]);
-
-  // Functie om race-informatie op te halen
-  const fetchRaceInfo = (raceId) => {
-    fetch(`http://localhost:5110/api/race/race/${raceId}`)
-      .then((res) => res.json())
-      .then((race) => {
-        setRaceData(race);
-        console.log("Race Info:", race);
-
-        if (race.youtubeLink) {
-          extractYouTubeEmbed(race.youtubeLink); // Stel embed URL in als een YouTube-link bestaat
-        }
-      })
-      .catch((err) => console.error("Error fetching race info:", err));
-  };
-  
-  // 🎥 Converteer de YouTube-link naar de embed-versie
-  const extractYouTubeEmbed = (url) => {
-    const youtubeRegex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
-    const match = url.match(youtubeRegex);
-    if (match && match[1]) {
-      setEmbedUrl(`https://www.youtube.com/embed/${match[1]}`);
-    } else {
-      console.error("Invalid YouTube URL:", url);
-    }
-  };
   
   const teamColors = {
     "Red Bull": "rgb(23, 38, 122)",
@@ -126,17 +139,17 @@ function RaceResultPage() {
                   <tr>
                     <th colSpan="5" className="table-subtitle">
                       {race ? (
-                        <>
-                          {race.track.raceName} 
+                        <div className="race-header">
+                          {race.track.raceName}
                           {race.track.country && (
                             <img
-                              src={`/flags/${race.track.country}.png`} // Path to the flags stored in the public folder
+                              src={`/flags/${race.track.country}.png`}
                               alt={race.track.country}
                               className="country-flag"
-                              title={race.track.country} // Tooltip with the country code/name
+                              title={race.track.country}
                             />
                           )}
-                        </>
+                        </div>
                       ) : (
                         "Loading..."
                       )}
@@ -154,6 +167,10 @@ function RaceResultPage() {
                 <tbody>
                   {raceResults.map((row, index) => {
                     const isDNF = row.dnf === "Yes" || row.dnf === "DNF";
+                    const isFastestLap =
+                      fastestLap &&
+                      (fastestLap.driver?.name ?? fastestLap.driver) === row.driver;
+
                     return (
                       <tr key={index}>
                         <td 
@@ -162,7 +179,10 @@ function RaceResultPage() {
                           {isDNF ? "DNF" : row.position}
                         </td>
                         <td>
-                          <Link to={`/STB/Driver/${encodeURIComponent(row.driver)}`} className="driver-link">
+                          <Link
+                            to={`/STB/Driver/${encodeURIComponent(row.driver)}`}
+                            className={`driver-link ${isFastestLap ? "fastest-lap" : ""}`}
+                          >
                             {row.driver}
                           </Link>
                         </td>

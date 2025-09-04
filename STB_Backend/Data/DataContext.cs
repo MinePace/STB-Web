@@ -19,6 +19,8 @@ public class RaceResult
     [Key]
     public int Id { get; set; }
     public int RaceId { get; set; }
+    
+    [JsonIgnore]
     public Race Race { get; set; }
     public int Position { get; set; }
     public string Driver { get; set; }
@@ -55,8 +57,6 @@ public class Race{
     public string Sprint { get; set; }
     public Track Track { get; set; }
     public DateTime? Date { get; set; }
-
-    [JsonIgnore] // 👈 ignore back-reference
     public List<RaceResult>? RaceResults { get; set; }
     public string? YoutubeLink { get; set; }
 }
@@ -84,5 +84,7 @@ public class FastestLap{
     public int DriverId { get; set; }
     public int RaceId { get; set; }
     public Driver Driver { get; set; }
+    
+    [JsonIgnore]
     public Race Race { get; set; }
 }

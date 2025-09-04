@@ -22,6 +22,8 @@ function HomePage() {
   const [nextRace, setNextRace] = useState(null); // 👈 fetched from API
   const [timeLeft, setTimeLeft] = useState("");
 
+  const [standings, setStandings] = useState([]);
+
   // Latest Race
   useEffect(() => {
     const fetchLatestRace = async () => {
@@ -109,32 +111,21 @@ function HomePage() {
     fetchLeagueStats();
   }, []);
 
-  const standings = [
-    {
-      tier: "Tier 1",
-      top3: [
-        { name: "John Doe", team: "Red Bull", points: 220 },
-        { name: "Jane Smith", team: "Ferrari", points: 198 },
-        { name: "Max Johnson", team: "Mercedes", points: 185 },
-      ],
-    },
-    {
-      tier: "Tier 2",
-      top3: [
-        { name: "Amy Lee", team: "McLaren", points: 200 },
-        { name: "Tim Brown", team: "Alpine", points: 190 },
-        { name: "Jack Black", team: "AlphaTauri", points: 175 },
-      ],
-    },
-    {
-      tier: "Tier 3",
-      top3: [
-        { name: "Sam Fox", team: "Haas", points: 180 },
-        { name: "Lisa Ray", team: "Williams", points: 170 },
-        { name: "Emma Stone", team: "Aston Martin", points: 160 },
-      ],
-    },
-  ];
+  useEffect(() => {
+    const fetchStandings = async () => {
+      try {
+        const res = await fetch("http://localhost:5110/api/championship/current");
+        if (!res.ok) throw new Error("Failed to fetch current championships.");
+        const data = await res.json();
+        setStandings(normalizeStandings(data));
+        setCurrentTier(0); // reset to first tier after load
+      } catch (err) {
+        console.error(err);
+        setStandings([]); // keep it safe
+      }
+    };
+    fetchStandings();
+  }, []);
 
   useEffect(() => {
     const fetchNextRace = async () => {
@@ -209,6 +200,30 @@ function HomePage() {
 
     return () => clearInterval(interval);
   }, [isHovered, standings.length]);
+
+  const normalizeStandings = (data) => {
+    const raw = Array.isArray(data) ? data : (data.top3 ?? []); // supports { top3: [...] } or [...]
+    // Map to a consistent shape
+    const mapped = raw.map(item => {
+      const division = item.division ?? item.Division ?? item.tier ?? item.Tier;
+      const list = item.top3 ?? item.Top3 ?? item.standings ?? [];
+      return {
+        tier: typeof division === "number" ? `Tier ${division}` : String(division),
+        top3: list.map(d => ({
+          name: d.driver ?? d.Driver ?? d.name,
+          team: d.team ?? d.Team, // may be undefined if your API doesn't include it
+          points: d.totalPoints ?? d.TotalPoints ?? d.points ?? 0,
+        })),
+      };
+    });
+
+    // De-dupe by tier string
+    const byTier = new Map();
+    for (const row of mapped) {
+      if (!byTier.has(row.tier)) byTier.set(row.tier, row);
+    }
+    return Array.from(byTier.values());
+  };
 
   return (
     <div className="home-container">

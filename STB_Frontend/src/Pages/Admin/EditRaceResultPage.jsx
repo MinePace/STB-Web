@@ -50,30 +50,18 @@ function EditRaceResults() {
   }, [selectedSeason]);
 
   useEffect(() => {
-    if (selectedSeason && selectedRace) {
-      fetch(`http://localhost:5110/api/race/results/${selectedRace}`)
-        .then((res) => {
-          if (!res.ok) {
-            if (res.status === 404) {
-              console.warn("No race results found for this race.");
-              setRaceResults([]); // Empty array triggers "no results" UI
-            } else {
-              throw new Error(`Failed to fetch race results: ${res.status}`);
-            }
-          } else {
-            return res.json();
-          }
-        })
-        .then((data) => {
-          if (data) {
-            setRaceResults(data);
-          }
-        })
-        .catch((err) => console.error("Error fetching race results:", err));
-    } else {
-      setRaceResults([]);
-    }
-  }, [selectedSeason, selectedRace]);
+  fetch(`http://localhost:5110/api/race/race/${selectedRace}`)
+    .then(res => res.json())
+    .then(data => {
+      const raceObj = data?.race ?? data;                 // works if server returns either shape
+      const flObj   = data?.fastestLap ?? raceObj?.fastestLap ?? null;
+
+      setRaceResults(raceObj?.raceResults ?? []);
+
+      if (raceObj?.youtubeLink) extractYouTubeEmbed(raceObj.youtubeLink);
+    })
+    .catch(err => console.error("Error fetching race results:", err));
+}, [selectedRace]);
 
   useEffect(() => {
     if (selectedSeason && selectedRace) {
@@ -239,6 +227,7 @@ function EditRaceResults() {
               <table className="race-results-table">
                 <thead>
                   <tr>
+                    <th style={{ width: 32 }} /> {/* handle column */}
                     <th>Pos</th>
                     <th>Driver</th>
                     <th>Team</th>
@@ -250,24 +239,24 @@ function EditRaceResults() {
                     <th>Actions</th>
                   </tr>
                 </thead>
+
                 <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="raceResults">
+                  <Droppable droppableId="raceResults" renderClone={null}>
                     {(provided) => (
                       <tbody ref={provided.innerRef} {...provided.droppableProps}>
                         {raceResults.map((result, index) => (
-                          <Draggable key={result.id} draggableId={result.id.toString()} index={index}>
-                            {(provided) => (
-                              <tr
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                              >
+                          <Draggable key={result.id} draggableId={String(result.id)} index={index}>
+                            {(prov) => (
+                              <tr ref={prov.innerRef} {...prov.draggableProps}>
+                                {/* drag handle in its own td */}
+                                <td {...prov.dragHandleProps} style={{ cursor: "grab" }}>⠿</td>
+
                                 <td>{result.position}</td>
                                 <td>
                                   <input
                                     type="text"
                                     className="compact-input"
-                                    value={editedResults[result.id]?.driver || result.driver}
+                                    value={editedResults[result.id]?.driver ?? result.driver ?? ""}
                                     onChange={(e) => handleInputChange(result.id, "driver", e.target.value)}
                                   />
                                 </td>
@@ -275,7 +264,7 @@ function EditRaceResults() {
                                   <input
                                     type="text"
                                     className="compact-input"
-                                    value={editedResults[result.id]?.team || result.team}
+                                    value={editedResults[result.id]?.team ?? result.team ?? ""}
                                     onChange={(e) => handleInputChange(result.id, "team", e.target.value)}
                                   />
                                 </td>
@@ -283,14 +272,17 @@ function EditRaceResults() {
                                   <input
                                     type="number"
                                     className="compact-input"
-                                    value={editedResults[result.id]?.points || result.points}
-                                    onChange={(e) => handleInputChange(result.id, "points", parseInt(e.target.value))}
+                                    value={editedResults[result.id]?.points ?? result.points ?? 0}
+                                    onChange={(e) => {
+                                      const v = e.target.value === "" ? "" : Number(e.target.value);
+                                      handleInputChange(result.id, "points", v);
+                                    }}
                                   />
                                 </td>
                                 <td>
                                   <select
                                     className="compact-select"
-                                    value={editedResults[result.id]?.dnf || result.dnf}
+                                    value={editedResults[result.id]?.dnf ?? result.dnf ?? "No"}
                                     onChange={(e) => handleInputChange(result.id, "dnf", e.target.value)}
                                   >
                                     <option value="No">No</option>
@@ -301,16 +293,19 @@ function EditRaceResults() {
                                   <input
                                     type="number"
                                     className="compact-input"
-                                    value={editedResults[result.id]?.qualifying || result.qualifying}
-                                    onChange={(e) => handleInputChange(result.id, "qualifying", parseInt(e.target.value))}
+                                    value={editedResults[result.id]?.qualifying ?? result.qualifying ?? ""}
+                                    onChange={(e) => {
+                                      const v = e.target.value === "" ? "" : Number(e.target.value);
+                                      handleInputChange(result.id, "qualifying", v);
+                                    }}
                                   />
                                 </td>
-                                <td>{editedResults[result.id]?.pos_Change ?? result.pos_Change}</td>
+                                <td>{editedResults[result.id]?.pos_Change ?? result.pos_Change ?? ""}</td>
                                 <td>
                                   <input
                                     type="text"
                                     className="compact-input"
-                                    value={editedResults[result.id]?.time || result.time}
+                                    value={editedResults[result.id]?.time ?? result.time ?? ""}
                                     onChange={(e) => handleInputChange(result.id, "time", e.target.value)}
                                   />
                                 </td>
@@ -322,7 +317,11 @@ function EditRaceResults() {
                             )}
                           </Draggable>
                         ))}
-                        {provided.placeholder}
+
+                        {/* render the placeholder as a proper row */}
+                        <tr className="dnd-placeholder">
+                          <td colSpan={10}>{provided.placeholder}</td>
+                        </tr>
                       </tbody>
                     )}
                   </Droppable>

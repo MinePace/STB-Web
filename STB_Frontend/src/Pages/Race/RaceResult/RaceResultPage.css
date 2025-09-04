@@ -68,6 +68,11 @@
   font-weight: bold;
 }
 
+.fastest-lap {
+  color: rgb(174, 61, 255);
+  font-weight: bold;
+}
+
 .video-player {
   position: absolute;
   margin: 0px;
@@ -92,7 +97,7 @@
 }
 
 .screenshot-btn:hover {
-  background-color: #1462aa;
+  background-color: #2d6eab;
 }
 
 /* Style for DNF Cell */
@@ -104,7 +109,7 @@
 }
 
 .team-name {
-  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.6); /* White glow effect */
+  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.866); /* White glow effect */
   font-weight: bold; /* Make text stand out */
 }
 
@@ -117,4 +122,16 @@
   vertical-align: middle; /* Vertically align the flag with the text */
 }
 
+.race-header {
+  display: flex;
+  justify-content: center; /* centers horizontally */
+  align-items: center;     /* aligns text + flag vertically */
+  gap: 0px;                /* space between name and flag */
+  width: 100%;             /* take full width of cell */
+  text-align: center;
+}
 
+.country-flag {
+  width: 48px;
+  height: auto;
+}

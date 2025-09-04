@@ -7,24 +7,7 @@ Content-Type: application/json
 
 ##########
 
-GET http://localhost:5110/api/fastestlap/117
-
-##########
-
-Delete http://localhost:5110/api/race/delete/12
-
-##########
-
-Put http://localhost:5110/api/raceresult/update/1314
-Content-Type: application/json
-
-{
-    "Driver": "LND Miquel_RDGZ",
-    "Team": "RB",
-    "DNF": "Yes",
-    "Qualifying": 18,
-    "Pos_Change": 2
-}
+GET http://localhost:5110/api/fastestlap/217
 
 ##########
 
@@ -40,7 +23,7 @@ GET http://localhost:5110/api/race/results/22/5/1/Sprint
 
 ##########
 
-GET http://localhost:5110/api/race/raceresults
+GET http://localhost:5110/api/race/raceresults/214
 
 ##########
 
@@ -48,11 +31,15 @@ GET http://localhost:5110/api/driver/season/29
 
 ##########
 
-GET http://localhost:5110/api/race/latest
+GET http://localhost:5110/api/race/race/214
 
 ##########
 
 GET http://localhost:5110/api/championship/28/1
+
+##########
+
+GET http://localhost:5110/api/championship/races/28/1
 
 ##########
 
@@ -68,3 +55,7 @@ Content-Type: application/json
     "Name": "brainyCactus30",
     "Country": "Great Britain"
 }
+
+##########
+
+GET http://localhost:5110/api/championship/current

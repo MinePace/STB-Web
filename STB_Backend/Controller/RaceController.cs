@@ -72,12 +72,18 @@ public class RaceController : ControllerBase
         var race = _context.Races
             .Where(r => r.Id == id)
             .Include(r => r.Track)
+            .Include(r => r.RaceResults.OrderBy(rr => rr.Position))
+            .FirstOrDefault();
+
+        var fastestLap = _context.FastestLaps
+            .Where(fl => fl.RaceId == id)
+            .Include(fl => fl.Driver)
             .FirstOrDefault();
 
         if (race is null)
             return NotFound(new { message = "No races were found." });
 
-        return Ok(race);
+        return Ok(new { race, fastestLap });
     }
 
     [HttpGet("seasons")]
@@ -127,10 +133,9 @@ public class RaceController : ControllerBase
     [HttpGet("results/{raceId}")]
     public IActionResult GetRaceResults(int raceId)
     {
-        var raceResults = _context.RaceResults
-            .Where(r => r.Race.Id == raceId) // Ensure case-insensitivity
-            .Include(r => r.Race)
-            .OrderBy(r => r.Position)
+        var raceResults = _context.Races
+            .Where(r => r.Id == raceId)
+            .Include(r => r.RaceResults)
             .ToList();
 
         if (!raceResults.Any())
@@ -138,7 +143,6 @@ public class RaceController : ControllerBase
 
         return Ok(raceResults);
     }
-
 
     [HttpPost("raceresults")]
     public async Task<IActionResult> AddRaceResults([FromBody] List<RaceResultRequest> raceResults)

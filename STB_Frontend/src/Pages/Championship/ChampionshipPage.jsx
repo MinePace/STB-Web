@@ -19,49 +19,26 @@ function ChampionshipPage() {
     setNotFound(false);
 
     fetch(`http://localhost:5110/api/championship/races/${season}/${division}`)
-      .then((res) => res.json())
-      .then((raceData) => {
-        if (!raceData || raceData.length === 0) {
+      .then(res => res.json())
+      .then(raceData => {
+        if (!Array.isArray(raceData) || raceData.length === 0) {
           setNotFound(true);
           setLoading(false);
           return;
         }
         setRaces(raceData);
+        // Build standings directly from races (which include raceResults)
+        transformData(raceData);
 
-        fetch(`http://localhost:5110/api/championship/${season}/${division}`)
-          .then((res) => res.json())
-          .then((resultData) => {
-            setRaceResults(Array.isArray(resultData) ? resultData : []);
-
-            if (Array.isArray(resultData) && resultData.length > 0) {
-              transformData(raceData, resultData); // Ensure data is transformed before state update
-            } else {
-              setSortedDrivers({
-                drivers: [],
-                raceNumbers: raceData.map((race) => `${race.round}`),
-                racePositions: {},
-              });
-            }
-
-            // Fetch fastest lap data for the championship
-            fetch(`http://localhost:5110/api/fastestlap/${season}/${division}`)
-              .then((res) => res.json())
-              .then((fastestLapData) => {
-                setFastestLapData(fastestLapData);
-                setLoading(false); // Only stop loading when all data is fetched and transformed
-              })
-              .catch(() => {
-                setFastestLapData([]);
-                setLoading(false);
-              });
+        // fastest laps (if you still have this endpoint)
+        fetch(`http://localhost:5110/api/fastestlap/${season}/${division}`)
+          .then(res => res.json())
+          .then(data => {
+            setFastestLapData(Array.isArray(data) ? data : []);
+            setLoading(false);
           })
           .catch(() => {
-            setRaceResults([]);
-            setSortedDrivers({
-              drivers: [],
-              raceNumbers: raceData.map((race) => `${race.round}`),
-              racePositions: {},
-            });
+            setFastestLapData([]);
             setLoading(false);
           });
       })
@@ -71,15 +48,15 @@ function ChampionshipPage() {
       });
   }, [season, division]);
 
-  const transformData = (races, raceResults) => {
+  const transformData = (races) => {
     const drivers = {};
     const raceNumbers = [];
     const racePositions = {};
 
-    // Group races by round (merge sprint and main race)
+    // Group by round (so sprint + main share a column)
     const groupedRaces = {};
     races.forEach((race) => {
-      const roundKey = `${race.round}`;
+      const roundKey = String(race.round);
       if (!groupedRaces[roundKey]) {
         groupedRaces[roundKey] = { mainRace: null, sprintRace: null };
       }
@@ -90,79 +67,43 @@ function ChampionshipPage() {
       }
     });
 
-    Object.keys(groupedRaces).forEach((roundKey) => {
-      raceNumbers.push(roundKey);
-    });
+    Object.keys(groupedRaces).forEach((roundKey) => raceNumbers.push(roundKey));
 
-    // Iterate through race results to build driver data
-    raceResults.forEach((result) => {
-      const roundKey = `${result.race.round}`;
+    // Walk every race's results
+    races.forEach((race) => {
+      const roundKey = String(race.round);
+      if (!race.raceResults) return;
 
-      // Ensure driver exists in object
-      if (!drivers[result.driver]) {
-        drivers[result.driver] = { totalPoints: 0 };
-      }
-      if (!drivers[result.driver][roundKey]) {
-        drivers[result.driver][roundKey] = 0;
-      }
-
-      // Prioritize main race position for racePositions
-      const raceId = result.race.id;
+      if (!racePositions[roundKey]) racePositions[roundKey] = {};
       const mainRaceId = groupedRaces[roundKey]?.mainRace?.id;
-      const sprintRaceId = groupedRaces[roundKey]?.sprintRace?.id;
 
-      if (!racePositions[roundKey]) {
-        racePositions[roundKey] = {};
-      }
+      race.raceResults.forEach((res) => {
+        // init driver buckets
+        if (!drivers[res.driver]) drivers[res.driver] = { totalPoints: 0 };
+        if (drivers[res.driver][roundKey] == null) drivers[res.driver][roundKey] = 0;
 
-      if (raceId === mainRaceId) {
-        racePositions[roundKey][result.driver] = result.position;
-      } else if (!mainRaceId && raceId === sprintRaceId) {
-        racePositions[roundKey][result.driver] = result.position;
-      }
+        // prefer main-race finishing position for medals coloring
+        if (race.id === mainRaceId || (!mainRaceId && race.sprint === "Yes")) {
+          racePositions[roundKey][res.driver] = res.position;
+        }
 
-      // Check if driver DNF'd and set 'DNF' instead of points
-      if (result.dnf === "Yes" || result.dnf === "DNF") {
-        drivers[result.driver][roundKey] = "DNF";
-      } else {
-        drivers[result.driver][roundKey] += result.points || 0;
-        drivers[result.driver].totalPoints += result.points || 0;
-      }
-    });
-
-    // Mark the driver with the fastest lap in each race and apply color
-    if (fastestLapData.length > 0) {
-      fastestLapData.forEach((fastestLap) => {
-        const raceId = fastestLap.raceId;
-        const fastestLapDriver = fastestLap.driver.name;
-
-        Object.keys(groupedRaces).forEach((roundKey) => {
-          const groupedRace = groupedRaces[roundKey];
-          const mainRaceId = groupedRace?.mainRace?.id;
-          const sprintRaceId = groupedRace?.sprintRace?.id;
-
-          if (raceId === mainRaceId || raceId === sprintRaceId) {
-            // Check if the driver has the fastest lap and apply purple color
-            if (drivers[fastestLapDriver]) {
-              const driverIndex = drivers[fastestLapDriver];
-              driverIndex[roundKey] = (
-                <span style={{ color: "rgb(163, 35, 255)", fontWeight: "bold" }}>
-                  {driverIndex[roundKey]}
-                </span>
-              );
-            }
-          }
-        });
+        // DNF? store "DNF", else add points
+        if (res.dnf === "Yes" || res.dnf === "DNF") {
+          drivers[res.driver][roundKey] = "DNF";
+        } else {
+          drivers[res.driver][roundKey] += res.points || 0;
+          drivers[res.driver].totalPoints += res.points || 0;
+        }
       });
-    }
+    });
+    
+    const sorted = Object.entries(drivers)
+      .map(([driver, rec]) => ({ driver, ...rec }))
+      .sort((a, b) => (b.totalPoints || 0) - (a.totalPoints || 0));
 
-    // Sort drivers by total points
-    const sortedDrivers = Object.entries(drivers)
-      .map(([driver, races]) => ({ driver, ...races }))
-      .sort((a, b) => b.totalPoints - a.totalPoints);
-
-    setSortedDrivers({ drivers: sortedDrivers, raceNumbers, racePositions, groupedRaces });
+    setSortedDrivers({ drivers: sorted, raceNumbers, racePositions, groupedRaces });
   };
+
 
   // Function to download table as an image
   const downloadTableAsImage = () => {
