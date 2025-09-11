@@ -113,12 +113,40 @@
 
 .race-flag:hover {
   filter: drop-shadow(0px 0px 6px aliceblue);
+  transition: filter 0.3s ease;
+}
+
+.race-link {
+  text-decoration: none;
+  color: white;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.race-link:hover {
+  color: #4caeff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.race-dnf {
+  text-decoration: none;
+  color: rgb(200, 50, 50);
+  font-weight: bold;
+  transition: color 0.2
+}
+
+.race-dnf:hover {
+  color: #f35f5f;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s;
 }
 
 /* Add hover effect for entire row */
 .scrollable-table tbody tr:hover {
   background-color: rgba(200, 200, 200, 0.6); /* Light gray background */
-  transition: background-color 0.3s ease-in-out; /* Smooth fade effect */
 }
 
 /* General button styling */

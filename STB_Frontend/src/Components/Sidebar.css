@@ -9,6 +9,7 @@
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Voeg een subtiele schaduw toe */
     z-index: 1000; /* Zorg dat de zijbalk altijd bovenaan blijft */
+    transition: color 0.2s;
 }
 
 .sidebar ul {
@@ -24,6 +25,14 @@
 .season-label {
     font-weight: bold;
     cursor: pointer;
+    
+}
+
+.season-item:hover .season-label{
+    color: #4caeff; /* Lichtere blauwe kleur bij hover */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s;
 }
 
 .division-dropdown {
@@ -47,10 +56,14 @@
     text-decoration: none;
     color: white;
     font-weight: bold;
+    transition: color 0.2s;
 }
 
 .division-link:hover {
-    color: #89a3ea; /* Lichtere blauwe kleur bij hover */
+    color: #4caeff; /* Lichtere blauwe kleur bij hover */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s;
 }
 
 .season-item:hover .division-dropdown {

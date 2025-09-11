@@ -195,7 +195,7 @@ function ChampionshipPage() {
 
                 return (
                   <th key={round}>
-                    <Link to={`/STB/Track/${encodeURIComponent(Id)}`} className="flag-link">{country ? (
+                    <Link to={`/STB/Track/${encodeURIComponent(Id)}`} >{country ? (
                       <img
                         src={`/flags/${country}.png`}
                         alt={country}
@@ -247,13 +247,12 @@ function ChampionshipPage() {
                           {driversraces[round] === "DNF" ? (
                             <Link
                               to={`/STB/Race/${RaceId}`}
-                              className="driver-link"
-                              style={{ color: "rgb(200, 50, 50)", fontWeight: "bold" }}
+                              className="race-dnf"
                             >
                               DNF
                             </Link>
                           ) : RaceId ? (
-                            <Link to={`/STB/Race/${RaceId}`} className="driver-link">
+                            <Link to={`/STB/Race/${RaceId}`} className="race-link">
                               {driversraces[round] ?? "-"}
                             </Link>
                           ) : (

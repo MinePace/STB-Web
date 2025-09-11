@@ -27,7 +27,7 @@ GET http://localhost:5110/api/race/raceresults/214
 
 ##########
 
-GET http://localhost:5110/api/driver/season/29
+GET http://localhost:5110/api/championship/29/xyz
 
 ##########
 

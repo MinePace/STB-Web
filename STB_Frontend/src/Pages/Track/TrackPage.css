@@ -33,7 +33,8 @@
   height: 36px;
   object-fit: cover;
   display: inline-block;
-  border-radius: 6px;
+  border-radius: 3px;
+  background: #00000088;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
 }
 .tp-title {
@@ -196,6 +197,7 @@
 
 /* ----- Show more ----- */
 .tp-showmore {
+  display: inline-block; /* or block if you want full width */
   margin-top: 10px;
   border: 1px solid rgba(255,255,255,0.14);
   background: transparent;
@@ -203,9 +205,22 @@
   padding: 6px 10px;
   border-radius: 8px;
   cursor: pointer;
+  text-decoration: none; /* remove underline */
+  text-align: center; /* center the text */
+  transition: background-color 0.2s, color 0.2s;
 }
-.tp-showmore:hover { background: rgba(255,255,255,0.06); }
-.tp-showmore:focus { outline: 2px solid rgba(255,255,255,0.35); outline-offset: 2px; }
+
+.tp-showmore:hover {
+  background: rgba(255,255,255,0.06);
+  color: #4caeff;
+  text-decoration: none;
+  transition: color 0.2s, background-color 0.2s;
+}
+
+.tp-showmore:focus {
+  outline: 2px solid rgba(255,255,255,0.35);
+  outline-offset: 2px;
+}
 
 /* ----- Position + medals ----- */
 .tp-pos { font-weight: 700; color: #e8edff; }
