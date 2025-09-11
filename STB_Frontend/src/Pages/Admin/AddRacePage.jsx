@@ -154,13 +154,13 @@ function AddRacePage() {
           onChange={handleInputChange}
         />
         {/* 👇 Date Picker */}
-        <input
+        {/* <input
           type="date"
           name="date"
           placeholder="Race Date"
           value={race.date}
           onChange={handleInputChange}
-        />
+        /> */}
         <button type="submit">Add Race</button>
       </form>
     </div>

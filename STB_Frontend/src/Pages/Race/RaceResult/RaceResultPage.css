@@ -109,7 +109,7 @@
 }
 
 .team-name {
-  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.866); /* White glow effect */
+  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.714); /* White glow effect */
   font-weight: bold; /* Make text stand out */
 }
 

@@ -69,6 +69,8 @@ function ChampionshipPage() {
 
     Object.keys(groupedRaces).forEach((roundKey) => raceNumbers.push(roundKey));
 
+    const roundAgg = {}; // { [roundKey]: { [driver]: { points, sprintPoints, mainDNF } } }
+
     // Walk every race's results
     races.forEach((race) => {
       const roundKey = String(race.round);
@@ -76,24 +78,45 @@ function ChampionshipPage() {
 
       if (!racePositions[roundKey]) racePositions[roundKey] = {};
       const mainRaceId = groupedRaces[roundKey]?.mainRace?.id;
+      const isMainRace = race.id === mainRaceId; // undefined/false if no main race known
+
+      if (!roundAgg[roundKey]) roundAgg[roundKey] = {};
 
       race.raceResults.forEach((res) => {
-        // init driver buckets
+        // init driver totals
         if (!drivers[res.driver]) drivers[res.driver] = { totalPoints: 0 };
-        if (drivers[res.driver][roundKey] == null) drivers[res.driver][roundKey] = 0;
+        if (!roundAgg[roundKey][res.driver]) {
+          roundAgg[roundKey][res.driver] = { points: 0, sprintPoints: 0, mainDNF: false };
+        }
+        const agg = roundAgg[roundKey][res.driver];
 
         // prefer main-race finishing position for medals coloring
-        if (race.id === mainRaceId || (!mainRaceId && race.sprint === "Yes")) {
+        if (isMainRace || (!mainRaceId && race.sprint === "Yes")) {
           racePositions[roundKey][res.driver] = res.position;
         }
 
-        // DNF? store "DNF", else add points
-        if (res.dnf === "Yes" || res.dnf === "DNF") {
-          drivers[res.driver][roundKey] = "DNF";
-        } else {
-          drivers[res.driver][roundKey] += res.points || 0;
-          drivers[res.driver].totalPoints += res.points || 0;
-        }
+        // accumulate points
+        const pts = res.points || 0;
+        agg.points += pts;
+        if (race.sprint === "Yes") agg.sprintPoints += pts;
+
+        // note main-race DNF (do NOT set output yet)
+        const isDNF = res.dnf === "Yes" || res.dnf === "DNF";
+        if (isMainRace && isDNF) agg.mainDNF = true;
+
+        // keep overall championship total
+        drivers[res.driver].totalPoints += pts;
+      });
+    });
+
+    // Finalize per-round display after all races in the round are known
+    Object.entries(roundAgg).forEach(([roundKey, perDriver]) => {
+      Object.entries(perDriver).forEach(([driver, agg]) => {
+        // Rule:
+        // - DNF in MAIN + zero sprint points => show "DNF"
+        // - otherwise show total points (even if sprint DNF or main DNF with sprint points)
+        drivers[driver][roundKey] =
+          agg.mainDNF && agg.sprintPoints === 0 ? "DNF" : agg.points;
       });
     });
     
@@ -168,10 +191,11 @@ function ChampionshipPage() {
               {sortedDrivers.raceNumbers?.map((round) => {
                 const groupedRace = sortedDrivers.groupedRaces?.[round];
                 const country = groupedRace?.mainRace?.track?.country || groupedRace?.sprintRace?.track?.country;
+                const Id = groupedRace?.mainRace?.track?.id || groupedRace?.sprintRace?.track?.id;
 
                 return (
                   <th key={round}>
-                    {country ? (
+                    <Link to={`/STB/Track/${encodeURIComponent(Id)}`} className="flag-link">{country ? (
                       <img
                         src={`/flags/${country}.png`}
                         alt={country}
@@ -180,7 +204,7 @@ function ChampionshipPage() {
                       />
                     ) : (
                       "N/A" // Fallback text if country is missing
-                    )}
+                    )}</Link>
                   </th>
                 );
               })}

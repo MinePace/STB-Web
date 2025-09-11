@@ -1,0 +1,249 @@
+/* ----- Container ----- */
+.tp-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #2e66ff0d, #2e66ff1f);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+  color: #eef3ff;
+}
+
+/* ----- HERO (left main, right map) ----- */
+.tp-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 520px; /* map on the right */
+  gap: 18px;
+  align-items: start;
+}
+.tp-hero-aside { align-self: start; }
+
+@media (max-width: 1000px) {
+  .tp-hero { grid-template-columns: 1fr; }
+}
+
+/* ----- Header ----- */
+.tp-header {
+  text-align: center;
+  padding: 0.5rem 0 1rem;
+}
+.tp-flag {
+  width: 56px;
+  height: 36px;
+  object-fit: cover;
+  display: inline-block;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+.tp-title {
+  margin: 0.5rem 0 0;
+  font-size: 2.6rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+.tp-subtitle {
+  margin-top: 0.25rem;
+  font-style: italic;
+  color: #b8c6ff;
+}
+
+/* ----- Stats ----- */
+.tp-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 1rem 0 1.5rem;
+}
+.tp-stat {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 14px 16px;
+  text-align: center;
+}
+.tp-stat-value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+}
+.tp-stat-label {
+  margin-top: 4px;
+  font-size: 0.8rem;
+  color: #cbd4ff;
+}
+
+/* ----- Map card (right) ----- */
+.tp-map-card {
+  position: sticky;
+  top: 18px; /* sticks while scrolling */
+  background: rgba(22, 27, 56, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 10px;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.tp-map {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  border-radius: 10px;
+}
+.tp-map-fallback {
+  color: #b8c6ff;
+  font-style: italic;
+}
+
+/* ----- Section ----- */
+.tp-section { margin-top: 1.25rem; }
+.tp-section-title {
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.75rem;
+}
+
+/* ----- Rounds (2 columns) ----- */
+.tp-rounds {
+  display: grid;
+  gap: 14px;
+}
+.tp-rounds-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (max-width: 900px) {
+  .tp-rounds-2 { grid-template-columns: 1fr; }
+}
+
+/* ----- Round card ----- */
+.tp-round-card {
+  background: rgba(22, 27, 56, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 14px;
+}
+.tp-round-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.tp-round-title { font-weight: 700; color: #fff; }
+.tp-round-sub {
+  color: #cbd4ff;
+  font-size: 0.9rem;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.tp-badge {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e9efff;
+}
+.tp-badge-sprint {
+  border-color: rgba(255, 193, 7, 0.4);
+  background: rgba(255, 193, 7, 0.12);
+  color: #ffe28b;
+}
+
+
+/* ----- Results table ----- */
+.tp-results {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.tp-results-head,
+.tp-result-row {
+  display: grid;
+  grid-template-columns: 64px 1fr 80px;
+  align-items: center;
+}
+.tp-results-head {
+  background: rgba(255, 255, 255, 0.06);
+  color: #dfe6ff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 10px 12px;
+}
+.tp-results-body .tp-result-row {
+  padding: 10px 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+.tp-right { text-align: right; }
+
+.tp-driver {
+  color: #ffffff;
+}
+
+.tp-driver:hover {
+  color: #4caeff;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+/* ----- Show more ----- */
+.tp-showmore {
+  margin-top: 10px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: transparent;
+  color: #e9efff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.tp-showmore:hover { background: rgba(255,255,255,0.06); }
+.tp-showmore:focus { outline: 2px solid rgba(255,255,255,0.35); outline-offset: 2px; }
+
+/* ----- Position + medals ----- */
+.tp-pos { font-weight: 700; color: #e8edff; }
+.tp-medal { border-radius: 999px; padding: 4px 10px; text-align: center; }
+.tp-medal-1 { background: linear-gradient(180deg, #ffef9e, #ffd452); color: #1f1700; }
+.tp-medal-2 { background: linear-gradient(180deg, #f0f3f9, #d9e1f0); color: #20232a; }
+.tp-medal-3 { background: linear-gradient(180deg, #ffd2a6, #ffa85a); color: #241200; }
+
+/* ----- Tags ----- */
+.tp-tag {
+  display: inline-block;
+  min-width: 36px;
+  text-align: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-weight: 600;
+}
+.tp-tag-dnf {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ffb3b3;
+}
+
+/* ----- Utility states ----- */
+.tp-spinner,
+.tp-error,
+.tp-empty {
+  margin: 2rem auto;
+  text-align: center;
+  color: #e9efff;
+}
+.tp-error { color: #ffd5d5; }
+
+/* ----- Responsive tweaks ----- */
+@media (max-width: 640px) {
+  .tp-stats { grid-template-columns: 1fr; }
+  .tp-results-head, .tp-result-row { grid-template-columns: 56px 1fr 64px; }
+}

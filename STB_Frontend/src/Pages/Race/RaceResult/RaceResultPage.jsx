@@ -100,6 +100,8 @@ const [fastestLap, setFastestLap] = useState(null);
     });
   };
 
+  const hasAnyTime = raceResults.some(r => r.time && r.time.trim() !== "");
+
   return (
     <div className="race-page-container">
       {/* Check if raceResults has data before rendering */}
@@ -132,12 +134,12 @@ const [fastestLap, setFastestLap] = useState(null);
                 <thead>
                   {/* New Table Headers Spanning Multiple Columns */}
                   <tr>
-                    <th colSpan="5" className="table-title">
+                    <th colSpan="6" className="table-title">
                       {race ? `Season ${race.season} - Round ${race.round} ${race.sprint === "Yes" ? "(Sprint)" : ""}` : "Loading..."}
                     </th>
                   </tr>
                   <tr>
-                    <th colSpan="5" className="table-subtitle">
+                    <th colSpan="6" className="table-subtitle">
                       {race ? (
                         <div className="race-header">
                           {race.track.raceName}
@@ -161,6 +163,7 @@ const [fastestLap, setFastestLap] = useState(null);
                     <th>Driver</th>
                     <th>Team</th>
                     <th>Points</th>
+                    {hasAnyTime && <th>Time</th>}
                     <th>Grid</th>
                   </tr>
                 </thead>
@@ -190,6 +193,15 @@ const [fastestLap, setFastestLap] = useState(null);
                           {row.team}
                         </td>
                         <td>{row.points}</td>
+                        {hasAnyTime && (
+                          <td>
+                            {row.time
+                              ? index === 0
+                                ? row.time
+                                : `+${row.time}`
+                              : ""}
+                          </td>
+                        )}
                         <td>{row.qualifying}</td>
                       </tr>
                     );

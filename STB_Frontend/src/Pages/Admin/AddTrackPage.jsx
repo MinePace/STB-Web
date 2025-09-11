@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function AddTrackPage() {
-  const [track, setTrack] = useState({ name: "", country: "" });
+  const [track, setTrack] = useState({ name: "", raceName: "", country: "" });
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
-        const role = localStorage.getItem("role");
-        if (role !== "Admin") {
-          navigate("/"); // Stuur terug naar homepage als geen admin
-        }
-      }, [navigate]);
+    const role = localStorage.getItem("role");
+    if (role !== "Admin") navigate("/");
+  }, [navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,19 +19,35 @@ function AddTrackPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSubmitting(true);
 
-    // Verstuur trackgegevens naar de backend
-    const response = await fetch("http://localhost:5110/api/race/track", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(track),
-    });
+    try {
+      const response = await fetch("http://localhost:5110/api/race/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(track), // includes raceName now
+      });
 
-    if (response.ok) {
+      if (!response.ok) {
+        let msg = "Failed to add track. Please try again.";
+        try {
+          const problem = await response.json();
+          if (problem?.title) msg = problem.title;
+          if (problem?.errors) {
+            const first = Object.values(problem.errors)[0]?.[0];
+            if (first) msg = first;
+          }
+        } catch {}
+        throw new Error(msg);
+      }
+
       alert("Track added successfully!");
-      setTrack({ name: "", country: "" }); // Reset het formulier
-    } else {
-      alert("Failed to add track. Please try again.");
+      setTrack({ name: "", raceName: "", country: "" });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -49,13 +65,24 @@ function AddTrackPage() {
         />
         <input
           type="text"
+          name="raceName"
+          placeholder="Grand Prix name (e.g., Austrian Grand Prix)"
+          value={track.raceName}
+          onChange={handleInputChange}
+          required
+        />
+        <input
+          type="text"
           name="country"
           placeholder="Country"
           value={track.country}
           onChange={handleInputChange}
           required
         />
-        <button type="submit">Add Track</button>
+        {error && <p className="error">{error}</p>}
+        <button type="submit" disabled={submitting}>
+          {submitting ? "Saving..." : "Add Track"}
+        </button>
       </form>
     </div>
   );

@@ -31,7 +31,7 @@ GET http://localhost:5110/api/driver/season/29
 
 ##########
 
-GET http://localhost:5110/api/race/race/214
+GET http://localhost:5110/api/race/race/147
 
 ##########
 
@@ -58,4 +58,56 @@ Content-Type: application/json
 
 ##########
 
-GET http://localhost:5110/api/championship/current
+GET http://localhost:5110/api/track/6
+
+##########
+
+GET http://localhost:5110/api/track/races/8
+
+##########
+
+# PUT http://localhost:5110/api/track/update/3
+# Content-Type: application/json
+
+# {
+#   "id": 3,
+#   "name": "Red Bull Ring",
+#   "raceName": "Austrian Grand Prix",
+#   "country": "Austria",
+#   "length": 4.318,
+#   "turns": 10
+# }
+
+##########
+
+PUT http://localhost:5110/api/race/update/147
+Content-Type: application/json
+
+{
+    "id": 147,
+    "f1_Game": 22,
+    "season": 21,
+    "division": 1,
+    "round": 11,
+    "sprint": "No",
+    "youtubeLink": "https://www.youtube.com/watch?v=sK08kyJO4-w",
+    "date": null,
+    "track": {
+        "id": 3,
+        "name": "Red Bull Ring",
+        "raceName": "Austrian Grand Prix",
+        "country": "Austria",
+        "length": 4.318,
+        "turns": 10
+    }
+}
+
+##########
+
+POST http://localhost:5110/api/race/update/147
+Content-Type: application/json
+
+{
+    "name": "Imola",
+    "country": ""
+}

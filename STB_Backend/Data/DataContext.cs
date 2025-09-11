@@ -47,7 +47,8 @@ public class User
     public bool DriverClaimed { get; set; } // Heeft een driver geclaimed
 }
 
-public class Race{
+public class Race
+{
     [Key]
     public int Id { get; set; }
     public int F1_Game { get; set; }
@@ -56,20 +57,24 @@ public class Race{
     public int Round { get; set; }
     public string Sprint { get; set; }
     public Track Track { get; set; }
+    public int TrackId { get; set; }
     public DateTime? Date { get; set; }
     public List<RaceResult>? RaceResults { get; set; }
     public string? YoutubeLink { get; set; }
 }
 
-public class Track{
+public class Track
+{
     [Key]
     public int Id { get; set; }
     public string Name { get; set; }
     public string RaceName { get; set; }
     public string Country { get; set; }
+    public float? Length { get; set; }
+    public int? Turns { get; set; }
 }
 
-public class Driver{
+public class Driver {
     [Key]
     public int Id { get; set; }
     public string Name { get; set; }

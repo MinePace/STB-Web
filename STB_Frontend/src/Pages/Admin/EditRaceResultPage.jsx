@@ -1,39 +1,38 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./EditRaceResultPage.css";
 
 function EditRaceResults() {
-  const { season: paramSeason, round: paramRound, division, type } = useParams();
+  const { season: paramSeason, round: paramRound, division: paramDivision, type } = useParams();
   const navigate = useNavigate();
   const pointsForPosition = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
-  
+
   const [seasons, setSeasons] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState(paramSeason || "");
   const [races, setRaces] = useState([]);
   const [selectedRace, setSelectedRace] = useState(paramRound || "");
-  const [FastestLap, setFastestLap] = useState("");
+  const [selectedDivision, setSelectedDivision] = useState(paramDivision || ""); // FIX
+  const [FastestLap, setFastestLap] = useState(""); // store as driver name (string) // FIX
   const [raceResults, setRaceResults] = useState([]);
   const [editedResults, setEditedResults] = useState({});
 
   useEffect(() => {
-      const role = localStorage.getItem("role");
-      if (role !== "Admin") {
-        navigate("/"); // Redirect to homepage if not admin
-      }
-    }, [navigate]);
+    const role = localStorage.getItem("role");
+    if (role !== "Admin") navigate("/");
+  }, [navigate]);
+
+  // Keep state in sync with URL changes (optional but nice to have) // FIX
+  useEffect(() => {
+    if (paramSeason !== undefined) setSelectedSeason(paramSeason || "");
+    if (paramDivision !== undefined) setSelectedDivision(paramDivision || "");
+    if (paramRound !== undefined) setSelectedRace(paramRound || "");
+  }, [paramSeason, paramDivision, paramRound]);
 
   useEffect(() => {
     fetch(`http://localhost:5110/api/race/seasons`)
       .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setSeasons(data);
-        } else {
-          console.error("Seasons API did not return an array", data);
-          setSeasons([]);
-        }
-      })
+      .then((data) => (Array.isArray(data) ? setSeasons(data) : setSeasons([])))
       .catch((err) => console.error("Error fetching seasons:", err));
   }, []);
 
@@ -46,136 +45,177 @@ function EditRaceResults() {
     } else {
       setRaces([]);
       setSelectedRace("");
+      setSelectedDivision(""); // optional: also clear division when season cleared // FIX
     }
   }, [selectedSeason]);
 
+  // Clear race when division changes (prevents showing races from a different division) // FIX
   useEffect(() => {
-  fetch(`http://localhost:5110/api/race/race/${selectedRace}`)
-    .then(res => res.json())
-    .then(data => {
-      const raceObj = data?.race ?? data;                 // works if server returns either shape
-      const flObj   = data?.fastestLap ?? raceObj?.fastestLap ?? null;
-
-      setRaceResults(raceObj?.raceResults ?? []);
-
-      if (raceObj?.youtubeLink) extractYouTubeEmbed(raceObj.youtubeLink);
-    })
-    .catch(err => console.error("Error fetching race results:", err));
-}, [selectedRace]);
+    setSelectedRace("");
+  }, [selectedDivision]);
 
   useEffect(() => {
-    if (selectedSeason && selectedRace) {
-      fetch(`http://localhost:5110/api/fastestlap/${selectedRace}`)
-        .then((res) => res.text())
-        .then((data) => setFastestLap(data))
-        .catch((err) => console.error("Error fetching race results:", err));
-    } else {
+    if (!selectedRace) {
       setRaceResults([]);
+      return;
     }
+    fetch(`http://localhost:5110/api/race/race/${selectedRace}`)
+      .then(res => res.json())
+      .then(data => {
+        const raceObj = data?.race ?? data;
+        const flObj   = data?.fastestLap ?? raceObj?.fastestLap ?? null;
+
+        setRaceResults(raceObj?.raceResults ?? []);
+
+        // If you keep this, be sure it's defined somewhere
+        // if (raceObj?.youtubeLink) extractYouTubeEmbed(raceObj.youtubeLink);
+
+        // Try to resolve a driver name from various shapes // FIX
+        if (flObj) {
+          const name =
+            flObj?.driver?.name ??           // { fastestLap: { driver: { name } } }
+            flObj?.driverName ??             // { fastestLap: { driverName } }
+            flObj?.name ??                   // { fastestLap: { name } }
+            (typeof flObj === "string" ? flObj : "");
+          setFastestLap(name || "");
+        } else {
+          setFastestLap("");
+        }
+      })
+      .catch(err => console.error("Error fetching race results:", err));
+  }, [selectedRace]);
+
+  // If you also have a dedicated fastest-lap endpoint, make it tolerant to object/string // FIX
+  useEffect(() => {
+    if (!selectedSeason || !selectedRace) return;
+    fetch(`http://localhost:5110/api/fastestlap/${selectedRace}`)
+      .then(async (res) => {
+        const text = await res.text();
+        try {
+          const obj = JSON.parse(text);
+          const name =
+            obj?.driver?.name ??
+            obj?.driverName ??
+            obj?.name ??
+            (typeof obj === "string" ? obj : "");
+          setFastestLap(name || "");
+        } catch {
+          // not JSON, assume plain name
+          setFastestLap(text || "");
+        }
+      })
+      .catch((err) => console.error("Error fetching fastest lap:", err));
   }, [selectedSeason, selectedRace]);
 
   const handleInputChange = (id, field, value) => {
     setEditedResults((prev) => {
-      const existingResult = prev[id] || raceResults.find((r) => r.id === id) || {};
-  
-      const updatedResult = { ...existingResult, [field]: value };
-  
-      // Ensure both position and qualifying are considered
-      const position = updatedResult.position !== undefined ? updatedResult.position : existingResult.position;
-      const qualifying = updatedResult.qualifying !== undefined ? updatedResult.qualifying : existingResult.qualifying;
-  
-      if (position !== undefined && qualifying !== undefined) {
-        updatedResult.pos_Change = qualifying - position;
+      const existing = prev[id] || raceResults.find((r) => r.id === id) || {};
+      const updated = { ...existing, [field]: value };
+
+      const position = updated.position ?? existing.position;
+      const qualifying = updated.qualifying ?? existing.qualifying;
+      if (position != null && qualifying != null) {
+        updated.pos_Change = qualifying - position;
       }
-  
-      return { ...prev, [id]: updatedResult };
+      return { ...prev, [id]: updated };
     });
-  };  
+  };
 
   const handleSave = async (id) => {
-    const updatedResult = editedResults[id];
-    if (!updatedResult) return;
-  
-    // Constructing the RaceResultDTO object
-    const raceResultDTO = {
-      Position: updatedResult.position || raceResults.find(r => r.id === id).position,
-      Driver: updatedResult.driver || raceResults.find(r => r.id === id).driver,
-      Team: updatedResult.team || raceResults.find(r => r.id === id).team,
-      Points: updatedResult.points || raceResults.find(r => r.id === id).points,
-      DNF: updatedResult.dnf || raceResults.find(r => r.id === id).dnf,
-      Qualifying: updatedResult.qualifying !== undefined ? updatedResult.qualifying : raceResults.find(r => r.id === id).qualifying,
-      Pos_Change: updatedResult.pos_Change !== undefined ? updatedResult.pos_Change : raceResults.find(r => r.id === id).pos_Change,
-      Time: updatedResult.time || raceResults.find(r => r.id === id).time
+    const base = raceResults.find(r => r.id === id);
+    const updated = editedResults[id];
+    if (!base && !updated) return;
+
+    const dto = {
+      Position: updated?.position ?? base.position,
+      Driver: updated?.driver ?? base.driver,
+      Team: updated?.team ?? base.team,
+      Points: updated?.points ?? base.points,
+      DNF: updated?.dnf ?? base.dnf,
+      Qualifying: updated?.qualifying ?? base.qualifying,
+      Pos_Change: updated?.pos_Change ?? base.pos_Change,
+      Time: updated?.time ?? base.time
     };
-  
-    console.log("Sending Data:", raceResultDTO);
-  
-    const response = await fetch(`http://localhost:5110/api/raceresult/update/${id}`, {
+
+    const resp = await fetch(`http://localhost:5110/api/raceresult/update/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(raceResultDTO),
+      body: JSON.stringify(dto),
     });
-  
-    if (response.ok) {
-      alert("Race result updated successfully!");
-    } else {
-      alert("Failed to update result.");
-    }
+
+    alert(resp.ok ? "Race result updated successfully!" : "Failed to update result.");
   };
 
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this result?");
-    if (!confirmDelete) return;
-  
-    const response = await fetch(`http://localhost:5110/api/raceresult/delete/${id}`, {
-      method: "DELETE",
-    });
-  
-    if (response.ok) {
+    if (!window.confirm("Are you sure you want to delete this result?")) return;
+    const resp = await fetch(`http://localhost:5110/api/raceresult/delete/${id}`, { method: "DELETE" });
+    if (resp.ok) {
       alert("Race result deleted successfully!");
-      setRaceResults((prevResults) => prevResults.filter((result) => result.id !== id)); // Remove from UI
+      setRaceResults((prev) => prev.filter((r) => r.id !== id));
+      setEditedResults((prev) => {
+        const { [id]: _, ...rest } = prev;
+        return rest;
+      });
     } else {
       alert("Failed to delete result.");
     }
   };
-  
+
   const handleDragEnd = (result) => {
-    if (!result.destination) return; // If dropped outside the list, do nothing
-  
-    const updatedResults = [...raceResults];
-    const [movedRow] = updatedResults.splice(result.source.index, 1);
-    updatedResults.splice(result.destination.index, 0, movedRow);
-  
-    // Recalculate positions and points
-    updatedResults.forEach((row, index) => {
-      row.position = index + 1; // New position
-      // Update points based on the new position
-      row.points = pointsForPosition[row.position - 1] || 0; // Set points based on position
+    if (!result.destination) return;
+
+    const updated = [...raceResults];
+    const [movedRow] = updated.splice(result.source.index, 1);
+    updated.splice(result.destination.index, 0, movedRow);
+
+    // Recalculate positions, points, and pos_Change // FIX
+    updated.forEach((row, i) => {
+      row.position = i + 1;
+      row.points = pointsForPosition[row.position - 1] || 0;
+      const quali = row.qualifying ?? row.position;
+      row.pos_Change = quali - row.position;
     });
-  
-    // Check if the FastestLap driver is within the top 10 and add 1 point if applicable
+
+    // Fastest lap extra point if in top 10 (and optionally not DNF)
     if (FastestLap) {
-      const fastestDriverIndex = updatedResults.findIndex((row) => row.driver === FastestLap);
-      if (fastestDriverIndex !== -1 && updatedResults[fastestDriverIndex].position <= 10) {
-        updatedResults[fastestDriverIndex].points += 1; // Add 1 point to the fastest lap driver
+      const idx = updated.findIndex((row) => row.driver === FastestLap);
+      if (idx !== -1 && updated[idx].position <= 10 /* && updated[idx].dnf !== "Yes" */) {
+        updated[idx].points += 1;
       }
     }
-  
-    setRaceResults(updatedResults);
-  
-    // Update the `editedResults` with the new positions and recalculated points
+
+    setRaceResults(updated);
+
+    // Mirror into editedResults
     setEditedResults((prev) => {
-      const updatedResultsObj = {};
-      updatedResults.forEach((row, index) => {
-        updatedResultsObj[row.id] = {
-          ...prev[row.id], // Retain other fields
-          position: row.position, // Update position
-          points: row.points, // Update points
+      const next = { ...prev };
+      updated.forEach((row) => {
+        next[row.id] = {
+          ...(next[row.id] || {}),
+          position: row.position,
+          points: row.points,
+          pos_Change: row.pos_Change,
         };
       });
-      return updatedResultsObj;
+      return next;
     });
-  };    
+  };
+
+  const uniqueDivisions = useMemo(() => {
+    const set = new Set(
+      races
+        .filter(r => !selectedSeason || String(r.season) === String(selectedSeason))
+        .map(r => r.division)
+        .filter(v => v !== undefined && v !== null)
+    );
+    return Array.from(set).sort((a, b) => (a - b) || String(a).localeCompare(String(b)));
+  }, [races, selectedSeason]);
+
+  const filteredRaces = useMemo(() => {
+    return races
+      .filter(r => !selectedSeason || String(r.season) === String(selectedSeason))
+      .filter(r => !selectedDivision || String(r.division) === String(selectedDivision));
+  }, [races, selectedSeason, selectedDivision]);
 
   return (
     <div className="edit-race-results-container">
@@ -184,13 +224,14 @@ function EditRaceResults() {
       {/* Season Selection */}
       <div>
         <label>Select Season: </label>
-        <select value={selectedSeason} onChange={(e) => setSelectedSeason(e.target.value)}>
+        <select
+          value={selectedSeason}
+          onChange={(e) => setSelectedSeason(e.target.value)}
+        >
           <option value="">-- Select Season --</option>
           {seasons.length > 0 ? (
             seasons.map((s) => (
-              <option key={s} value={s}>
-                Season {s}
-              </option>
+              <option key={s} value={s}>Season {s}</option>
             ))
           ) : (
             <option disabled>No seasons available</option>
@@ -198,17 +239,43 @@ function EditRaceResults() {
         </select>
       </div>
 
+      {/* Division / Tier Selection */}
+      {selectedSeason && (
+        <div>
+          <label>Select Division / Tier: </label>
+          <select
+            value={selectedDivision}
+            onChange={(e) => setSelectedDivision(e.target.value)}
+          >
+            <option value="">-- All Divisions --</option>
+            {uniqueDivisions.length > 0 ? (
+              uniqueDivisions.map((d) => (
+                <option key={d} value={d}>T{d}</option>
+              ))
+            ) : (
+              <option disabled>No divisions available</option>
+            )}
+          </select>
+        </div>
+      )}
+
       {/* Race Selection */}
       {selectedSeason && (
         <div>
           <label>Select Race: </label>
-          <select value={selectedRace} onChange={(e) => setSelectedRace(e.target.value)}>
+          <select
+            value={selectedRace}
+            onChange={(e) => setSelectedRace(e.target.value)}
+          >
             <option value="">-- Select Race --</option>
-            {races.map((r) => (
+            {filteredRaces.map((r) => (
               <option key={r.id} value={r.id}>
                 Round: {r.round} - T{r.division}
               </option>
             ))}
+            {filteredRaces.length === 0 && (
+              <option disabled>No races for this selection</option>
+            )}
           </select>
         </div>
       )}
@@ -216,7 +283,9 @@ function EditRaceResults() {
       {/* Race Results Table */}
       {selectedSeason && selectedRace && (
         <>
-          <h2>Race Results - {type} {selectedRace} - Season {selectedSeason}</h2>
+          <h2>
+            Race Results{type ? ` - ${type}` : ""} • Round {selectedRace} • Season {selectedSeason}
+          </h2>
 
           {raceResults.length === 0 ? (
             <p style={{ color: "red", fontWeight: "bold" }}>
@@ -227,7 +296,7 @@ function EditRaceResults() {
               <table className="race-results-table">
                 <thead>
                   <tr>
-                    <th style={{ width: 32 }} /> {/* handle column */}
+                    <th style={{ width: 32 }} />
                     <th>Pos</th>
                     <th>Driver</th>
                     <th>Team</th>
@@ -241,14 +310,13 @@ function EditRaceResults() {
                 </thead>
 
                 <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="raceResults" renderClone={null}>
+                  <Droppable droppableId="raceResults">
                     {(provided) => (
                       <tbody ref={provided.innerRef} {...provided.droppableProps}>
                         {raceResults.map((result, index) => (
                           <Draggable key={result.id} draggableId={String(result.id)} index={index}>
                             {(prov) => (
                               <tr ref={prov.innerRef} {...prov.draggableProps}>
-                                {/* drag handle in its own td */}
                                 <td {...prov.dragHandleProps} style={{ cursor: "grab" }}>⠿</td>
 
                                 <td>{result.position}</td>
@@ -317,11 +385,7 @@ function EditRaceResults() {
                             )}
                           </Draggable>
                         ))}
-
-                        {/* render the placeholder as a proper row */}
-                        <tr className="dnd-placeholder">
-                          <td colSpan={10}>{provided.placeholder}</td>
-                        </tr>
+                        {provided.placeholder}
                       </tbody>
                     )}
                   </Droppable>

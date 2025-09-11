@@ -20,12 +20,12 @@ public class TrackController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetTrack(int id)
     {
-        var track  = _context.Tracks
+        var track = _context.Tracks
             .Where(d => d.Id == id)
             .FirstOrDefault();
 
         if (track == null)
-        return NotFound(new { message = "No track were found with this Id." });
+            return NotFound(new { message = "No track were found with this Id." });
 
         return Ok(track);
     }
@@ -33,32 +33,65 @@ public class TrackController : ControllerBase
     [HttpGet()]
     public IActionResult GetAllTrack(int id)
     {
-        var tracks  = _context.Tracks
+        var tracks = _context.Tracks
             .ToListAsync();
 
         if (tracks == null)
-        return NotFound(new { message = "No tracks were found." });
+            return NotFound(new { message = "No tracks were found." });
 
         return Ok(tracks);
+    }
+
+    [HttpGet("races/{id}")]
+    public IActionResult GetTrackRaces(int id)
+    {
+        var trackraces = _context.Races
+            .Where(r => r.Track.Id == id)
+            .Include(r => r.RaceResults)
+            .ToList();
+
+        if (trackraces == null)
+            return NotFound(new { message = "No track were found with this Id." });
+
+        return Ok(trackraces);
     }
 
     [HttpPut("update/{id}")]
     public IActionResult UpdateTrack(int id, [FromBody] Track updatedTrack)
     {
-        var track  = _context.Tracks
+        var track = _context.Tracks
             .Where(d => d.Id == id)
             .FirstOrDefault();
 
         if (track == null)
-        return NotFound(new { message = $"No track was found with this Id: {id}." });
+            return NotFound(new { message = $"No track was found with this Id: {id}." });
+
+        if (id != updatedTrack.Id)
+            return BadRequest(new { message = "Track ID mismatch." });
 
         track.Name = updatedTrack.Name;
         track.RaceName = updatedTrack.RaceName;
         track.Country = updatedTrack.Country;
+        track.Length = updatedTrack.Length;
+        track.Turns = updatedTrack.Turns;
 
         _context.Tracks.Update(track);
         _context.SaveChanges();
 
         return Ok(track);
+    }
+    
+    [HttpDelete("delete/{id}")]
+    public async Task<IActionResult> DeleteTrack(int id)
+    {
+        var track = await _context.Tracks.FirstOrDefaultAsync(r => r.Id == id);
+
+        if (track == null)
+            return NotFound("Race not found.");
+
+        _context.Tracks.Remove(track);
+        await _context.SaveChangesAsync();
+
+        return Ok("Track deleted successfully.");
     }
 }

@@ -361,12 +361,8 @@ public class RaceController : ControllerBase
         race.YoutubeLink = updatedRace.YoutubeLink;
         race.Date = updatedRace.Date;
 
-        // Update track details
-        if (updatedRace.Track != null)
-        {
-            race.Track.Name = updatedRace.Track.Name;
-            race.Track.Country = updatedRace.Track.Country;
-        }
+        race.TrackId = updatedRace.Track.Id;
+        race.Track = null; // prevent EF from thinking you want to modify Track
 
         await _context.SaveChangesAsync();
         return Ok("Race updated successfully.");

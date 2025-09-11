@@ -48,17 +48,42 @@ function AddRaceResults() {
   };
 
   useEffect(() => {
-    if (selectedRace) {
-      fetch(`http://localhost:5110/api/driver/season/${selectedRace.season}`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (Array.isArray(data)) {
-            setDriversList(data);
-          }
-        })
-        .catch((err) => console.error("Error fetching drivers:", err));
-    }
-  }, [selectedRace]);
+    fetch(`http://localhost:5110/api/driver/all`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setDriversList(data);
+        }
+      })
+      .catch((err) => console.error("Error fetching drivers:", err));
+  }, []);
+
+  // Put this above the component or inside it before handleSubmit:
+  const getNextRaceAfter = (current, remaining) => {
+    if (!current) return null;
+
+    // same Season + Division, higher Round
+    const sameSeasonDiv = remaining
+      .filter(r =>
+        Number(r.season) === Number(current.season) &&
+        String(r.division) === String(current.division) &&
+        Number(r.round) > Number(current.round)
+      )
+      .sort((a, b) => Number(a.round) - Number(b.round));
+
+    if (sameSeasonDiv.length > 0) return sameSeasonDiv[0];
+
+    // (Optional fallback) nothing higher left in this season/division:
+    // pick the lowest round in the same season/division if any exist
+    const resetToFirst = remaining
+      .filter(r =>
+        Number(r.season) === Number(current.season) &&
+        String(r.division) === String(current.division)
+      )
+      .sort((a, b) => Number(a.round) - Number(b.round));
+
+    return resetToFirst[0] || null;
+  };
 
   const handleRaceSelect = (e) => {
     const raceId = e.target.value;
@@ -158,6 +183,39 @@ function AddRaceResults() {
 
       const data = await response.json();
       alert(`${data.message}`);
+
+      // ✅ After success: move to the next available race
+      setFilteredRaces((prev) => {
+        const updated = prev.filter((r) => r.id !== selectedRace.id);
+
+        const nextRace = getNextRaceAfter(selectedRace, updated);
+        if (nextRace) {
+          setSelectedRace(nextRace);
+
+          const pointsTable =
+            nextRace.sprint === "Yes" ? SPRINT_RACE_POINTS : MAIN_RACE_POINTS;
+
+          setRaceResults(
+            Array.from({ length: 20 }, (_, index) => ({
+              position: index + 1,
+              driver: "",
+              team: "",
+              points: pointsTable[index] || 0,
+              dnf: "No",
+              pos_Change: 0,
+              qualifying: "",
+              fastestLap: false,
+              raceTime: "",
+            }))
+          );
+        } else {
+          setSelectedRace(null);
+          setRaceResults([]);
+          alert("✅ All races have results for this season/division!");
+        }
+
+        return updated;
+      });
     } catch (error) {
       console.error("❌ Error submitting results:", error);
       alert("Error submitting results! Check the console for details.");
