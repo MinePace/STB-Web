@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import "./AddRaceResultPage.css";
 
 // Points Table for Main and Sprint Races
 const MAIN_RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -139,7 +140,7 @@ function AddRaceResults() {
 
         updatedResults.forEach((row, i) => {
           row.points = selectedRace?.sprint === "Yes" ? SPRINT_RACE_POINTS[i] || 0 : MAIN_RACE_POINTS[i] || 0;
-          if (row.fastestLap === true && row.position <= 10 && selectedRace?.sprint !== "Yes") {
+          if (row.fastestLap === true && row.position <= 10 && selectedRace?.sprint !== "Yes" && selectedRace.season <= 28) {
             row.points += 1;
           }
         });
@@ -228,7 +229,7 @@ function AddRaceResults() {
       e.preventDefault();
 
       const isShiftPressed = e.shiftKey;
-      const inputClass = `${type}-input`;
+      const inputClass = `ar-${type}-input`;
       const inputs = Array.from(document.querySelectorAll(`.${inputClass}`));
 
       let nextIndex;
@@ -302,7 +303,7 @@ function AddRaceResults() {
   };
 
   return (
-    <div className="add-race-results-container">
+    <div className="ar-container">
       <h1>Add Race Results</h1>
 
       {/* Race Selection */}
@@ -324,7 +325,7 @@ function AddRaceResults() {
       </div>
 
       {/* Results Form */}
-      <div className="result-form">
+      <div className="ar-form">
         <h2>Add Results for {selectedRace?.track?.raceName}</h2>
         <p style={{ fontSize: 12, color: "#444951ff" }}>
           Tip: You can paste multiple rows from Excel/Sheets. Focus a cell in Driver, Team, Qualifying or Race Time,
@@ -339,7 +340,7 @@ function AddRaceResults() {
               <th>Points</th>
               <th>DNF</th>
               <th>Qualifying</th>
-              <th>Position Change</th>
+              <th>Pos Change</th>
               <th>Fastest Lap</th>
               <th>Race Time</th>
             </tr>
@@ -357,7 +358,7 @@ function AddRaceResults() {
                     onKeyDown={(e) => handleTabKeyDown(e, index, "driver")}
                     onPaste={(e) => handleColumnPaste(e, index, "driver")} // NEW
                     placeholder="Select or type driver..."
-                    className="driver-input"
+                    className="ar-driver-input"
                   />
                   <datalist id="drivers-list">
                     {driversList.map((driver, i) => (
@@ -372,7 +373,7 @@ function AddRaceResults() {
                     onChange={(e) => handleResultChange(index, "team", e.target.value)}
                     onKeyDown={(e) => handleTabKeyDown(e, index, "team")}
                     onPaste={(e) => handleColumnPaste(e, index, "team")} // NEW
-                    className="team-input"
+                    className="ar-team-input"
                   />
                 </td>
                 <td>{result.points}</td>
@@ -380,6 +381,7 @@ function AddRaceResults() {
                   <select
                     value={result.dnf}
                     onChange={(e) => handleResultChange(index, "dnf", e.target.value)}
+                    className="ar-dnf-select"
                     // Note: native select doesn't have a paste UX, so we skip onPaste here.
                   >
                     <option value="No">No</option>
@@ -393,7 +395,7 @@ function AddRaceResults() {
                     onChange={(e) => handleResultChange(index, "qualifying", e.target.value)}
                     onKeyDown={(e) => handleTabKeyDown(e, index, "quali")}
                     onPaste={(e) => handleColumnPaste(e, index, "qualifying")} // NEW
-                    className="quali-input"
+                    className="ar-quali-input"
                   />
                 </td>
                 <td>{result.pos_Change}</td>
@@ -414,7 +416,7 @@ function AddRaceResults() {
                     onKeyDown={(e) => handleTabKeyDown(e, index, "time")}
                     onPaste={(e) => handleColumnPaste(e, index, "raceTime")} // NEW
                     placeholder="Enter race time"
-                    className="time-input"
+                    className="ar-time-input"
                   />
                 </td>
               </tr>
@@ -424,7 +426,10 @@ function AddRaceResults() {
       </div>
 
       {/* Submit Button */}
-      <button onClick={handleSubmit} disabled={!selectedRace}>
+      <button 
+        onClick={handleSubmit} disabled={!selectedRace}
+        className="ar-submit-button"
+      >
         Submit All Results
       </button>
     </div>

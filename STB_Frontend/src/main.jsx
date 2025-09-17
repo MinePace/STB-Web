@@ -35,9 +35,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       
       <Route path="/STB/Add/RaceResults" element={<Layout showSidebar={true}><AddRaceResultPage /></Layout>} />
       <Route path="/STB/Add/Track" element={<AddTrackPage />} />
-      <Route path="/STB/Add/Race" element={<AddRacePage />} />
+      <Route path="/STB/Add/Race" element={<Layout showSidebar={true}><AddRacePage /></Layout>} />
 
-      <Route path="/STB/Edit/Race" element={<EditRacePage />} />
+      <Route path="/STB/Edit/Race" element={<Layout showSidebar={true}><EditRacePage /></Layout>} />
       <Route path="/STB/Edit/RaceResults" element={<Layout showSidebar={true}><EditRaceResultPage /></Layout>} />
       <Route path="/STB/Edit/Tracks" element={<Layout showSidebar={true}><EditTrackPage /></Layout>} />
     </Routes>

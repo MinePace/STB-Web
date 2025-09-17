@@ -13,6 +13,17 @@ function ChampionshipPage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const tableRef = useRef(null);
+  const username = localStorage.getItem("name") || "";
+  const isLoggedIn = localStorage.getItem("token") !== null;
+  const [claimedDriver, setClaimedDriver] = useState(null);
+
+  useEffect(() => {
+    if (!isLoggedIn || !username) return;
+    fetch(`http://localhost:5110/api/driver/user/${username}`)
+      .then(r => r.json())
+      .then(d => setClaimedDriver(d))
+      .catch(err => console.error("Error fetching claimed driver:", err));
+  }, [isLoggedIn, username]);
 
   useEffect(() => {
     setLoading(true);
@@ -162,6 +173,19 @@ function ChampionshipPage() {
     }
   };
 
+  const raceCount = sortedDrivers.raceNumbers?.length || 0;
+
+  const renderColGroup = () => (
+    <colgroup>
+      <col className="col-pos" />
+      <col className="col-driver" />
+      {Array.from({ length: raceCount }).map((_, i) => (
+        <col key={i} className="col-race" />
+      ))}
+      <col className="col-points" />
+    </colgroup>
+  );
+
   if (loading) {
     return <div className="loading-bar">Loading Championship Data...</div>;
   }
@@ -178,16 +202,18 @@ function ChampionshipPage() {
 
       <div ref={tableRef} id="championship-table">
         {/* Fixed Header Table */}
+        {/* Fixed Header Table */}
         <table className="header-table" border="1">
+          {renderColGroup()}
+
           <thead>
-            <tr>
-              <th colSpan={(sortedDrivers.raceNumbers?.length || 0) + 3}>
-                Championship - Season {season} - Tier {division}
-              </th>
+            <tr className="header-title">
+              <th rowSpan={2} colSpan={2}>STB Championship</th>
+              <th colSpan={raceCount}>Season {season}</th>
+              <th rowSpan={2}>Tier {division}</th>
             </tr>
+
             <tr>
-              <th><strong>#</strong></th> {/* New Position Column */}
-              <th>Driver</th>
               {sortedDrivers.raceNumbers?.map((round) => {
                 const groupedRace = sortedDrivers.groupedRaces?.[round];
                 const country = groupedRace?.mainRace?.track?.country || groupedRace?.sprintRace?.track?.country;
@@ -195,69 +221,71 @@ function ChampionshipPage() {
 
                 return (
                   <th key={round}>
-                    <Link to={`/STB/Track/${encodeURIComponent(Id)}`} >{country ? (
-                      <img
-                        src={`/flags/${country}.png`}
-                        alt={country}
-                        title={country}
-                        className="race-flag"
-                      />
-                    ) : (
-                      "N/A" // Fallback text if country is missing
-                    )}</Link>
+                    <Link to={`/STB/Track/${encodeURIComponent(Id)}`}>
+                      {country ? <img src={`/flags/${country}.png`} alt={country} title={country} className="race-flag" /> : "N/A"}
+                    </Link>
                   </th>
                 );
+              })}
+            </tr>
+
+            <tr>
+              <th>#</th>
+              <th>Driver</th>
+              {sortedDrivers.raceNumbers?.map((round) => {
+                const groupedRace = sortedDrivers.groupedRaces?.[round];
+                const countryCode =
+                  groupedRace?.mainRace?.track?.countryCode ||
+                  groupedRace?.sprintRace?.track?.countryCode;
+                return <th key={round}>{countryCode}</th>;
               })}
               <th>Points</th>
             </tr>
           </thead>
         </table>
 
-        {/* Scrollable Table */}
+        {/* Scrollable body */}
         <div className="scrollable-wrapper">
           <div className="scrollable-table">
             <table className="scrollable" border="1">
+              {renderColGroup()}
               <tbody>
                 {sortedDrivers.drivers?.map(({ driver, totalPoints, ...driversraces }, index) => (
                   <tr key={driver} className="table-row">
-                    <td><strong>{index + 1}</strong></td> {/* Position column added */}
+                    <td><strong>{index + 1}</strong></td>
                     <td>
-                      <Link to={`/STB/Driver/${encodeURIComponent(driver)}`} className="driver-link">
+                      <Link
+                        to={`/STB/Driver/${encodeURIComponent(driver)}`}
+                        className={`driver-link ${
+                          claimedDriver && driver.trim().toLowerCase() === claimedDriver.name.trim().toLowerCase()
+                            ? "driver-link--claimed"
+                            : ""
+                        }`}
+                      >
                         {driver}
                       </Link>
                     </td>
                     {sortedDrivers.raceNumbers?.map((round) => {
                       const groupedRace = sortedDrivers.groupedRaces?.[round];
-                      let RaceId = groupedRace?.mainRace?.id || groupedRace?.sprintRace?.id;
+                      const RaceId = groupedRace?.mainRace?.id || groupedRace?.sprintRace?.id;
 
-                      const isWinner = sortedDrivers.racePositions?.[round]?.[driver] === 1;
-                      const isSecond = sortedDrivers.racePositions?.[round]?.[driver] === 2;
-                      const isThird = sortedDrivers.racePositions?.[round]?.[driver] === 3;
+                      const pos = sortedDrivers.racePositions?.[round]?.[driver];
+                      const bg =
+                        pos === 1 ? "rgb(255, 215, 0)" :
+                        pos === 2 ? "rgb(211, 211, 211)" :
+                        pos === 3 ? "rgb(165, 107, 49)" : "transparent";
 
                       return (
-                        <td
-                          key={round}
-                          style={{
-                            backgroundColor: isWinner ? "rgb(255, 215, 0)"
-                              : isSecond ? "rgb(211, 211, 211)"
-                              : isThird ? "rgb(165, 107, 49)"
-                              : "transparent",
-                          }}
-                        >
+                        <td key={round} style={{ backgroundColor: bg }}>
                           {driversraces[round] === "DNF" ? (
-                            <Link
-                              to={`/STB/Race/${RaceId}`}
-                              className="race-dnf"
-                            >
-                              DNF
-                            </Link>
+                            <Link to={`/STB/Race/${RaceId}`} className="race-dnf">DNF</Link>
                           ) : RaceId ? (
                             <Link to={`/STB/Race/${RaceId}`} className="race-link">
                               {driversraces[round] ?? "-"}
                             </Link>
                           ) : (
                             driversraces[round] ?? "-"
-                        )}
+                          )}
                         </td>
                       );
                     })}
@@ -267,7 +295,7 @@ function ChampionshipPage() {
               </tbody>
             </table>
           </div>
-        </div>        
+        </div>
       </div>
     </div>
   );

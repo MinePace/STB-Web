@@ -1,43 +1,49 @@
-.add-race-results-container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+.ar-driver-input {
+  width: 200px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   }
-  
-  .result-form input {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+
+.ar-team-input {
+  width: 150px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   }
-  
-  .result-form button {
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+
+.ar-quali-input {
+  width: 100px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   }
-  
-  .result-form button:hover {
-    background-color: #0056b3;
+
+.ar-time-input {
+  width: 120px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   }
-  
-  .results-list ul {
-    list-style-type: none;
-    padding: 0;
+
+.ar-dnf-select {
+  width: 60px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   }
-  
-  .results-list li {
-    background-color: #eef;
-    padding: 10px;
-    margin: 5px 0;
-    border-radius: 5px;
+
+.ar-submit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
   }
-  
+
+.ar-submit-button:hover {
+  background-color: #45a049;
+  transition: background-color 0.3s ease; 
+  }

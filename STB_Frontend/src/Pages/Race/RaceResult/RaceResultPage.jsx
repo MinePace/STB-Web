@@ -86,6 +86,8 @@ const [fastestLap, setFastestLap] = useState(null);
     "RB": "rgb(0, 44, 238)",
     "KICK": "rgb(25, 225, 52)",
     "Racing Bulls": "rgb(245, 245, 245)",
+    "Audi": "",
+    "Cadillac": ""
   };
 
   // 📸 Function to capture screenshot
@@ -135,7 +137,7 @@ const [fastestLap, setFastestLap] = useState(null);
                   {/* New Table Headers Spanning Multiple Columns */}
                   <tr>
                     <th colSpan="6" className="table-title">
-                      {race ? `Season ${race.season} - Round ${race.round} ${race.sprint === "Yes" ? "(Sprint)" : ""}` : "Loading..."}
+                      {race ? `Season ${race.season} • Round ${race.round} ${race.sprint === "Yes" ? "(Sprint)" : ""} • Tier ${race.division}` : "Loading..."}
                     </th>
                   </tr>
                   <tr>

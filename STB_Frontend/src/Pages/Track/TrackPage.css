@@ -5,7 +5,7 @@
   padding: 1.25rem;
   border-radius: 16px;
   background: linear-gradient(180deg, #2e66ff0d, #2e66ff1f);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 3px solid rgba(33, 36, 80, 0.304);
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
   color: #eef3ff;
 }

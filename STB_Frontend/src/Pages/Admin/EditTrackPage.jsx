@@ -42,6 +42,9 @@ function EditTrackPage() {
       raceName: track?.raceName || "",
       name: track?.name || "",
       country: track?.country || "",
+      countryCode: track?.countryCode || "",
+      turns: track?.turns || "",
+      length: track?.length || ""
     }); // Pre-fill input fields
   };
 
@@ -55,16 +58,25 @@ function EditTrackPage() {
   const handleSave = async () => {
     if (!selectedTrack) return;
 
-    const response = await fetch(`http://localhost:5110/api/track/update/${selectedTrack.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(editedTrack),
-    });
+    const updatedTrack = { ...editedTrack, id: selectedTrack.id }; // ensure id is included
+
+    console.log("Saving track:", updatedTrack);
+
+    const response = await fetch(
+      `http://localhost:5110/api/track/update/${selectedTrack.id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedTrack),
+      }
+    );
 
     if (response.ok) {
       alert("Track updated successfully!");
       setTracks((prevTracks) =>
-        prevTracks.map((t) => (t.id === selectedTrack.id ? { ...t, ...editedTrack } : t))
+        prevTracks.map((t) =>
+          t.id === selectedTrack.id ? { ...t, ...updatedTrack } : t
+        )
       );
     } else {
       alert("Failed to update track.");
@@ -120,6 +132,30 @@ function EditTrackPage() {
                 type="text"
                 name="country"
                 value={editedTrack.country}
+                onChange={handleInputChange}
+              />
+
+              <label>Country Code:</label>
+              <input
+                type="text"
+                name="countryCode"
+                value={editedTrack.countryCode || ""}
+                onChange={handleInputChange}
+              />
+
+              <label>Turns:</label>
+              <input
+                type="text"
+                name="turns"
+                value={editedTrack.turns || ""}
+                onChange={handleInputChange}
+              />
+
+              <label>Length:</label>
+              <input
+                type="text"
+                name="length"
+                value={editedTrack.length || ""}
                 onChange={handleInputChange}
               />
 

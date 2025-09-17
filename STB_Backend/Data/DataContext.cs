@@ -70,6 +70,7 @@ public class Track
     public string Name { get; set; }
     public string RaceName { get; set; }
     public string Country { get; set; }
+    public string? CountryCode { get; set; }
     public float? Length { get; set; }
     public int? Turns { get; set; }
 }

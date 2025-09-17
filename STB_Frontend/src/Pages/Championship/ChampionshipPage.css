@@ -1,185 +1,174 @@
-/* Ensure the table header stays fixed */
-.header-table {
-  position: sticky;
-  background-color: rgb(0, 76, 169);
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+/* === Theme (tweak these) === */
+:root {
+  --pos-col-w: 44px;      /* "#" col */
+  --race-col-w: 54px;     /* each race col */
+  --points-col-w: 84px;   /* "Points" col */
+  --driver-min-w: 120px;  /* minimum driver column */
+  --header-bg: rgb(0, 76, 169);
+  --row-bg: linear-gradient(to bottom, rgb(0, 90, 199), rgb(0, 50, 110));
+  --row-hover: rgba(200, 200, 200, 0.6);
+  --text: #ffffff;
 }
 
-/* Wrapper to control scrollbar placement */
+/* === Page container bits you already have (kept) === */
+.table-container { width: 100%; }
+
+/* === Header table (separate table only for thead) === */
+.header-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;              /* important */
+  background: var(--header-bg);
+  color: var(--text);
+  box-shadow: 0 2px 5px rgba(0,0,0,.3);
+}
+
+/* Use the same model for the scrollable body table */
+.scrollable-table table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;              /* important */
+  background: var(--row-bg);
+  color: var(--text);
+}
+
+/* Consistent cell styling */
+.header-table th,
+.scrollable-table td {
+  padding: 1px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border: 1px solid rgba(255, 255, 255, 0.129);
+  color: white;
+}
+
+/* Title row */
+.header-title th {
+  font-size: 1.05rem;
+  font-weight:750;
+}
+
+/* Sticky header effect is achieved by separate table; just keep body scrollable */
 .scrollable-wrapper {
   width: 100%;
   max-width: 100%;
-  overflow-y: auto; /* Ensure vertical scrolling */
-  overflow-x: hidden; /* Hide horizontal scrollbar */
-  max-height: 60vh; /* Prevent it from taking full screen */
-  margin: 0 auto; /* Center the table */
+  overflow-y: auto;
+  overflow-x: hidden;
+  max-height: 60vh;
+  margin: 0 auto;
 }
 
-/* Apply to the wrapper to control scrollbar appearance */
-.scrollable-wrapper::-webkit-scrollbar {
-  width: 1px; /* Super thin vertical scrollbar */
-}
-
-/* The track (background of the scrollbar) */
-.scrollable-wrapper::-webkit-scrollbar-track {
-  background: transparent; /* Make it blend in */
-}
-
-/* The draggable scrollbar itself */
+/* Slender scrollbar */
+.scrollable-wrapper::-webkit-scrollbar { width: 0.5px; }
+.scrollable-wrapper::-webkit-scrollbar-track { background: transparent; }
 .scrollable-wrapper::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.381); /* Light scrollbar */
+  background: rgba(255,255,255,.38);
   border-radius: 3px;
 }
+.scrollable-wrapper::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.8); }
 
-/* On hover, slightly darken the scrollbar */
-.scrollable-wrapper::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.8);
+.scrollable-table td:nth-child(2), .scrollable-table td:last-child { background-color: rgb(147, 59, 59); }
+
+/* --- Column-specific sizing via <colgroup> classes --- */
+.col-pos    { width: var(--pos-col-w); }
+.col-driver {
+  width: clamp(120px, 16vw, 160px); /* min, preferred, max */
+}
+.col-race {
+  width: clamp(30px, 40px, 160px); /* min, preferred, max */
+}
+.col-points { width: var(--points-col-w); }
+
+/* Make the driver column text behave well */
+/* Keep your existing rules. Add this one: */
+.driver-link.driver-link--claimed {
+  color: #91ff95;         /* green */
+  font-weight: 800;       /* stronger if you want */
+  transition: color .2s ease;
+}
+.driver-link.driver-link--claimed:hover {
+  color: #4caeff;         /* green */
+  transition: color .2s ease;
 }
 
-/* Keep scrollbar outside table */
-.scrollable-table {
-  background: linear-gradient(to bottom, rgb(0, 90, 199), rgb(0, 50, 110)); 
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
-  display: block; /* Ensures proper rendering */
+.driver-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+}
+.driver-link:hover { 
+  color: #4caeff; 
+  text-decoration: none; 
+  transition: color .2 ease;
 }
 
-
-/* Ensure fixed width for all table columns */
-.header-table th,
-.scrollable-table td {
-  width: calc(82vw / 20); /* Set equal width for all race columns */
-  min-width: 50px; /* Prevent columns from becoming too small */
-  max-width: 50px; /* Prevent columns from expanding */
-  text-align: center; /* Center-align content */
-  white-space: nowrap; /* Prevent text from wrapping */
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* --- OVERRIDES FOR THE DRIVER COLUMN --- */
-.header-table th:nth-child(2),
-.scrollable-table td:nth-child(2) {
-  width: auto;               /* allow it to grow */
-  min-width: 180px;          /* pick a floor you like */
-  max-width: none;           /* remove the 120px cap */
-  white-space: normal;       /* allow wrapping instead of ellipsis */
-  overflow: visible;
-  text-overflow: clip;
-}
-
-/* Fix the last column (Points) */
-.header-table th:last-child,
-.scrollable-table td:last-child {
-  width: 7%; /* Set points column width */
-  min-width: 75px;
-  max-width: 75px;
-}
-
-.scrollable-table td:nth-child(2),
-.scrollable-table td:last-child {
-  background-color: rgb(147, 59, 59);
-}
-
-/* change the position color to corresponding color */
-.scrollable-table tbody tr:first-child td:first-child {
-  color: rgb(255, 215, 0) !important; /* Black text */
-  font-weight: bold; /* Make the text bold */
-}
-
-.scrollable-table tbody tr:nth-child(2) td:first-child {
-  color: rgb(211, 211, 211) !important; /* Black text */
-  font-weight: bold; /* Make the text bold */
-}
-
-.scrollable-table tbody tr:nth-child(3) td:first-child {
-  color: rgb(165, 107, 49) !important; /* Black text */
-  font-weight: bold; /* Make the text bold */
-}
-
-/* Target only the first row in the table body */
-.scrollable-table tbody td:first-child {
-  background-color: rgb(0, 76, 169); /* Black text */
-  font-weight: bold; /* Make the text bold */
-}
-
-/* Ensure flags scale properly */
+/* Flags should never size the column */
 .race-flag {
-  width: 100%; /* Ensure flag takes full column width */
-  height: auto; /* Maintain aspect ratio */
-  display: block;
-  max-width: 100%;
-  object-fit: contain;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+  transition: filter .25s ease;
 }
+.race-flag:hover { filter: drop-shadow(0 0 6px aliceblue); }
 
-.race-flag:hover {
-  filter: drop-shadow(0px 0px 6px aliceblue);
-  transition: filter 0.3s ease;
-}
-
+/* Race links */
 .race-link {
   text-decoration: none;
   color: white;
-  font-weight: bold;
-  transition: color 0.2s;
+  font-weight: 700;
+  transition: color .2s;
 }
-
-.race-link:hover {
-  color: #4caeff;
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.2s;
+.race-link:hover { 
+  color: #4caeff; 
+  text-decoration: none; 
+  transition: color 0.2 ease-in;
 }
 
 .race-dnf {
   text-decoration: none;
   color: rgb(200, 50, 50);
-  font-weight: bold;
-  transition: color 0.2
+  font-weight: 800;
+  letter-spacing: .25px;
 }
 
 .race-dnf:hover {
-  color: #f35f5f;
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.2s;
+  color: rgb(198, 92, 92);
+  transition: color 0.2s ease;
+  text-decoration: none ;
 }
 
-/* Add hover effect for entire row */
-.scrollable-table tbody tr:hover {
-  background-color: rgba(200, 200, 200, 0.6); /* Light gray background */
+/* Hover row */
+.scrollable-table tbody tr:hover { background: var(--row-hover); }
+
+/* Position coloring (first cell in body rows) */
+.scrollable-table tbody tr:nth-child(1) td:first-child { color: rgb(255,215,0);   font-weight: 800; }
+.scrollable-table tbody tr:nth-child(2) td:first-child { color: rgb(211,211,211); font-weight: 800; }
+.scrollable-table tbody tr:nth-child(3) td:first-child { color: rgb(165,107,49);  font-weight: 800; }
+
+/* Leftmost cell styling */
+.scrollable-table tbody td:first-child {
+  background: var(--header-bg);
+  font-weight: 800;
 }
 
-/* General button styling */
+/* Download button (kept, simplified) */
 .download-button {
-  background-color: #004ca9; /* Default button color */
-  color: white; /* Text color */
-  font-size: 16px; /* Adjust font size */
-  font-weight: bold;
-  padding: 10px 20px; /* Add padding */
-  border: none; /* Remove border */
-  border-radius: 8px; /* Rounded corners */
-  cursor: pointer; /* Indicate clickable button */
-  transition: all 0.3s ease-in-out; /* Smooth transition for hover effects */
+  background: #004ca9;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform .2s, background .2s;
   display: block;
-  margin: 15px auto; /* Center button */
-  text-align: center;
+  margin: 15px auto;
 }
-
-/* Hover effect */
-.download-button:hover {
-  background-color: #003b85; /* Darker blue */
-  transform: scale(1.05); /* Slightly increase size */
-}
-
-/* Active (click) effect */
-.download-button:active {
-  background-color: #002a5f; /* Even darker blue */
-  transform: scale(0.95); /* Slightly shrink */
-}
-
-/* Disabled state */
-.download-button:disabled {
-  background-color: #7a7a7a; /* Gray color when disabled */
-  cursor: not-allowed; /* Change cursor */
-  opacity: 0.6;
-}
+.download-button:hover  { background: #003b85; transform: scale(1.05); }
+.download-button:active { background: #002a5f; transform: scale(.95); }
+.download-button:disabled { background: #7a7a7a; cursor: not-allowed; opacity: .6; }

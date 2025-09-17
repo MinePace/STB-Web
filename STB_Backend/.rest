@@ -11,7 +11,7 @@ GET http://localhost:5110/api/fastestlap/217
 
 ##########
 
-GET http://localhost:5110/api/race/races
+DELETE http://localhost:5110/api/race/delete/226
 
 ##########
 
@@ -27,7 +27,7 @@ GET http://localhost:5110/api/race/raceresults/214
 
 ##########
 
-GET http://localhost:5110/api/championship/29/xyz
+GET http://localhost:5110/api/championship/29/1
 
 ##########
 
@@ -43,22 +43,37 @@ GET http://localhost:5110/api/championship/races/28/1
 
 ##########
 
-GET http://localhost:5110/api/race/results/214
+GET http://localhost:5110/api/track/14
 
 ##########
 
-PUT http://localhost:5110/api/driver/update/97
+PUT http://localhost:5110/api/race/update/421
 Content-Type: application/json
 
 {
-    "Id": 97,
-    "Name": "brainyCactus30",
-    "Country": "Great Britain"
+    "id": 421,
+    "f1_Game": 25,
+    "season": 29,
+    "division": 1,
+    "round": 12,
+    "sprint": "No",
+    "youtubeLink": "",
+    "date": "2025-10-13",
+    "trackId": 14,
+    "track": {
+      "id": 14,
+      "name": "Las Vegas",
+      "raceName": "Las Vegas Grand Prix",
+      "country": "United States",
+      "countryCode": "LAS",
+      "length": 6.201,
+      "turns": 17
+    }
 }
 
 ##########
 
-GET http://localhost:5110/api/track/6
+GET http://localhost:5110/api/track/1
 
 ##########
 
@@ -66,17 +81,18 @@ GET http://localhost:5110/api/track/races/8
 
 ##########
 
-# PUT http://localhost:5110/api/track/update/3
-# Content-Type: application/json
+PUT http://localhost:5110/api/track/update/1
+Content-Type: application/json
 
-# {
-#   "id": 3,
-#   "name": "Red Bull Ring",
-#   "raceName": "Austrian Grand Prix",
-#   "country": "Austria",
-#   "length": 4.318,
-#   "turns": 10
-# }
+{
+  "id": 1,
+  "name": "Zandvoort",
+  "raceName": "Dutch Grand Prix",
+  "country": "Netherlands",
+  "countryCode": "NED",
+  "length": 4.259,
+  "turns": 14
+}
 
 ##########
 

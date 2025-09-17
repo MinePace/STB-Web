@@ -1,57 +1,86 @@
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect, useMemo } from "react";
-import "./EditRacePage.css";
+import React from "react";
+import { useEffect, useMemo, useState } from "react";
+import "./EditRacePage.css"; // re-use your season builder styles (blue theme)
 
 function EditRacePage() {
   const navigate = useNavigate();
 
-  // Seasons & races
+  // Filters
   const [seasons, setSeasons] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState("");
-  const [races, setRaces] = useState([]);
-  const [selectedRace, setSelectedRace] = useState("");
+  const [selectedDivision, setSelectedDivision] = useState("");
 
-  // Race form (no track fields here anymore)
-  const [formData, setFormData] = useState({
-    f1_Game: "",
-    season: "",
-    division: "",
-    round: "",
-    sprint: "No",
-    youtubeLink: "",
-    date: "",
-  });
+  // Data
+  const [allRacesForSeason, setAllRacesForSeason] = useState([]);
+  const [rows, setRows] = useState([]);              // editable copy (filtered by division)
+  const [originalRows, setOriginalRows] = useState([]); // for change detection
 
-  // Tracks list + chosen track
+  // Tracks
   const [tracks, setTracks] = useState([]);
   const [tracksLoading, setTracksLoading] = useState(false);
   const [tracksError, setTracksError] = useState(null);
-  const [selectedTrackId, setSelectedTrackId] = useState("");
 
-  // Auth guard
+  // UI state
+  const [saving, setSaving] = useState(false);
+
+  // ----- Auth guard -----
   useEffect(() => {
     const role = localStorage.getItem("role");
     if (role !== "Admin") navigate("/");
   }, [navigate]);
 
-  // Load seasons on mount
+  // ----- Load seasons -----
   useEffect(() => {
-    fetch(`http://localhost:5110/api/race/seasons`)
-      .then((res) => res.json())
+    fetch("http://localhost:5110/api/race/seasons")
+      .then((r) => r.json())
       .then(setSeasons)
-      .catch((err) => console.error("Error fetching seasons:", err));
+      .catch((e) => console.error("seasons error:", e));
   }, []);
 
-  // Load races when season picked
+  // ----- Load races when season changes -----
   useEffect(() => {
+    setAllRacesForSeason([]);
+    setRows([]);
+    setOriginalRows([]);
+
     if (!selectedSeason) return;
     fetch(`http://localhost:5110/api/race/races/${selectedSeason}`)
-      .then((res) => res.json())
-      .then(setRaces)
-      .catch((err) => console.error("Error fetching races:", err));
+      .then((r) => r.json())
+      .then((list) => {
+        // normalize + sort by round
+        const sorted = (list || []).slice().sort((a, b) => a.round - b.round);
+        setAllRacesForSeason(sorted);
+      })
+      .catch((e) => console.error("races error:", e));
   }, [selectedSeason]);
 
-  // Load tracks list once
+  // ----- Filter by division into editable rows -----
+  useEffect(() => {
+    if (!selectedDivision) {
+      setRows([]);
+      setOriginalRows([]);
+      return;
+    }
+    const filtered = allRacesForSeason
+      .filter((r) => String(r.division) === String(selectedDivision))
+      .map((r) => ({
+        id: r.id,
+        f1_Game: r.f1_Game,
+        season: r.season,
+        division: r.division,
+        round: r.round,
+        sprint: r.sprint || "No",
+        youtubeLink: r.youtubeLink || "",
+        date: r.date ? r.date.split("T")[0] : "",
+        trackId: r.track?.id ?? r.trackId ?? "",
+        track: r.track || null, // keep full track if provided
+      }));
+    setRows(filtered);
+    setOriginalRows(filtered);
+  }, [allRacesForSeason, selectedDivision]);
+
+  // ----- Load tracks (once) -----
   useEffect(() => {
     let abort = false;
     setTracksLoading(true);
@@ -59,27 +88,19 @@ function EditRacePage() {
 
     (async () => {
       try {
-        // 🔧 put your correct endpoint here (the one you said is right)
         const res = await fetch("http://localhost:5110/api/track");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
         const json = await res.json();
-        console.log("[tracks] raw response:", json); // 👀 inspect in DevTools
 
-        // Normalize: accept several common shapes
         let arr = [];
         if (Array.isArray(json)) arr = json;
         else if (Array.isArray(json?.data)) arr = json.data;
         else if (Array.isArray(json?.tracks)) arr = json.tracks;
         else {
-          // fallback: first array-like property in the object
           const firstArray = Object.values(json).find(Array.isArray);
           if (firstArray) arr = firstArray;
         }
-
-        if (!Array.isArray(arr)) {
-          throw new Error("Response did not contain a track list array.");
-        }
+        if (!Array.isArray(arr)) throw new Error("Track list not found.");
 
         if (!abort) setTracks(arr);
       } catch (e) {
@@ -92,235 +113,379 @@ function EditRacePage() {
     return () => { abort = true; };
   }, []);
 
-  // Load a race’s data when picked
-  useEffect(() => {
-    if (!selectedRace) return;
+  // Create a blank row (new race)
+  const makeBlankRow = (afterRound, defaults = {}) => ({
+    // id: undefined → treated as "new"
+    id: undefined,
+    f1_Game: rows[0]?.f1_Game ?? allRacesForSeason[0]?.f1_Game ?? 24, // sensible default
+    season: Number(selectedSeason),
+    division: Number(selectedDivision),
+    round: afterRound + 1,                 // insert after
+    sprint: "No",
+    youtubeLink: "",
+    date: "",                              // optional
+    trackId: "",                           // must choose
+    ...defaults,
+  });
 
-    fetch(`http://localhost:5110/api/race/race/${selectedRace}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setFormData({
-          f1_Game: data.race.f1_Game,
-          season: data.race.season,
-          division: data.race.division,
-          round: data.race.round,
-          sprint: data.race.sprint || "No",
-          youtubeLink: data.race.youtubeLink || "",
-          date: data.race.date ? data.race.date.split("T")[0] : "",
-        });
+  // Re-number rounds from top to bottom (1..n)
+  const renumberRounds = (list) =>
+    list.map((r, i) => ({ ...r, round: i + 1 }));
 
-        // Preselect the current track
-        const tid = data?.race?.track?.id ?? data?.race?.trackId ?? "";
-        setSelectedTrackId(String(tid));
-      })
-      .catch((err) => console.error("Error fetching race data:", err));
-  }, [selectedRace]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  // Insert a blank row after index i
+  const addRowAfter = (i) => {
+    setRows((prev) => {
+      const copy = [...prev];
+      const afterRound = copy[i]?.round ?? copy.length;
+      copy.splice(i + 1, 0, makeBlankRow(afterRound));
+      return renumberRounds(copy);
+    });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedRace) return;
-    if (!selectedTrackId) {
-      alert("Please select a track.");
+  // Append at the end
+  const addRowAtEnd = () => {
+    setRows((prev) => {
+      const afterRound = prev[prev.length - 1]?.round ?? 0;
+      const copy = [...prev, makeBlankRow(afterRound)];
+      return renumberRounds(copy);
+    });
+  };
+
+  const trackById = useMemo(() => {
+    const m = new Map();
+    for (const t of tracks) m.set(String(t.id), t);
+    return m;
+  }, [tracks]);
+
+  // ----- Helpers -----
+  const updateCell = (idx, field, value) => {
+    setRows((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], [field]: value };
+      return next;
+    });
+  };
+
+  const isChanged = (r, o) => JSON.stringify(r) !== JSON.stringify(o);
+
+  const changedRows = useMemo(() => {
+    const list = [];
+    rows.forEach((r, i) => {
+      const o = originalRows[i];
+      if (!o) return;
+      if (isChanged(r, o)) list.push(r);
+    });
+    return list;
+  }, [rows, originalRows]);
+
+  const ensureFullTrack = async (trackId) => {
+    const existing = trackById.get(String(trackId));
+    if (existing && existing.length != null && existing.turns != null && existing.raceName != null) {
+      return existing;
+    }
+    // fetch full track if list is minimal
+    const tr = await fetch(`http://localhost:5110/api/track/${trackId}`);
+    if (!tr.ok) throw new Error(`Failed to load track ${trackId} (${tr.status})`);
+    return tr.json();
+  };
+
+  const toUpdatePayload = (row, fullTrack) => {
+    const { id, name, raceName, country, length, turns } = fullTrack;
+    return {
+      f1_Game: row.f1_Game,
+      season: row.season,
+      division: row.division,
+      round: row.round,
+      sprint: row.sprint || "No",
+      youtubeLink: row.youtubeLink || "",
+      date: row.date || null,
+      // your update endpoint expects full Track object (based on your current Edit page)
+      track: { id, name, raceName, country, length, turns },
+    };
+  };
+
+  const saveAll = async () => {
+    if (!selectedSeason || !selectedDivision) {
+      alert("Please select Season and Division first.");
       return;
     }
 
-    try {
-      // 1) Find the chosen track in the list
-      let chosen = tracks.find(t => String(t.id) === String(selectedTrackId));
+    // Split into creates (no id) and updates (has id & changed)
+    const creates = rows.filter((r) => !r.id); // new
+    const updates = rows.filter((r, i) => r.id && JSON.stringify(r) !== JSON.stringify(originalRows[i]));
 
-      // 2) If your track list is minimal, fetch full details
-      //    (uncomment if needed)
-      if (!chosen || chosen.length == null || chosen.turns == null || chosen.raceName == null) {
-        const tr = await fetch(`http://localhost:5110/api/track/${selectedTrackId}`);
-        if (!tr.ok) throw new Error(`Failed to load full track (${tr.status})`);
-        chosen = await tr.json();
+    if (!creates.length && !updates.length) {
+      alert("No changes to save.");
+      return;
+    }
+
+    setSaving(true);
+    const failures = [];
+
+    // POST new races
+    for (const row of creates) {
+      try {
+        if (!row.trackId) throw new Error("Track required");
+
+        // RaceRequest payload for your POST /api/race
+        const payload = {
+          Game: row.f1_Game,
+          Season: row.season,
+          Division: row.division,
+          Round: row.round,
+          Sprint: row.sprint || "No",
+          TrackId: Number(row.trackId),
+          YoutubeLink: row.youtubeLink || "",
+          Date: row.date || null,
+        };
+
+        const res = await fetch("http://localhost:5110/api/race", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          throw new Error(txt || `HTTP ${res.status}`);
+        }
+      } catch (e) {
+        failures.push({ type: "create", row, error: e.message });
       }
+    }
 
-      // 3) Build the exact Track payload your API expects
-      const { id, name, raceName, country, length, turns } = chosen;
-      const payload = {
-        ...formData,
-        // IMPORTANT: do NOT also send trackId when API expects the full object
-        track: { id, name, raceName, country, length, turns },
-      };
-      console.log("Submitting payload:", payload);
-      if (!payload.date) payload.date = null; // handle empty date
+    // PUT updates (existing rows)
+    for (const row of updates) {
+      try {
+        if (!row.trackId) throw new Error("Track required");
 
-      // 4) Update
-      const res = await fetch(`http://localhost:5110/api/race/update/${selectedRace}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+        // safer: update by TrackId, not full Track object
+        const payload = {
+          f1_Game: row.f1_Game,
+          season: row.season,
+          division: row.division,
+          round: row.round,
+          sprint: row.sprint || "No",
+          youtubeLink: row.youtubeLink || "",
+          date: row.date || null,
+          trackId: Number(row.trackId),
+        };
 
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(text || `HTTP ${res.status}`);
+        const res = await fetch(`http://localhost:5110/api/race/update/${row.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          const txt = await res.text().catch(() => "");
+          throw new Error(txt || `HTTP ${res.status}`);
+        }
+      } catch (e) {
+        failures.push({ type: "update", row, error: e.message });
       }
+    }
 
-      alert("Race updated successfully!");
-    } catch (err) {
-      console.error("Error updating race:", err);
-      alert("Failed to update the race.");
+    setSaving(false);
+
+    if (failures.length) {
+      console.error("Some operations failed:", failures);
+      alert(`Saved with errors. Success: ${creates.length + updates.length - failures.length}/${creates.length + updates.length}.`);
+    } else {
+      alert("Season saved successfully!");
+      // Refresh originals to the new rows (IDs for new rows require a refetch if you need them immediately)
+      setOriginalRows(rows);
     }
   };
 
-  // Derived preview of selected track
-  const selectedTrack = useMemo(
-    () => tracks.find((t) => String(t.id) === String(selectedTrackId)),
-    [tracks, selectedTrackId]
-  );
+  const revertChanges = () => setRows(originalRows);
 
+  // ----- UI -----
   return (
-    <div className="admin-edit-race">
-      <h1>Edit Race</h1>
+  <div className="add-season-page">
+    <h1>Edit Season</h1>
 
-      {/* Season selector */}
-      <label>
-        Select Season:
+    {/* Filters card */}
+    <div className="card">
+      <div className="header-grid">
         <select
+          className="select"
           value={selectedSeason}
-          onChange={(e) => {
-            setSelectedSeason(e.target.value);
-            setSelectedRace("");
-          }}
+          onChange={(e) => { setSelectedSeason(e.target.value); setSelectedDivision(""); }}
         >
-          <option value="">-- Select Season --</option>
-          {seasons.map((season) => (
-            <option key={season} value={season}>
-              Season {season}
-            </option>
+          <option value="">Season…</option>
+          {seasons.map((s) => (
+            <option key={s} value={s}>Season {s}</option>
           ))}
         </select>
-      </label>
 
-      {/* Race selector */}
-      {selectedSeason && (
-        <label>
-          Select Race:
-          <select
-            value={selectedRace}
-            onChange={(e) => setSelectedRace(e.target.value)}
-          >
-            <option value="">-- Select Race --</option>
-            {races.map((race) => (
-              <option key={race.id} value={race.id}>
-                Season {race.season} · Round {race.round} · Tier {race.division}
-              </option>
+        <select
+          className="select"
+          value={selectedDivision}
+          onChange={(e) => setSelectedDivision(e.target.value)}
+          disabled={!selectedSeason}
+        >
+          <option value="">Division…</option>
+          {Array.from(new Set(allRacesForSeason.map(r => r.division)))
+            .sort((a,b)=>a-b)
+            .map((d) => (
+              <option key={d} value={d}>Division {d}</option>
             ))}
-          </select>
-        </label>
-      )}
+        </select>
 
-      {/* Form (no track text inputs) */}
-      {selectedRace && (
-        <form onSubmit={handleSubmit} className="admin-form">
-          <div className="admin-grid">
-            <div className="admin-col">
-              <label>
-                F1 Game:
-                <input type="number" name="f1_Game" value={formData.f1_Game} onChange={handleInputChange} required />
-              </label>
-              <label>
-                Season:
-                <input type="number" name="season" value={formData.season} onChange={handleInputChange} required />
-              </label>
-              <label>
-                Division:
-                <input type="number" name="division" value={formData.division} onChange={handleInputChange} required />
-              </label>
-              <label>
-                Round:
-                <input type="number" name="round" value={formData.round} onChange={handleInputChange} required />
-              </label>
-              <label>
-                Sprint:
-                <select name="sprint" value={formData.sprint} onChange={handleInputChange} required>
-                  <option value="Yes">Yes</option>
-                  <option value="No">No</option>
-                </select>
-              </label>
-              <label>
-                Race Date:
-                <input type="date" name="date" value={formData.date} onChange={handleInputChange} />
-              </label>
-              <label>
-                YouTube Link:
-                <input type="text" name="youtubeLink" value={formData.youtubeLink} onChange={handleInputChange} />
-              </label>
-            </div>
+        <div className="inline-row">
+          <span className="input" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
+            {rows.length ? `${rows.length} rounds` : "—"}
+          </span>
+        </div>
 
-            {/* Track selector & preview */}
-            <div className="admin-col">
-              <div className="track-select">
-                <div className="track-select-header">Track</div>
-                {tracksLoading ? (
-                  <div className="muted">Loading tracks…</div>
-                ) : tracksError ? (
-                  <div className="error">Failed to load tracks</div>
-                ) : (
-                  <select
-                    value={selectedTrackId}
-                    onChange={(e) => setSelectedTrackId(e.target.value)}
-                    required
-                  >
-                    <option value="">-- Select Track --</option>
-                    {tracks
-                      .slice()
-                      .sort((a, b) => a.name.localeCompare(b.name))
-                      .map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {t.name} · {t.raceName} · {t.country}
-                        </option>
-                      ))}
-                  </select>
-                )}
-              </div>
+        <button
+          className="button primary"
+          type="button"
+          onClick={saveAll}
+          disabled={saving || (!rows.some(r => !r.id) && !rows.some((r,i)=> r.id && JSON.stringify(r)!==JSON.stringify(originalRows[i])))}
+        >
+          {saving ? "Saving…" : "Save Changes"}
+        </button>
 
-              <div className="track-preview">
-                <div className="track-preview-title">Track Preview</div>
-                {selectedTrack ? (
-                  <div className="track-preview-body">
-                    <div className="row">
-                      <span>Name</span>
-                      <strong>{selectedTrack.name}</strong>
-                    </div>
-                    <div className="row">
-                      <span>Race</span>
-                      <strong>{selectedTrack.raceName || "—"}</strong>
-                    </div>
-                    <div className="row">
-                      <span>Country</span>
-                      <strong>{selectedTrack.country}</strong>
-                    </div>
-                    <div className="row">
-                      <span>Length</span>
-                      <strong>{selectedTrack.length != null ? `${Number(selectedTrack.length).toFixed(3)} km` : "—"}</strong>
-                    </div>
-                    <div className="row">
-                      <span>Turns</span>
-                      <strong>{selectedTrack.turns ?? "—"}</strong>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="muted">No track selected</div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <button type="submit" className="primary" disabled={!selectedTrackId}>
-            Save Changes
-          </button>
-        </form>
-      )}
+        <button
+          className="button ghost"
+          type="button"
+          onClick={revertChanges}
+          disabled={saving || JSON.stringify(rows) === JSON.stringify(originalRows)}
+        >
+          Revert Changes
+        </button>
+      </div>
     </div>
-  );
+
+    {/* Table */}
+    {selectedSeason && selectedDivision ? (
+      <div className="table-wrap" style={{ marginTop: 16 }}>
+        <table className="season-table">
+          <thead>
+            <tr>
+              <th>Round</th>
+              <th>Track</th>
+              <th>Sprint WKND</th>
+              <th>Race Date</th>
+              <th>YouTube</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r, idx) => {
+              const changed = originalRows[idx] && JSON.stringify(r) !== JSON.stringify(originalRows[idx]);
+              return (
+                <React.Fragment key={r.id ?? `new-${idx}`}>
+                  <tr style={changed ? { boxShadow: "inset 0 0 0 2px var(--accent)" } : undefined}>
+                    <td>
+                      <input
+                        className="cell-input"
+                        type="number"
+                        value={r.round}
+                        onChange={(e) => updateCell(idx, "round", Number(e.target.value))}
+                        min={1}
+                      />
+                    </td>
+                    <td>
+                      {tracksLoading ? (
+                        <div className="cell-input" style={{ opacity: .7 }}>Loading tracks…</div>
+                      ) : tracksError ? (
+                        <div className="cell-input" style={{ borderColor: "var(--danger)", color: "var(--danger)" }}>
+                          Tracks error
+                        </div>
+                      ) : (
+                        <select
+                          className="cell-select"
+                          value={r.trackId || ""}
+                          onChange={(e) => updateCell(idx, "trackId", e.target.value || "")}
+                          required
+                        >
+                          <option value="">Select Track</option>
+                          {tracks
+                            .slice()
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map((t) => (
+                              <option key={t.id} value={t.id}>
+                                {t.name} · {t.raceName} · {t.country}
+                              </option>
+                            ))}
+                        </select>
+                      )}
+                    </td>
+                    <td style={{ textAlign: "center" }}>
+                      <select
+                        className="cell-select"
+                        value={r.sprint || "No"}
+                        onChange={(e) => updateCell(idx, "sprint", e.target.value)}
+                      >
+                        <option value="No">No</option>
+                        <option value="Yes">Yes</option>
+                      </select>
+                    </td>
+                    <td>
+                      <input
+                        className="cell-input"
+                        type="date"
+                        value={r.date || ""}
+                        onChange={(e) => updateCell(idx, "date", e.target.value)}
+                      />
+                    </td>
+                    <td>
+                      <input
+                        className="cell-input"
+                        type="url"
+                        placeholder="https://www.youtube.com/watch?v=…"
+                        value={r.youtubeLink || ""}
+                        onChange={(e) => updateCell(idx, "youtubeLink", e.target.value)}
+                      />
+                    </td>
+                  </tr>
+
+                  {/* Inline add divider (appears on hover) */}
+                  <tr className="add-divider">
+                    <td colSpan={5}>
+                      <button
+                        type="button"
+                        className="add-btn"
+                        onClick={() => addRowAfter(idx)}
+                        title="Add race below"
+                      >
+                        +
+                      </button>
+                    </td>
+                  </tr>
+                </React.Fragment>
+              );
+            })}
+
+            {/* Bottom add button */}
+            <tr className="add-bottom">
+              <td colSpan={5}>
+                <button type="button" className="button" onClick={addRowAtEnd}>
+                  + Add race
+                </button>
+              </td>
+            </tr>
+
+            {!rows.length && (
+              <tr>
+                <td colSpan={5} style={{ padding: 16, color: "var(--text-dim)" }}>
+                  No races found for this selection.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    ) : (
+      <div className="toast" style={{ background: "var(--muted)" }}>
+        Select a season and division to load races.
+      </div>
+    )}
+  </div>
+);
+
 }
 
 export default EditRacePage;

@@ -348,21 +348,30 @@ public class RaceController : ControllerBase
     [HttpPut("update/{id}")]
     public async Task<IActionResult> UpdateRace(int id, [FromBody] Race updatedRace)
     {
-        var race = await _context.Races.Include(r => r.Track).FirstOrDefaultAsync(r => r.Id == id);
+        var race = await _context.Races
+            .FirstOrDefaultAsync(r => r.Id == id);  // no Include here
 
         if (race == null)
             return NotFound("Race not found.");
 
-        race.F1_Game = updatedRace.F1_Game;
-        race.Season = updatedRace.Season;
-        race.Division = updatedRace.Division;
-        race.Round = updatedRace.Round;
-        race.Sprint = updatedRace.Sprint;
-        race.YoutubeLink = updatedRace.YoutubeLink;
-        race.Date = updatedRace.Date;
+        race.F1_Game    = updatedRace.F1_Game;
+        race.Season     = updatedRace.Season;
+        race.Division   = updatedRace.Division;
+        race.Round      = updatedRace.Round;
+        race.Sprint     = updatedRace.Sprint;
+        race.YoutubeLink= updatedRace.YoutubeLink;
+        race.Date       = updatedRace.Date;
 
-        race.TrackId = updatedRace.Track.Id;
-        race.Track = null; // prevent EF from thinking you want to modify Track
+        // Prefer TrackId if provided; otherwise use Track?.Id from the payload
+        var newTrackId = updatedRace.TrackId != 0
+            ? updatedRace.TrackId
+            : (updatedRace.Track?.Id ?? race.TrackId);
+
+        race.TrackId = newTrackId;
+
+        // IMPORTANT: do NOT set race.Track = null
+        // Also make sure EF doesn't try to modify Track
+        _context.Entry(race).Reference(r => r.Track).IsModified = false;
 
         await _context.SaveChangesAsync();
         return Ok("Race updated successfully.");
@@ -526,7 +535,7 @@ public class RaceRequest
     public int Round { get; set; }
     public string Sprint { get; set; }
     public int TrackId { get; set; }
-    public string YoutubeLink { get; set; }
+    public string? YoutubeLink { get; set; }
     public DateTime? Date { get; set; }
 }
 

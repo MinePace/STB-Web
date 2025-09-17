@@ -121,6 +121,37 @@ public class DriverController : ControllerBase
         return Ok(driver);
     }
 
+    [HttpGet("claimeddriver/races/{username}")]
+    public IActionResult GetClaimedDriverRaces(string username)
+{
+    var user = _context.Users
+        .FirstOrDefault(u => u.Username == username);
+
+    if (user == null)
+        return NotFound(new { message = "User not found." });
+
+    var driver = _context.Drivers
+        .FirstOrDefault(d => d.UserId == user.Id);
+
+    if (driver == null)
+        return NotFound(new { message = "No driver was found with this user id." });
+
+    var appearances = _context.RaceResults
+        .Where(rr => rr.Driver == driver.Name)
+        .Select(rr => new
+        {
+            Season = rr.Race.Season,
+            Division = rr.Race.Division
+        })
+        .Distinct()
+        .OrderByDescending(x => x.Season)
+        .ThenBy(x => x.Division)
+        .AsNoTracking()
+        .ToList();
+
+    return Ok(appearances);
+}
+
     [HttpPut("claim/{driverName}")]
     public IActionResult ClaimDriver(string driverName, [FromBody] ClaimDriverRequest request)
     {

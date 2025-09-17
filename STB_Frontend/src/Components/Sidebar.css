@@ -69,3 +69,15 @@
 .season-item:hover .division-dropdown {
     display: block; /* Toon divisies bij hover */
 }
+
+/* Highlighted season */
+.season-item--raced .season-label {
+  color: #91ff95; /* or another highlight color */
+  font-weight: bold;
+}
+
+/* Highlighted division link */
+.division-link--raced {
+  color: #91ff95; /* subtle background tint */
+  border-radius: 4px;
+}

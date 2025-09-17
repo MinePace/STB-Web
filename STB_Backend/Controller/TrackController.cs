@@ -72,6 +72,7 @@ public class TrackController : ControllerBase
         track.Name = updatedTrack.Name;
         track.RaceName = updatedTrack.RaceName;
         track.Country = updatedTrack.Country;
+        track.CountryCode = updatedTrack.CountryCode;
         track.Length = updatedTrack.Length;
         track.Turns = updatedTrack.Turns;
 
