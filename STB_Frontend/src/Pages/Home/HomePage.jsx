@@ -8,7 +8,6 @@ function HomePage() {
   const [currentTier, setCurrentTier] = useState(0);
   const [currentStatsView, setCurrentStatsView] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const navigate = useNavigate();
 
   const [latestRace, setLatestRace] = useState(null); // 👈 use state for API data
   const [loadingLatest, setLoadingLatest] = useState(true);

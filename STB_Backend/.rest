@@ -120,10 +120,8 @@ Content-Type: application/json
 
 ##########
 
-POST http://localhost:5110/api/race/update/147
-Content-Type: application/json
+GET http://localhost:5110/api/race/testmail
 
-{
-    "name": "Imola",
-    "country": ""
-}
+##########
+
+GET http://localhost:5110/api/driver/user/MinePace

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Topbar.css";
+import { useShortcut } from "@/Components/ShortCut";
+import { use } from "react";
 
 function Topbar() {
   const [claimedDriver, setClaimedDriver] = useState(null);
@@ -22,6 +24,13 @@ function Topbar() {
         .catch((err) => console.error("Error fetching claimed driver:", err));
     }
   }, [isLoggedIn, username]);
+
+  useShortcut("d", () => {
+    if (claimedDriver) {
+      navigate(`/STB/Driver/${claimedDriver.name}`);
+    }
+  }, { alt: false, shift: false, caps: true });
+  useShortcut("h", () => navigate("/"), { alt: true, shift: true });
 
   const handleLogout = () => {
     localStorage.removeItem("token");

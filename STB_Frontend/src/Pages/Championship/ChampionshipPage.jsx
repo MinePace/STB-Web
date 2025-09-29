@@ -209,7 +209,7 @@ function ChampionshipPage() {
           <thead>
             <tr className="header-title">
               <th rowSpan={2} colSpan={2}>STB Championship</th>
-              <th colSpan={raceCount}>Season {season}</th>
+              <th colSpan={raceCount} >Season {season}</th>
               <th rowSpan={2}>Tier {division}</th>
             </tr>
 
@@ -234,10 +234,13 @@ function ChampionshipPage() {
               <th>Driver</th>
               {sortedDrivers.raceNumbers?.map((round) => {
                 const groupedRace = sortedDrivers.groupedRaces?.[round];
+                const RaceId = groupedRace?.mainRace?.id || groupedRace?.sprintRace?.id;
                 const countryCode =
                   groupedRace?.mainRace?.track?.countryCode ||
                   groupedRace?.sprintRace?.track?.countryCode;
-                return <th key={round}>{countryCode}</th>;
+                return <th>
+                        <Link className= "round-link" to={`/STB/Race/${RaceId}`} key={round}>{countryCode}</Link>
+                      </th>
               })}
               <th>Points</th>
             </tr>

@@ -75,6 +75,43 @@ public class DriverController : ControllerBase
         var averagePosition = driverResults.Average(r => r.Position);
         var races = driverResults.Count();
 
+        var lastRace = _context.Races
+            .Where(r => r.RaceResults.Any(rr => rr.Driver == driverName))
+            .OrderByDescending(r => r.Division)
+            .ThenByDescending(r => r.Season)
+            .ThenByDescending(r => r.Round)
+            .Select(r => new {
+                r.Id, r.F1_Game, r.Season, r.Division, r.Round, r.Sprint,
+                r.Track, r.TrackId, r.Date, r.YoutubeLink,
+                RaceResults = r.RaceResults.OrderBy(rr => rr.Position).ToList()
+            })
+            .AsNoTracking()
+            .FirstOrDefault();
+
+        var lastFiveRaces = _context.Races
+            .Where(r => r.RaceResults.Any(rr => rr.Driver == driverName))
+            .OrderByDescending(r => r.Division)
+            .ThenByDescending(r => r.Season)
+            .ThenByDescending(r => r.Round)
+            .Take(5)
+            .Select(r => new
+            {
+                r.Id,
+                r.F1_Game,
+                r.Season,
+                r.Division,
+                r.Round,
+                r.Sprint,
+                r.Track,
+                r.TrackId,
+                r.Date,
+                r.YoutubeLink,
+                RaceResults = r.RaceResults.OrderBy(rr => rr.Position).ToList()
+            })
+            .AsNoTracking()
+            .Take(5)
+            .ToList();
+
         var stats = new
         {
             driver = driverName,
@@ -84,6 +121,8 @@ public class DriverController : ControllerBase
             podiums,
             averagePosition,
             races,
+            lastRace,
+            lastFiveRaces,
             driverOBJ = _context.Drivers.Where(d => d.Name == driverName).Include(d => d.User).FirstOrDefault()
         };
 

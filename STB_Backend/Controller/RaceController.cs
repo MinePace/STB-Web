@@ -151,53 +151,42 @@ public class RaceController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-
         if (raceResults == null || raceResults.Count == 0)
         {
             return BadRequest("The race results list cannot be empty.");
         }
         int count = 0;
-
         foreach (var result in raceResults)
         {
-
             if (!string.IsNullOrWhiteSpace(result.Driver))
             {
-
-                var existingDriver = await _context.Drivers.FirstOrDefaultAsync(d => d.Name == result.Driver);
-
+                var existingDriver = await _context.Drivers
+                .FirstOrDefaultAsync(d => d.Name == result.Driver);
                 if (existingDriver == null)
                 {
-                    existingDriver = new Driver
-                    {
-                        Country = null,
-                        Name = result.Driver,
-                        UserId = null
-                    };
-
+                    existingDriver = new Driver { Country = null, Name = result.Driver, UserId = null };
                     _context.Drivers.Add(existingDriver);
                     await _context.SaveChangesAsync();
                 }
-
                 if (result.DNF == "Yes")
-                {
-                    result.Points = 0;
-                }
-
+                { result.Points = 0; }
                 if (result.FastestLap)
                 {
                     var FastestLap = new FastestLap
                     {
                         RaceId = result.RaceId,
-                        DriverId = _context.Drivers.Where(d => d.Name == result.Driver).Select(d => d.Id).FirstOrDefault(),
+                        DriverId = _context.Drivers
+                        .Where(d => d.Name == result.Driver)
+                        .Select(d => d.Id)
+                        .FirstOrDefault(),
                         Race = await _context.Races.FindAsync(result.RaceId),
-                        Driver = _context.Drivers.Where(d => d.Name == result.Driver).FirstOrDefault(),
+                        Driver = _context.Drivers
+                        .Where(d => d.Name == result.Driver)
+                        .FirstOrDefault(),
                     };
-
                     _context.FastestLaps.AddRange(FastestLap);
                     await _context.SaveChangesAsync();
                 }
-
                 var NewResult = new RaceResult
                 {
                     RaceId = result.RaceId,
@@ -211,13 +200,11 @@ public class RaceController : ControllerBase
                     Qualifying = result.Qualifying,
                     Time = result.Time
                 };
-
                 _context.RaceResults.AddRange(NewResult);
                 await _context.SaveChangesAsync();
                 count++;
             }
         }
-
         return Ok(new { message = $"{count} race results added successfully!" });
     }
 
@@ -354,13 +341,13 @@ public class RaceController : ControllerBase
         if (race == null)
             return NotFound("Race not found.");
 
-        race.F1_Game    = updatedRace.F1_Game;
-        race.Season     = updatedRace.Season;
-        race.Division   = updatedRace.Division;
-        race.Round      = updatedRace.Round;
-        race.Sprint     = updatedRace.Sprint;
-        race.YoutubeLink= updatedRace.YoutubeLink;
-        race.Date       = updatedRace.Date;
+        race.F1_Game = updatedRace.F1_Game;
+        race.Season = updatedRace.Season;
+        race.Division = updatedRace.Division;
+        race.Round = updatedRace.Round;
+        race.Sprint = updatedRace.Sprint;
+        race.YoutubeLink = updatedRace.YoutubeLink;
+        race.Date = updatedRace.Date;
 
         // Prefer TrackId if provided; otherwise use Track?.Id from the payload
         var newTrackId = updatedRace.TrackId != 0
@@ -470,8 +457,8 @@ public class RaceController : ControllerBase
 
         var mostPodium = _context.RaceResults
             .Include(rr => rr.Race)
-            .Where(rr => 
-                    (rr.Position == 1 || rr.Position == 2 || rr.Position == 3) 
+            .Where(rr =>
+                    (rr.Position == 1 || rr.Position == 2 || rr.Position == 3)
                     && rr.Race.Season == season
                 )
             .GroupBy(rr => rr.Driver)
@@ -524,6 +511,29 @@ public class RaceController : ControllerBase
 
         return Ok(raceResults);
     }
+
+    [HttpGet("testmail")]
+    public async Task<IActionResult> TestMail()
+    {
+        try
+        {
+            await Mail.SendAsync(
+                RaceId: 356,
+                Location: "Montreal",
+                recipientName: "Joey1854",
+                recipientEmail: "joeyzwinkels@gmail.com",
+                kind: RaceEmailKind.NewRaceResults,
+                linkUrl: "http://localhost:5173/STB/Race/356"
+            );
+
+            return Ok("✅ Test mail sent successfully!");
+        }
+        catch (Exception ex)
+        {
+            // Log ex in real projects
+            return StatusCode(500, $"❌ Failed to send mail: {ex.Message}");
+        }
+    }
 }
 
 public class RaceRequest
@@ -539,7 +549,8 @@ public class RaceRequest
     public DateTime? Date { get; set; }
 }
 
-public class RaceResultRequest{
+public class RaceResultRequest
+{
     public int Id { get; set; }
     public int RaceId { get; set; }
     public int Position { get; set; }

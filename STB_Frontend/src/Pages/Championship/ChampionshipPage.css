@@ -104,6 +104,17 @@
   transition: color .2 ease;
 }
 
+.round-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+}
+.round-link:hover { 
+  color: #4caeff; 
+  text-decoration: none; 
+  transition: color .2 ease;
+}
+
 /* Flags should never size the column */
 .race-flag {
   width: 100%;

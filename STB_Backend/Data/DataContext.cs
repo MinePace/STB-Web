@@ -12,6 +12,16 @@ public class DataContext : DbContext
     public DbSet<Track> Tracks { get; set; }
     public DbSet<Driver> Drivers { get; set; }
     public DbSet<FastestLap> FastestLaps { get; set; }
+    public DbSet<RaceResultNotification> RaceResultNotifications { get; set; }
+
+    
+    protected override void OnModelCreating(ModelBuilder mb)
+    {
+        base.OnModelCreating(mb);
+        mb.Entity<RaceResultNotification>()
+        .HasIndex(x => new { x.RaceId, x.UserId })
+        .IsUnique();
+    }
 }
 
 public class RaceResult
@@ -93,4 +103,12 @@ public class FastestLap{
     
     [JsonIgnore]
     public Race Race { get; set; }
+}
+
+public class RaceResultNotification
+{
+    public int Id { get; set; }
+    public int RaceId { get; set; }
+    public int UserId { get; set; }
+    public DateTime SentAtUtc { get; set; }
 }
