@@ -193,50 +193,48 @@ function DriverPage() {
           <header className="panel-header">Last 5 Races</header>
           <div className="panel-body">
             {Array.isArray(driverStats.lastFiveRaces) && driverStats.lastFiveRaces.length ? (
-              <div className="races-stack">
+              <div className="race-chips">
                 {driverStats.lastFiveRaces.map((race, idx) => {
                   const trackLabel = asTrackLabel(race.track);
                   const raceLabel  = asRaceLabel(race);
-                  const dateLabel  = fmtDate(race.date);
+                  const results    = (race.raceResults ?? []).slice().sort((a,b)=>toPosSortKey(a)-toPosSortKey(b));
+                  const myResult   = results.find(rr => rr.driver === driverStats.driver);
 
-                  // find this driver's result
-                  const results  = (race.raceResults ?? []).slice().sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
-                  const myResult = results.find(rr => rr.driver === driverStats.driver);
+                  const labelPos = myResult ? (isDNF(myResult) ? "DNF" : `P${myResult.position}`) : "—";
+                  const pts      = myResult && !isDNF(myResult) ? (myResult.points ?? 0) : 0;
+
+                  const isSprint =
+                    race?.isSprint === true ||
+                    race?.sprint === true ||
+                    race?.format === "Sprint" ||
+                    race?.type === "Sprint";
+
+                  const title = `${trackLabel} • ${labelPos}${isSprint ? " • Sprint" : ""}${myResult ? ` • ${pts} pts` : ""}`;
 
                   return (
-                    <div className="last-race" key={race.id ?? `${raceLabel}-${idx}`}>
-                      {/* race title as link + date */}
-                      <div className="lr-meta">
-                        <a href={`/STB/Race/${raceLabel}`}>{trackLabel}</a>
+                    <a
+                      key={race.id ?? `${raceLabel}-${idx}`}
+                      className="race-chip race-chip--stacked"
+                      href={`/STB/Race/${raceLabel}`}
+                      title={title}
+                      aria-label={title}
+                    >
+                      <span className="race-chip-name">{trackLabel}</span>
+                      <span className="race-chip-divider" aria-hidden="true" />
+                      <div className="race-chip-stats">
+                        <span
+                          className={`race-chip-badge ${
+                            isDNF(myResult) ? "tp-medal tp-medal-dnf" : medalClass(myResult?.position)
+                          }`}
+                        >
+                          {labelPos}
+                        </span>
+                        {myResult && !isDNF(myResult) && (
+                          <span className="race-chip-pts">{pts}</span>
+                        )}
+                        {isSprint && <span className="race-chip-sprint">SPR</span>}
                       </div>
-
-                      {/* only this driver's row */}
-                      <div className="tp-results" style={{ marginTop: 12 }}>
-                        <div className="tp-results-body">
-                          {myResult ? (
-                            <div className="tp-result-row tp-result-row--me" key={myResult.id ?? `me-${idx}`}>
-                              <div className={`tp-pos ${medalClass(myResult.position)}`}>{posLabel(myResult)}</div>
-                              <a href={`/STB/Driver/${encodeURIComponent(myResult.driver)}`} className="tp-driver">
-                                {myResult.driver}
-                              </a>
-                              <div className="tp-right">
-                                {isDNF(myResult) ? (
-                                  <span className="tp-tag tp-tag-dnf">DNF</span>
-                                ) : (
-                                  <span className="tp-tag">{myResult.points ?? 0}</span>
-                                )}
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="empty" style={{ marginTop: 8 }}>No result recorded for this driver.</div>
-                          )}
-                        </div>
-                      </div>
-
-                      {idx < driverStats.lastFiveRaces.length - 1 && (
-                        <div className="tp-divider" style={{ margin: '16px 0' }} />
-                      )}
-                    </div>
+                    </a>
                   );
                 })}
               </div>
@@ -309,6 +307,7 @@ const medalClass = (position) => {
   if (position === 1) return "tp-medal tp-medal-1";
   if (position === 2) return "tp-medal tp-medal-2";
   if (position === 3) return "tp-medal tp-medal-3";
+  if (position === "DNF") return "tp-medal tp-medal-dnf";
   return "";
 };
 const asTrackLabel = (t) =>

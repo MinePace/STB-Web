@@ -72,17 +72,6 @@
 }
 
 /* ===== Buttons ===== */
-.button {
-  cursor: pointer;
-  background: var(--brand);
-  color: #fff;
-  transition: background .2s ease, transform .1s ease;
-}
-.button:hover {
-  background: var(--accent);
-  transform: translateY(-1px);
-}
-.button:active { transform: translateY(0); }
 
 .button.ghost {
   background: transparent;

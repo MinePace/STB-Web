@@ -1,109 +1,83 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "./AddRaceResultPage.css";
+import "@/Components/Links.css";
 
 // Points Table for Main and Sprint Races
 const MAIN_RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const SPRINT_RACE_POINTS = [8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
-function AddRaceResults() {
+export default function AddRaceResults() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const prefillRaceId = searchParams.get("race"); // e.g. ?race=224
+
   const [races, setRaces] = useState([]);
   const [filteredRaces, setFilteredRaces] = useState([]);
   const [existingResults, setExistingResults] = useState(new Set());
   const [selectedRace, setSelectedRace] = useState(null);
+
   const [raceResults, setRaceResults] = useState([]);
   const [driversList, setDriversList] = useState([]);
-  const navigate = useNavigate();
 
-  const driverInputRef = useRef(null);
-
+  // ---------- Access control ----------
   useEffect(() => {
     const role = localStorage.getItem("role");
-    if (role !== "Admin") {
-      navigate("/"); // Redirect if not admin
-    }
+    if (role !== "Admin") navigate("/");
   }, [navigate]);
 
-  // Fetch races and existing results
+  // ---------- Data fetching ----------
   useEffect(() => {
+    // fetch all races
     fetch("http://localhost:5110/api/race/races")
       .then((res) => res.json())
-      .then((data) => {
-        setRaces(data);
-        fetchExistingResults(data); // Fetch existing results after fetching races
+      .then((allRaces) => {
+        setRaces(allRaces);
+        // after races, fetch existing results so we can compute availability & preselect
+        fetch("http://localhost:5110/api/race/raceresults")
+          .then((res) => res.json())
+          .then((allResults) => {
+            const withResults = new Set(allResults.map((r) => r.raceId));
+            setExistingResults(withResults);
+
+            // races you can add results to
+            const available = allRaces.filter((r) => !withResults.has(r.id));
+            setFilteredRaces(available);
+
+            // preselect from query (?race=) if available and has no results
+            if (prefillRaceId) {
+              const targetId = Number(prefillRaceId);
+              const target = available.find((r) => Number(r.id) === targetId);
+              if (target) {
+                setSelectedRace(target);
+                initResultsForRace(target, setRaceResults);
+              }
+            }
+          })
+          .catch((err) => console.error("Error fetching existing results:", err));
       })
       .catch((err) => console.error("Error fetching races:", err));
-  }, []);
+  }, [prefillRaceId]);
 
-  const fetchExistingResults = (allRaces) => {
-    fetch("http://localhost:5110/api/race/raceresults")
-      .then((res) => res.json())
-      .then((data) => {
-        const raceIdsWithResults = new Set(data.map((result) => result.raceId));
-        setExistingResults(raceIdsWithResults);
-
-        const availableRaces = allRaces.filter((race) => !raceIdsWithResults.has(race.id));
-        setFilteredRaces(availableRaces);
-      })
-      .catch((err) => console.error("Error fetching existing results:", err));
-  };
-
+  // drivers list
   useEffect(() => {
-    fetch(`http://localhost:5110/api/driver/all`)
+    fetch("http://localhost:5110/api/driver/all")
       .then((res) => res.json())
       .then((data) => {
-        if (Array.isArray(data)) {
-          setDriversList(data);
-        }
+        if (Array.isArray(data)) setDriversList(data);
       })
       .catch((err) => console.error("Error fetching drivers:", err));
   }, []);
 
-  // Put this above the component or inside it before handleSubmit:
-  const getNextRaceAfter = (current, remaining) => {
-    if (!current) return null;
-
-    // same Season + Division, higher Round
-    const sameSeasonDiv = remaining
-      .filter(r =>
-        Number(r.season) === Number(current.season) &&
-        String(r.division) === String(current.division) &&
-        Number(r.round) > Number(current.round)
-      )
-      .sort((a, b) => Number(a.round) - Number(b.round));
-
-    if (sameSeasonDiv.length > 0) return sameSeasonDiv[0];
-
-    // (Optional fallback) nothing higher left in this season/division:
-    // pick the lowest round in the same season/division if any exist
-    const resetToFirst = remaining
-      .filter(r =>
-        Number(r.season) === Number(current.season) &&
-        String(r.division) === String(current.division)
-      )
-      .sort((a, b) => Number(a.round) - Number(b.round));
-
-    return resetToFirst[0] || null;
-  };
-
-  const handleRaceSelect = (e) => {
-    const raceId = e.target.value;
-    const race = filteredRaces.find((race) => race.id.toString() === raceId);
-
-    if (!race) {
-      console.error("Selected race not found!");
-      return;
-    }
-
-    setSelectedRace(race);
-    const pointsTable = race.sprint === "Yes" ? SPRINT_RACE_POINTS : MAIN_RACE_POINTS;
-
-    setRaceResults(
-      Array.from({ length: 20 }, (_, index) => ({
-        position: index + 1,
+  // ---------- Helpers ----------
+  const initResultsForRace = (race, setFn) => {
+    const table = race?.sprint === "Yes" ? SPRINT_RACE_POINTS : MAIN_RACE_POINTS;
+    setFn(
+      Array.from({ length: 20 }, (_, i) => ({
+        position: i + 1,
         driver: "",
         team: "",
-        points: pointsTable[index] || 0,
+        points: table[i] || 0,
         dnf: "No",
         pos_Change: 0,
         qualifying: "",
@@ -113,152 +87,92 @@ function AddRaceResults() {
     );
   };
 
+  const getNextRaceAfter = (current, remaining) => {
+    if (!current) return null;
+    const sameSeasonDiv = remaining
+      .filter(
+        (r) =>
+          Number(r.season) === Number(current.season) &&
+          String(r.division) === String(current.division) &&
+          Number(r.round) > Number(current.round)
+      )
+      .sort((a, b) => Number(a.round) - Number(b.round));
+
+    if (sameSeasonDiv.length > 0) return sameSeasonDiv[0];
+
+    const resetToFirst = remaining
+      .filter(
+        (r) =>
+          Number(r.season) === Number(current.season) &&
+          String(r.division) === String(current.division)
+      )
+      .sort((a, b) => Number(a.round) - Number(b.round));
+
+    return resetToFirst[0] || null;
+  };
+
+  // ---------- UI handlers ----------
+  const handleRaceSelect = (e) => {
+    const id = e.target.value;
+    const race = filteredRaces.find((r) => String(r.id) === id);
+    if (!race) return;
+    setSelectedRace(race);
+    initResultsForRace(race, setRaceResults);
+  };
+
   const handleResultChange = (index, field, value) => {
-    setRaceResults((prevResults) => {
-      const updatedResults = [...prevResults];
+    setRaceResults((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
 
-      updatedResults[index] = { ...updatedResults[index], [field]: value };
-
+      // keep pos_Change in sync
       if (field === "position" || field === "qualifying") {
-        const q = parseInt(updatedResults[index].qualifying, 10);
-        updatedResults[index].pos_Change =
-          Number.isFinite(q) && updatedResults[index].position
-            ? q - updatedResults[index].position
-            : 0;
+        const q = parseInt(updated[index].qualifying, 10);
+        updated[index].pos_Change =
+          Number.isFinite(q) && updated[index].position ? q - updated[index].position : 0;
       }
 
+      // cascading DNF
       if (field === "dnf" && value === "Yes") {
-        for (let i = index; i < updatedResults.length; i++) {
-          updatedResults[i].dnf = "Yes";
-        }
+        for (let i = index; i < updated.length; i++) updated[i].dnf = "Yes";
       }
 
+      // fastest lap: single true, points +1 if main race, pos <= 10, seasons <= 28
       if (field === "fastestLap") {
-        updatedResults.forEach((row, i) => {
+        updated.forEach((row, i) => {
           if (i !== index) row.fastestLap = false;
         });
 
-        updatedResults.forEach((row, i) => {
-          row.points = selectedRace?.sprint === "Yes" ? SPRINT_RACE_POINTS[i] || 0 : MAIN_RACE_POINTS[i] || 0;
-          if (row.fastestLap === true && row.position <= 10 && selectedRace?.sprint !== "Yes" && selectedRace.season <= 28) {
+        updated.forEach((row, i) => {
+          const base =
+            selectedRace?.sprint === "Yes" ? SPRINT_RACE_POINTS[i] || 0 : MAIN_RACE_POINTS[i] || 0;
+          row.points = base;
+          if (
+            row.fastestLap === true &&
+            row.position <= 10 &&
+            selectedRace?.sprint !== "Yes" &&
+            Number(selectedRace?.season) <= 28
+          ) {
             row.points += 1;
           }
         });
       }
 
-      return updatedResults;
+      return updated;
     });
   };
 
-  const handleSubmit = async () => {
-    if (!selectedRace) {
-      console.error("No race selected!");
-      return;
-    }
-
-    const raceData = raceResults.map((result) => ({
-      raceId: selectedRace.id,
-      position: result.position,
-      driver: result.driver.trim(),
-      team: result.team.trim(),
-      points: result.points,
-      dnf: result.dnf,
-      qualifying: result.qualifying ? parseInt(result.qualifying, 10) : 0,
-      pos_Change: result.pos_Change,
-      fastestLap: result.fastestLap,
-      Time: result.raceTime.trim(),
-    }));
-
-    try {
-      const response = await fetch("http://localhost:5110/api/race/raceresults", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(raceData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      alert(`${data.message}`);
-
-      // ✅ After success: move to the next available race
-      setFilteredRaces((prev) => {
-        const updated = prev.filter((r) => r.id !== selectedRace.id);
-
-        const nextRace = getNextRaceAfter(selectedRace, updated);
-        if (nextRace) {
-          setSelectedRace(nextRace);
-
-          const pointsTable =
-            nextRace.sprint === "Yes" ? SPRINT_RACE_POINTS : MAIN_RACE_POINTS;
-
-          setRaceResults(
-            Array.from({ length: 20 }, (_, index) => ({
-              position: index + 1,
-              driver: "",
-              team: "",
-              points: pointsTable[index] || 0,
-              dnf: "No",
-              pos_Change: 0,
-              qualifying: "",
-              fastestLap: false,
-              raceTime: "",
-            }))
-          );
-        } else {
-          setSelectedRace(null);
-          setRaceResults([]);
-          alert("✅ All races have results for this season/division!");
-        }
-
-        return updated;
-      });
-    } catch (error) {
-      console.error("❌ Error submitting results:", error);
-      alert("Error submitting results! Check the console for details.");
-    }
-  };
-
-  // Handle Tab key press to move down between inputs
-  const handleTabKeyDown = (e, index, type) => {
-    if (e.key === "Tab") {
-      e.preventDefault();
-
-      const isShiftPressed = e.shiftKey;
-      const inputClass = `ar-${type}-input`;
-      const inputs = Array.from(document.querySelectorAll(`.${inputClass}`));
-
-      let nextIndex;
-
-      if (isShiftPressed) {
-        nextIndex = index === 0 ? inputs.length - 1 : index - 1;
-      } else {
-        nextIndex = (index + 1) % inputs.length;
-      }
-
-      inputs[nextIndex].focus();
-    }
-  };
-
-  // NEW: Paste handler to fill down a column from the focused row
+  // paste column fill
   const handleColumnPaste = (e, startIndex, field) => {
     const text = e.clipboardData?.getData("text");
     if (!text) return;
 
-    // Split into non-empty lines
     const lines = text
       .split(/\r?\n/)
       .map((l) => l.trim())
       .filter((l) => l.length > 0);
 
-    // If it’s just a single line, let the native paste happen (so single-cell paste works).
-    if (lines.length <= 1) return;
-
-    // We’re handling it — stop the default paste
+    if (lines.length <= 1) return; // allow native single-cell paste
     e.preventDefault();
 
     setRaceResults((prev) => {
@@ -274,10 +188,9 @@ function AddRaceResults() {
         const idx = startIndex + i;
         if (idx >= updated.length) break;
 
-        // Take the first token on the line (so tab/comma-separated still works)
         const firstCell = lines[i].split(/\t|,/)[0]?.trim() ?? "";
-
         let value = firstCell;
+
         if (field === "qualifying") {
           const n = parseInt(firstCell, 10);
           value = Number.isFinite(n) ? n : "";
@@ -289,7 +202,6 @@ function AddRaceResults() {
 
         const row = { ...updated[idx], [field]: value };
 
-        // Keep Position Change in sync when qualifying changes
         if (field === "qualifying") {
           const q = parseInt(row.qualifying, 10);
           row.pos_Change = Number.isFinite(q) ? q - row.position : 0;
@@ -297,11 +209,74 @@ function AddRaceResults() {
 
         updated[idx] = row;
       }
-
       return updated;
     });
   };
 
+  // simple tab navigation (column-wise)
+  const handleTabKeyDown = (e, index, type) => {
+    if (e.key !== "Tab") return;
+    e.preventDefault();
+
+    const isShift = e.shiftKey;
+    const cls = `.ar-${type}-input`;
+    const inputs = Array.from(document.querySelectorAll(cls));
+
+    if (inputs.length === 0) return;
+    const nextIndex = isShift ? (index === 0 ? inputs.length - 1 : index - 1) : (index + 1) % inputs.length;
+    inputs[nextIndex].focus();
+  };
+
+  // ---------- Submit ----------
+  const handleSubmit = async () => {
+    if (!selectedRace) return;
+
+    const payload = raceResults.map((r) => ({
+      raceId: selectedRace.id,
+      position: r.position,
+      driver: r.driver.trim(),
+      team: r.team.trim(),
+      points: r.points,
+      dnf: r.dnf,
+      qualifying: r.qualifying ? parseInt(r.qualifying, 10) : 0,
+      pos_Change: r.pos_Change,
+      fastestLap: r.fastestLap,
+      Time: r.raceTime.trim(),
+    }));
+
+    try {
+      const res = await fetch("http://localhost:5110/api/race/raceresults", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error(`Error: ${res.status} ${res.statusText}`);
+      const data = await res.json();
+      alert(`${data.message}`);
+
+      // remove this race from the available list & move to next
+      setFilteredRaces((prev) => {
+        const updated = prev.filter((r) => r.id !== selectedRace.id);
+        const next = getNextRaceAfter(selectedRace, updated);
+
+        if (next) {
+          setSelectedRace(next);
+          initResultsForRace(next, setRaceResults);
+        } else {
+          setSelectedRace(null);
+          setRaceResults([]);
+          alert("✅ All races have results for this season/division!");
+        }
+        return updated;
+      });
+    } catch (err) {
+      console.error("❌ Error submitting results:", err);
+      alert("Error submitting results! Check the console for details.");
+    }
+  };
+
+  // ---------- Render ----------
   return (
     <div className="ar-container">
       <h1>Add Race Results</h1>
@@ -309,13 +284,13 @@ function AddRaceResults() {
       {/* Race Selection */}
       <div className="race-settings">
         <h2>Select Race</h2>
-        <select onChange={handleRaceSelect} required>
+        <select onChange={handleRaceSelect} required value={selectedRace?.id ?? ""}>
           <option value="">Select a Race</option>
           {filteredRaces.length > 0 ? (
-            filteredRaces.map((race) => (
-              <option key={race.id} value={race.id}>
-                {race.name} - Season {race.season}, Round {race.round}, Div {race.division}{" "}
-                {race.sprint === "Yes" ? "(Sprint)" : ""}
+            filteredRaces.map((r) => (
+              <option key={r.id} value={r.id}>
+                {r.name} - Season {r.season}, Round {r.round}, Div {r.division}{" "}
+                {r.sprint === "Yes" ? "(Sprint)" : ""}
               </option>
             ))
           ) : (
@@ -326,11 +301,12 @@ function AddRaceResults() {
 
       {/* Results Form */}
       <div className="ar-form">
-        <h2>Add Results for {selectedRace?.track?.raceName}</h2>
+        <h2>Add Results for {selectedRace?.track?.raceName ?? "—"}</h2>
         <p style={{ fontSize: 12, color: "#444951ff" }}>
-          Tip: You can paste multiple rows from Excel/Sheets. Focus a cell in Driver, Team, Qualifying or Race Time,
+          Tip: you can paste multiple rows from Excel/Sheets. Focus a cell in Driver, Team, Qualifying or Race Time,
           then paste — it fills down from the focused row.
         </p>
+
         <table>
           <thead>
             <tr>
@@ -346,75 +322,80 @@ function AddRaceResults() {
             </tr>
           </thead>
           <tbody>
-            {raceResults.map((result, index) => (
-              <tr key={index}>
-                <td>{result.position}</td>
+            {raceResults.map((row, i) => (
+              <tr key={i}>
+                <td>{row.position}</td>
+
                 <td>
                   <input
                     type="text"
                     list="drivers-list"
-                    value={result.driver}
-                    onChange={(e) => handleResultChange(index, "driver", e.target.value)}
-                    onKeyDown={(e) => handleTabKeyDown(e, index, "driver")}
-                    onPaste={(e) => handleColumnPaste(e, index, "driver")} // NEW
+                    value={row.driver}
+                    onChange={(e) => handleResultChange(i, "driver", e.target.value)}
+                    onKeyDown={(e) => handleTabKeyDown(e, i, "driver")}
+                    onPaste={(e) => handleColumnPaste(e, i, "driver")}
                     placeholder="Select or type driver..."
                     className="ar-driver-input"
                   />
                   <datalist id="drivers-list">
-                    {driversList.map((driver, i) => (
-                      <option key={i} value={driver} />
+                    {driversList.map((d, idx) => (
+                      <option key={idx} value={d} />
                     ))}
                   </datalist>
                 </td>
+
                 <td>
                   <input
                     type="text"
-                    value={result.team}
-                    onChange={(e) => handleResultChange(index, "team", e.target.value)}
-                    onKeyDown={(e) => handleTabKeyDown(e, index, "team")}
-                    onPaste={(e) => handleColumnPaste(e, index, "team")} // NEW
+                    value={row.team}
+                    onChange={(e) => handleResultChange(i, "team", e.target.value)}
+                    onKeyDown={(e) => handleTabKeyDown(e, i, "team")}
+                    onPaste={(e) => handleColumnPaste(e, i, "team")}
                     className="ar-team-input"
                   />
                 </td>
-                <td>{result.points}</td>
+
+                <td>{row.points}</td>
+
                 <td>
                   <select
-                    value={result.dnf}
-                    onChange={(e) => handleResultChange(index, "dnf", e.target.value)}
+                    value={row.dnf}
+                    onChange={(e) => handleResultChange(i, "dnf", e.target.value)}
                     className="ar-dnf-select"
-                    // Note: native select doesn't have a paste UX, so we skip onPaste here.
                   >
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
                   </select>
                 </td>
+
                 <td>
                   <input
                     type="number"
-                    value={result.qualifying}
-                    onChange={(e) => handleResultChange(index, "qualifying", e.target.value)}
-                    onKeyDown={(e) => handleTabKeyDown(e, index, "quali")}
-                    onPaste={(e) => handleColumnPaste(e, index, "qualifying")} // NEW
+                    value={row.qualifying}
+                    onChange={(e) => handleResultChange(i, "qualifying", e.target.value)}
+                    onKeyDown={(e) => handleTabKeyDown(e, i, "quali")}
+                    onPaste={(e) => handleColumnPaste(e, i, "qualifying")}
                     className="ar-quali-input"
                   />
                 </td>
-                <td>{result.pos_Change}</td>
+
+                <td>{row.pos_Change}</td>
+
                 <td>
                   <input
                     type="checkbox"
-                    checked={result.fastestLap}
-                    onChange={(e) => handleResultChange(index, "fastestLap", e.target.checked)}
-                    // If you want to support pasting booleans here, you could add:
-                    // onPaste={(e) => handleColumnPaste(e, index, "fastestLap")}
+                    checked={row.fastestLap}
+                    onChange={(e) => handleResultChange(i, "fastestLap", e.target.checked)}
                   />
                 </td>
+
                 <td>
                   <input
                     type="text"
-                    value={result.raceTime}
-                    onChange={(e) => handleResultChange(index, "raceTime", e.target.value)}
-                    onKeyDown={(e) => handleTabKeyDown(e, index, "time")}
-                    onPaste={(e) => handleColumnPaste(e, index, "raceTime")} // NEW
+                    value={row.raceTime}
+                    onChange={(e) => handleResultChange(i, "raceTime", e.target.value)}
+                    onKeyDown={(e) => handleTabKeyDown(e, i, "time")}
+                    onPaste={(e) => handleColumnPaste(e, i, "raceTime")}
                     placeholder="Enter race time"
                     className="ar-time-input"
                   />
@@ -426,14 +407,9 @@ function AddRaceResults() {
       </div>
 
       {/* Submit Button */}
-      <button 
-        onClick={handleSubmit} disabled={!selectedRace}
-        className="ar-submit-button"
-      >
+      <button onClick={handleSubmit} disabled={!selectedRace} className="submit-button">
         Submit All Results
       </button>
     </div>
   );
 }
-
-export default AddRaceResults;

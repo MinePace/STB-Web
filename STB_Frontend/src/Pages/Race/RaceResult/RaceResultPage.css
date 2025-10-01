@@ -55,24 +55,6 @@
   text-align: center;
 }
 
-/* Stijl de links binnen de tabel */
-.driver-link {
-  color: #ffffff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.driver-link:hover {
-  color: #4caeff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.fastest-lap {
-  color: rgb(174, 61, 255);
-  font-weight: bold;
-}
-
 .video-player {
   position: absolute;
   margin: 0px;
@@ -80,24 +62,6 @@
   left: 10%;
   width: 300px; /* Adjust width as needed */
   height: 180px; /* Adjust height as needed */
-}
-
-/* Screenshot Button */
-.screenshot-btn {
-  background-color: #0b4e8b;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-bottom: 15px;
-  transition: background-color 0.3s ease;
-}
-
-.screenshot-btn:hover {
-  background-color: #2d6eab;
 }
 
 /* Style for DNF Cell */
@@ -134,4 +98,22 @@
 .country-flag {
   width: 48px;
   height: auto;
+}
+
+.no-results-banner {
+  margin: 12px auto 0;
+  max-width: 820px;
+  background: rgba(239, 68, 68, 0.15);   /* red-500 @ 15% */
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fecaca;                         /* light red text */
+  padding: 10px 12px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 700;
+}
+.error-message {
+  color: #ffb4b4;
+  text-align: center;
+  margin-top: 40px;
+  font-weight: 700;
 }

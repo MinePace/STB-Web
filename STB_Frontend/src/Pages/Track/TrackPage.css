@@ -225,9 +225,10 @@
 /* ----- Position + medals ----- */
 .tp-pos { font-weight: 700; color: #e8edff; }
 .tp-medal { border-radius: 999px; padding: 4px 10px; text-align: center; }
-.tp-medal-1 { background: linear-gradient(180deg, #ffef9e, #ffd452); color: #1f1700; }
-.tp-medal-2 { background: linear-gradient(180deg, #f0f3f9, #d9e1f0); color: #20232a; }
-.tp-medal-3 { background: linear-gradient(180deg, #ffd2a6, #ffa85a); color: #241200; }
+.tp-medal-1 { background: linear-gradient(180deg, #ffef9e, #ffd452); color: #1f1700; border: #ffd452}
+.tp-medal-2 { background: linear-gradient(180deg, #f0f3f9, #d9e1f0); color: #20232a; border: #d9e1f0}
+.tp-medal-3 { background: linear-gradient(180deg, #ffd2a6, #ffa85a); color: #241200; border: #ffa85a}
+.tp-medal-dnf { background: linear-gradient(180deg, #ffa6a6, #ff5a5a); color: #241200; border: #ff5a5a}
 
 /* ----- Tags ----- */
 .tp-tag {

@@ -19,7 +19,7 @@ body {
   color: #eaf2ff;
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0,0,0,.25);
-  padding: 18px 22px;
+  padding: 10px 22px;
   display: grid;
   grid-template-columns: 1fr auto auto;
   align-items: center;
@@ -78,7 +78,7 @@ body {
 .panel {
   background: rgba(30, 58, 138, 0.85);
   color: #eaf2ff;
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: 0 8px 20px rgba(0,0,0,.2);
   overflow: hidden;
   min-height: 320px;
@@ -88,8 +88,8 @@ body {
 
 .panel-header {
   font-weight: 800;
-  font-size: 20px;
-  padding: 14px 16px;
+  font-size: 24px;
+  padding: 8px 10px;
   border-bottom: 1px solid rgba(255,255,255,0.15);
   text-align: center;
 }
@@ -103,25 +103,6 @@ body {
   opacity: 0.8;
   font-style: italic;
 }
-
-/* Last 5 list */
-.races-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.race-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 10px;
-  padding: 10px 12px;
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 12px;
-  margin-bottom: 10px;
-  background: rgba(255,255,255,0.06);
-}
-.race-track { font-weight: 600; }
-.race-finish, .race-points { opacity: .95; }
 
 /* Stats grid inside the third panel */
 .stats-grid {
@@ -230,3 +211,170 @@ body {
   font-size: 0.85rem;
   margin-bottom: 4px;
 }
+
+/* Stack spacing tighter */
+.races-stack {
+  display: grid;
+  gap: 10px; /* smaller gap */
+}
+
+/* Card wrapper per race */
+.race-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px;         /* slightly smaller radius */
+  padding: 6px 8px;            /* reduced padding */
+}
+
+/* Race title centered and linked */
+.race-card-title {
+  display: block;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.55rem;          /* smaller font */
+  margin: 0px 4px 3px;         /* less margin */
+  text-decoration: none;
+  color: #cfe3ff;
+}
+
+.race-card-title:hover{
+  color: #4caeff;
+  text-decoration: none
+}
+
+/* Thin divider under title */
+.race-card-title::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin: 2px auto 0;
+  max-width: 92%;
+  background: rgba(255,255,255,0.15);
+  border-radius: 999px;
+}
+
+/* Inner pill for the single row */
+.race-card-body {
+  background: rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 4px 6px;             /* tighter */
+}
+
+/* Single-row layout */
+.race-card .tp-result-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px; /* narrower columns */
+  align-items: center;
+  font-size: 0.8rem;            /* smaller font */
+  line-height: 1.2;
+}
+
+/* Compact position / tag */
+.race-card .tp-pos {
+  font-size: 0.75rem;
+  padding: 1px 4px;
+  border-radius: 6px;
+}
+
+.race-card .tp-tag {
+  font-size: 0.75rem;
+  padding: 1px 4px;
+}
+
+.race-card .tp-right {
+  justify-self: center;
+}
+
+/* Chips container */
+.race-chips {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;           /* compact vertical spacing */
+  padding-right: 6px;  /* optical balance */
+}
+
+/* Base chip */
+.race-chip {
+  display: inline-grid;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: #eaf2ff;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.16);
+  transition: transform .06s ease, background-color .2s ease, border-color .2s ease;
+}
+.race-chip:hover { 
+  transform: translateY(-1px); 
+  background: rgba(255,255,255,0.09); 
+  border-color: rgba(255,255,255,0.24);
+  color: #4caeff;
+  text-decoration: none;
+}
+
+.race-chip-name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.race-chip-name:hover {
+  text-decoration: none;
+  color: #4caeff;
+}
+
+/* P#/DNF badge */
+.race-chip-badge {
+  font-size: 0.8rem;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.18);
+  border: 1px solid rgba(255,255,255,0.18);
+  line-height: 1;
+}
+
+/* Points badge (smaller) */
+.race-chip-pts {
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.16);
+  line-height: 1;
+}
+
+/* Sprint tag */
+.race-chip-sprint {
+  font-size: 0.68rem;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.10);
+  border: 1px dashed rgba(255,255,255,0.22);
+  line-height: 1;
+  opacity: 0.95;
+}
+
+/* Ensure badges/text inside don't change on hover */
+.race-chip-pts,
+.race-chip-sprint {
+  color: #eaf2ff !important;   /* lock text color */
+}
+
+.race-chip:hover .race-chip-pts,
+.race-chip:hover .race-chip-sprint {
+  color: #eaf2ff !important;   /* preserve on hover */
+}
+
+.tp-medal-dnf {
+  background: linear-gradient(180deg, #ffa6a6, #ff5a5a); 
+  color: #241200 !important;    /* white text for contrast */
+  border: #ff5a5a
+}
+

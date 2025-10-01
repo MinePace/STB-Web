@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "@/Components/Links.css";
 
 function AddTrackPage() {
   const [track, setTrack] = useState({ name: "", raceName: "", country: "" });
@@ -80,7 +81,7 @@ function AddTrackPage() {
           required
         />
         {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={submitting}>
+        <button type="submit" disabled={submitting} className="submit-button">
           {submitting ? "Saving..." : "Add Track"}
         </button>
       </form>

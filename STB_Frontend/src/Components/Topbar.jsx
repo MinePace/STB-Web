@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Topbar.css";
 import { useShortcut } from "@/Components/ShortCut";
+import "@/Components/Links.css"
 import { use } from "react";
 
 function Topbar() {
@@ -50,7 +51,7 @@ function Topbar() {
       <div className="nav-container">
         <ul className="nav-links">
           <li>
-            <Link to="/" className="nav-link">Home</Link>
+            <Link to="/" className="topbar-link">Home</Link>
           </li>
           <li>
             <a 
@@ -74,12 +75,12 @@ function Topbar() {
           </li>
           {role === "Admin" && (
             <li>
-              <Link to="/admin" className="nav-link">Admin Hub</Link>
+              <Link to="/admin" className="topbar-link">Admin Hub</Link>
             </li>
           )}
           {isLoggedIn && claimedDriver ? (
             <li>
-              <Link to={`/STB/Driver/${claimedDriver.name}`} className="nav-link">
+              <Link to={`/STB/Driver/${claimedDriver.name}`} className="topbar-link">
                 My Driver
               </Link>
             </li>
@@ -89,7 +90,7 @@ function Topbar() {
             </li>
           ) : (
             <li>
-              <Link to="/login" className="nav-link">Login</Link>
+              <Link to="/login" className="topbar-link">Login</Link>
             </li>
           )}
           {isLoggedIn && (

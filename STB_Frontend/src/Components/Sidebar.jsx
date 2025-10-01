@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./Sidebar.css";
+import "@/Components/Links.css";
 
 function Sidebar() {
   const seasons = [

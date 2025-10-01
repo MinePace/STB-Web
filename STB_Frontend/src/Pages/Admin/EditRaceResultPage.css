@@ -21,14 +21,6 @@
     text-align: center;
   }
   
-  .save-btn {
-    background-color: green;
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-  }
-  
   .cancel-btn {
     background-color: red;
     color: white;

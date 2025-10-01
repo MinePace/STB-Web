@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas"; // Import html2canvas
 import "./ChampionshipPage.css";
+import "@/Components/Links.css"
 
 function ChampionshipPage() {
   const { season, division } = useParams();
@@ -239,7 +240,7 @@ function ChampionshipPage() {
                   groupedRace?.mainRace?.track?.countryCode ||
                   groupedRace?.sprintRace?.track?.countryCode;
                 return <th>
-                        <Link className= "round-link" to={`/STB/Race/${RaceId}`} key={round}>{countryCode}</Link>
+                        <Link className= "primary-link" to={`/STB/Race/${RaceId}`} key={round}>{countryCode}</Link>
                       </th>
               })}
               <th>Points</th>
@@ -259,7 +260,7 @@ function ChampionshipPage() {
                     <td>
                       <Link
                         to={`/STB/Driver/${encodeURIComponent(driver)}`}
-                        className={`driver-link ${
+                        className={`primary-link ${
                           claimedDriver && driver.trim().toLowerCase() === claimedDriver.name.trim().toLowerCase()
                             ? "driver-link--claimed"
                             : ""

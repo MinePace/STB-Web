@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import React from "react";
 import { useEffect, useMemo, useState } from "react";
-import "./EditRacePage.css"; // re-use your season builder styles (blue theme)
+import "./EditRacePage.css";
+import "@/Components/Links.css";
 
 function EditRacePage() {
   const navigate = useNavigate();
@@ -340,7 +341,7 @@ function EditRacePage() {
         </div>
 
         <button
-          className="button primary"
+          className="submit-button"
           type="button"
           onClick={saveAll}
           disabled={saving || (!rows.some(r => !r.id) && !rows.some((r,i)=> r.id && JSON.stringify(r)!==JSON.stringify(originalRows[i])))}

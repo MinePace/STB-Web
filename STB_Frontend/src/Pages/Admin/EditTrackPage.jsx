@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "@/Components/Links.css";
 
 function EditTrackPage() {
   const [tracks, setTracks] = useState([]);
@@ -159,7 +160,7 @@ function EditTrackPage() {
                 onChange={handleInputChange}
               />
 
-              <button className="save-btn" onClick={handleSave}>
+              <button className="submit-button" onClick={handleSave}>
                 Save Changes
               </button>
             </div>

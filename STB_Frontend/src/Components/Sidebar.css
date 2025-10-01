@@ -30,7 +30,7 @@
 
 .season-item:hover .season-label{
     color: #4caeff; /* Lichtere blauwe kleur bij hover */
-    text-decoration: none;
+    text-decoration: underline;
     font-weight: bold;
     transition: color 0.2s;
 }
@@ -52,20 +52,6 @@
     margin: 5px 0;
 }
 
-.division-link {
-    text-decoration: none;
-    color: white;
-    font-weight: bold;
-    transition: color 0.2s;
-}
-
-.division-link:hover {
-    color: #4caeff; /* Lichtere blauwe kleur bij hover */
-    text-decoration: none;
-    font-weight: bold;
-    transition: color 0.2s;
-}
-
 .season-item:hover .division-dropdown {
     display: block; /* Toon divisies bij hover */
 }
@@ -74,10 +60,4 @@
 .season-item--raced .season-label {
   color: #91ff95; /* or another highlight color */
   font-weight: bold;
-}
-
-/* Highlighted division link */
-.division-link--raced {
-  color: #91ff95; /* subtle background tint */
-  border-radius: 4px;
 }

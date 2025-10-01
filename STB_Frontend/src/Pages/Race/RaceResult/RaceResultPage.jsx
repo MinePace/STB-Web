@@ -3,13 +3,34 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import "./RaceResultPage.css";
+import "@/Components/Links.css";
 
 function RaceResultPage() {
   const { raceId } = useParams(); // Haal "type" op uit de URL
   const [raceResults, setRaceResults] = useState([]);
   const [race, setRaceData] = useState();
-const [fastestLap, setFastestLap] = useState(null);
+  const [fastestLap, setFastestLap] = useState(null);
   const [embedUrl, setEmbedUrl] = useState(""); // Opslag voor de embed-URL
+  
+  const role = localStorage.getItem("role") || "user";
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const name = localStorage.getItem("name");
+    if (!token || !name) return;
+
+    fetch(`http://localhost:5110/api/user/${name}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => data && setUser(data))
+      .catch(err => console.error("Error fetching user data:", err));
+  }, []);
 
   // 🎥 turn any YouTube URL into an <iframe> embed URL
   const extractYouTubeEmbed = (url) => {
@@ -47,10 +68,15 @@ const [fastestLap, setFastestLap] = useState(null);
   };
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
+
     fetch(`http://localhost:5110/api/race/race/${raceId}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("This Race doesn't exist.");
+        return res.json();
+      })
       .then((data) => {
-        // support either: { race, fastestLap } OR a race object with raceResults [+ optional fastestLap]
         const raceObj = data?.race ?? data;
         const flObj = data?.fastestLap ?? raceObj?.fastestLap ?? null;
 
@@ -58,11 +84,17 @@ const [fastestLap, setFastestLap] = useState(null);
         setRaceResults(raceObj?.raceResults ?? []);
         setFastestLap(flObj);
 
-        if (raceObj?.youtubeLink) {
-          extractYouTubeEmbed(raceObj.youtubeLink);
-        }
+        if (raceObj?.youtubeLink) extractYouTubeEmbed(raceObj.youtubeLink);
       })
-      .catch((err) => console.error("Error fetching race results:", err));
+      .catch((err) => {
+        console.error("Error fetching race results:", err);
+        setError(err.message || "Failed to load race");
+        setRaceData(undefined);
+        setRaceResults([]);
+        setFastestLap(null);
+        setEmbedUrl("");
+      })
+      .finally(() => setLoading(false));
   }, [raceId]);
   
   const teamColors = {
@@ -106,60 +138,46 @@ const [fastestLap, setFastestLap] = useState(null);
 
   return (
     <div className="race-page-container">
-      {/* Check if raceResults has data before rendering */}
-      {raceResults.length > 0 ? (
+      {loading ? (
+        <div className="loading-message">Loading race results...</div>
+      ) : error ? (
+        <div className="error-message">❌ {error}</div>
+      ) : !race ? (
+        <div className="error-message">❌ This Race doensn't exist.</div>
+      ) : (
         <>
-          {/* Container for video and table */}
-          <div className="content-section">
-            {/* YouTube Video Player */}
-            {embedUrl && (
-              <div className="video-player">
-                <iframe
-                  width="100%"
-                  height="250px"
-                  src={embedUrl}
-                  title="YouTube Video Player"
-                  frameBorder="0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
+          {/* Header & basic info always visible */}
+          <div className="table-container">
+            {raceResults.length > 0 && (
+              <button className="download-button" onClick={captureScreenshot}>
+                📸 Save Screenshot
+              </button>
             )}
-            {/* Screenshot Button */}
-            <button className="screenshot-btn" onClick={captureScreenshot}>
-              📸 Save Screenshot
-            </button>
-  
-            {/* Race Results Table */}
-            <div className="table-container">
-              <table className="result-table" border="1">
-                <thead>
-                  {/* New Table Headers Spanning Multiple Columns */}
-                  <tr>
-                    <th colSpan="6" className="table-title">
-                      {race ? `Season ${race.season} • Round ${race.round} ${race.sprint === "Yes" ? "(Sprint)" : ""} • Tier ${race.division}` : "Loading..."}
-                    </th>
-                  </tr>
-                  <tr>
-                    <th colSpan="6" className="table-subtitle">
-                      {race ? (
-                        <div className="race-header">
-                          {race.track.raceName}
-                          {race.track.country && (
-                            <img
-                              src={`/flags/${race.track.country}.png`}
-                              alt={race.track.country}
-                              className="country-flag"
-                              title={race.track.country}
-                            />
-                          )}
-                        </div>
-                      ) : (
-                        "Loading..."
+            <table className="result-table" border="1">
+              <thead>
+                <tr>
+                  <th colSpan="6" className="table-title">
+                    {`Season ${race.season} • Round ${race.round} ${race.sprint === "Yes" ? "(Sprint)" : ""} • Tier ${race.division}`}
+                  </th>
+                </tr>
+                <tr>
+                  <th colSpan="6" className="table-subtitle">
+                    <div className="race-header">
+                      {race.track?.raceName ?? "—"}
+                      {race.track?.country && (
+                        <img
+                          src={`/flags/${race.track.country}.png`}
+                          alt={race.track.country}
+                          className="country-flag"
+                          title={race.track.country}
+                        />
                       )}
-                    </th>
-                  </tr>
-                  {/* Column Headers */}
+                    </div>
+                  </th>
+                </tr>
+
+                {/* Only show column headers if we actually have rows */}
+                {raceResults.length > 0 && (
                   <tr>
                     <th>Pos</th>
                     <th>Driver</th>
@@ -168,7 +186,10 @@ const [fastestLap, setFastestLap] = useState(null);
                     {hasAnyTime && <th>Time</th>}
                     <th>Grid</th>
                   </tr>
-                </thead>
+                )}
+              </thead>
+
+              {raceResults.length > 0 && (
                 <tbody>
                   {raceResults.map((row, index) => {
                     const isDNF = row.dnf === "Yes" || row.dnf === "DNF";
@@ -178,9 +199,7 @@ const [fastestLap, setFastestLap] = useState(null);
 
                     return (
                       <tr key={index}>
-                        <td 
-                          className={isDNF ? "dnf-cell" : ""} // Apply the special CSS class if DNF
-                        >
+                        <td className={isDNF ? "dnf-cell" : ""}>
                           {isDNF ? "DNF" : row.position}
                         </td>
                         <td>
@@ -197,11 +216,7 @@ const [fastestLap, setFastestLap] = useState(null);
                         <td>{row.points}</td>
                         {hasAnyTime && (
                           <td>
-                            {row.time
-                              ? index === 0
-                                ? row.time
-                                : `+${row.time}`
-                              : ""}
+                            {row.time ? (index === 0 ? row.time : `+${row.time}`) : ""}
                           </td>
                         )}
                         <td>{row.qualifying}</td>
@@ -209,12 +224,43 @@ const [fastestLap, setFastestLap] = useState(null);
                     );
                   })}
                 </tbody>
-              </table>
-            </div>
+              )}
+            </table>
           </div>
+
+          {/* No-results notice */}
+          {raceResults.length === 0 && (
+            <div className="no-results-banner">
+              No results are available for this race.
+            </div>
+          )}
+
+          {role === "Admin" && raceResults.length === 0 && (
+            <div className="admin-actions">
+              <Link
+                to={`/STB/Add/RaceResults?race=${race.id}`}
+                className="primary-link"
+              >
+                ➕ Add Race Results
+              </Link>
+            </div>
+          )}
+
+          {/* Optional: video & screenshot only when results exist (or keep them always) */}
+          {embedUrl && (
+            <div className="video-player">
+              <iframe
+                width="100%"
+                height="250px"
+                src={embedUrl}
+                title="YouTube Video Player"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          )}
         </>
-      ) : (
-        <div className="loading-message">Loading race results...</div>
       )}
     </div>
   );  

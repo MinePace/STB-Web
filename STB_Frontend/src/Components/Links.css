@@ -1,0 +1,130 @@
+
+/* ----- Primary Link ----- */
+a.primary-link {
+  display: inline-block;
+  font-weight: 500;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 0px 1px;
+  border-radius: 8px;
+  transition: background .2s ease, transform .15s ease, letter-spacing .25s, color .2s;
+}
+
+a.primary-link:hover,
+a.primary-link:focus-visible {
+  background: rgba(0,129,235,0.25);
+  color: #4caeff;
+  letter-spacing: .5px;
+  transform: translateY(-1px);
+}
+
+a.primary-link:active {
+  transform: scale(0.97);
+  background: rgba(0,129,235,0.25);
+  letter-spacing: -.45px;
+}
+
+/* ----- Download Button ----- */
+.download-button {
+  background: #004ca9;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 8px 15px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform .2s, background .2s, letter-spacing .25s;
+  display: block;
+  margin: 15px auto;
+}
+
+.download-button:hover  { 
+  background: #003b85; 
+  letter-spacing: .5px;
+  transform: translateY(-1px);
+}
+
+.download-button:active { 
+  background: #002a5f;
+  letter-spacing: -.45px;
+  transform: translateY(1px);
+}
+
+.download-button:disabled { 
+  background: #7a7a7a; 
+  cursor: not-allowed; 
+  opacity: .6; 
+}
+
+/* ----- Submit Button ----- */
+.submit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, letter-spacing .4s, transform .4s;
+}
+
+.submit-button:hover {
+  background-color: #2e8432;
+  transform: translateY(-1px);
+}
+
+.submit-button:active { 
+  background: #1d5820;
+  letter-spacing: -.45px;
+  transform: translateY(1px);
+}
+
+/* ----- TopBar Link -----*/
+a.topbar-link {
+  color: white;
+  font-weight: bold;
+  transition: color 0.3s, text-decoration 0.3s;
+}
+
+a.topbar-link:hover {
+  color: #ffcc00;
+  text-decoration: underline;
+}
+
+/* ----- SideBar Link -----*/
+a.division-link {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+
+a.division-link:hover {
+    color: #4caeff;
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+a.division-link--raced {
+  color: #91ff95;
+}
+
+/* ----- Driver Link ----- */
+.driver-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.driver-link:hover {
+  color: #4caeff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.fastest-lap {
+  color: rgb(174, 61, 255);
+  font-weight: bold;
+}

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./AddRacePage.css";
+import "@/Components/Links.css";
 
 function AddRacePage() {
   const navigate = useNavigate();
@@ -369,7 +370,7 @@ function AddRacePage() {
       </div>
 
       <div className="actions">
-        <button type="submit" className="button-primary">Add Season</button>
+        <button type="submit" className="submit-button">Add Season</button>
         <button
           type="button"
           className="button-ghost"

@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "./EditRaceResultPage.css";
+import "@/Components/Links.css";
 
 function EditRaceResults() {
   const { season: paramSeason, round: paramRound, division: paramDivision, type } = useParams();
@@ -284,7 +285,7 @@ function EditRaceResults() {
       {selectedSeason && selectedRace && (
         <>
           <h2>
-            Race Results{type ? ` - ${type}` : ""} • Round {selectedRace} • Season {selectedSeason}
+            Race Results{type ? ` - ${type}` : ""} • Id {selectedRace} • Season {selectedSeason}
           </h2>
 
           {raceResults.length === 0 ? (
@@ -378,7 +379,7 @@ function EditRaceResults() {
                                   />
                                 </td>
                                 <td>
-                                  <button className="save-btn" onClick={() => handleSave(result.id)}>Save</button>
+                                  <button className="submit-button" onClick={() => handleSave(result.id)}>Save</button>
                                   <button className="delete-btn" onClick={() => handleDelete(result.id)}>Delete</button>
                                 </td>
                               </tr>

@@ -120,7 +120,7 @@ Content-Type: application/json
 
 ##########
 
-GET http://localhost:5110/api/race/testmail
+GET http://localhost:5110/api/driver/stats/Joey1854
 
 ##########
 
