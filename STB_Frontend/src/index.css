@@ -28,9 +28,17 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background: linear-gradient(to bottom, #007BFF, #002b58);
   color: white;
+  background: transparent;
+  position: relative;
+}
 
+body::before {
+  content: "";
+  position: fixed; /* covers entire viewport regardless of scroll */
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom, #007BFF, #002b58);
 }
 
 h1 {

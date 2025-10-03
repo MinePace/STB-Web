@@ -25,7 +25,7 @@ public class TrackController : ControllerBase
             .FirstOrDefault();
 
         if (track == null)
-            return NotFound(new { message = "No track were found with this Id." });
+            return NotFound(new { message = "No track was found with this Id." });
 
         return Ok(track);
     }
@@ -51,7 +51,7 @@ public class TrackController : ControllerBase
             .ToList();
 
         if (trackraces == null)
-            return NotFound(new { message = "No track were found with this Id." });
+            return NotFound(new { message = "No track was found with this Id." });
 
         return Ok(trackraces);
     }

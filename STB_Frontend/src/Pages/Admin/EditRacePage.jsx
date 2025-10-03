@@ -236,6 +236,7 @@ function EditRacePage() {
           Round: row.round,
           Sprint: row.sprint || "No",
           TrackId: Number(row.trackId),
+          Track: row.track,
           YoutubeLink: row.youtubeLink || "",
           Date: row.date || null,
         };
@@ -260,17 +261,12 @@ function EditRacePage() {
       try {
         if (!row.trackId) throw new Error("Track required");
 
-        // safer: update by TrackId, not full Track object
-        const payload = {
-          f1_Game: row.f1_Game,
-          season: row.season,
-          division: row.division,
-          round: row.round,
-          sprint: row.sprint || "No",
-          youtubeLink: row.youtubeLink || "",
-          date: row.date || null,
-          trackId: Number(row.trackId),
-        };
+        // get the full track object (uses cache when possible)
+        const fullTrack = await ensureFullTrack(row.trackId);
+
+        // build the payload with the full nested track
+        const payload = toUpdatePayload(row, fullTrack);
+        // If your backend expects PascalCase, map here instead.
 
         const res = await fetch(`http://localhost:5110/api/race/update/${row.id}`, {
           method: "PUT",

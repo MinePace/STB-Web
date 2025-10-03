@@ -96,32 +96,25 @@ Content-Type: application/json
 
 ##########
 
-PUT http://localhost:5110/api/race/update/147
+PUT http://localhost:5110/api/raceresult/update/3252
 Content-Type: application/json
 
 {
-    "id": 147,
-    "f1_Game": 22,
-    "season": 21,
-    "division": 1,
-    "round": 11,
-    "sprint": "No",
-    "youtubeLink": "https://www.youtube.com/watch?v=sK08kyJO4-w",
-    "date": null,
-    "track": {
-        "id": 3,
-        "name": "Red Bull Ring",
-        "raceName": "Austrian Grand Prix",
-        "country": "Austria",
-        "length": 4.318,
-        "turns": 10
-    }
+    "Position": 13,
+    "Driver": "Onur Conker",
+    "Team": "Alpine",
+    "Points": 0,
+    "DNF": "No",
+    "Qualifying": 15,
+    "Pos_Change": 2,
+    "Time": "",
+    "TeamId": 3 
 }
 
 ##########
 
-GET http://localhost:5110/api/driver/stats/Joey1854
+DELETE  http://localhost:5110/api/raceresult/delete/842
 
 ##########
 
-GET http://localhost:5110/api/driver/user/MinePace
+GET http://localhost:5110/api/team

@@ -24,6 +24,25 @@ a.primary-link:active {
   letter-spacing: -.45px;
 }
 
+/* ----- Driver Link ----- */
+.driver-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.driver-link:hover {
+  color: #4caeff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.fastest-lap {
+  color: rgb(174, 61, 255);
+  font-weight: bold;
+}
+
 /* ----- Download Button ----- */
 .download-button {
   background: #004ca9;
@@ -108,23 +127,4 @@ a.division-link:hover {
 
 a.division-link--raced {
   color: #91ff95;
-}
-
-/* ----- Driver Link ----- */
-.driver-link {
-  color: #ffffff;
-  text-decoration: none;
-  font-weight: bold;
-  transition: color 0.2s;
-}
-
-.driver-link:hover {
-  color: #4caeff;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.fastest-lap {
-  color: rgb(174, 61, 255);
-  font-weight: bold;
 }

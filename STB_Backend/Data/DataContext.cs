@@ -11,6 +11,9 @@ public class DataContext : DbContext
     public DbSet<Race> Races { get; set; }
     public DbSet<Track> Tracks { get; set; }
     public DbSet<Driver> Drivers { get; set; }
+    public DbSet<Team> Teams { get; set; }
+    public DbSet<SeasonalTeamColor> SeasonalTeamColors { get; set; }
+    public DbSet<SeasonalTeamDriver> SeasonalTeamDrivers { get; set; }
     public DbSet<FastestLap> FastestLaps { get; set; }
     public DbSet<RaceResultNotification> RaceResultNotifications { get; set; }
 
@@ -34,6 +37,7 @@ public class RaceResult
     public Race Race { get; set; }
     public int Position { get; set; }
     public string Driver { get; set; }
+    public int TeamId { get; set; }
     public string Team { get; set; }
     public int Points { get; set; }
     public string DNF { get; set; }
@@ -85,7 +89,8 @@ public class Track
     public int? Turns { get; set; }
 }
 
-public class Driver {
+public class Driver
+{
     [Key]
     public int Id { get; set; }
     public string Name { get; set; }
@@ -94,16 +99,45 @@ public class Driver {
     public int? UserId { get; set; }
 }
 
-public class FastestLap{
+public class Team
+{
     [Key]
     public int Id { get; set; }
-    public int DriverId { get; set; }
-    public int RaceId { get; set; }
-    public Driver Driver { get; set; }
-    
-    [JsonIgnore]
-    public Race Race { get; set; }
+    public string Name { get; set; }
+    public string? Country { get; set; }
 }
+
+public class SeasonalTeamColor
+{
+    public int Id { get; set; }
+    public int Season { get; set; }
+    public int TeamId { get; set; }
+    public Team Team { get; set; }
+    public string? ColorHex { get; set; }
+}
+
+public class SeasonalTeamDriver
+{
+    public int Id { get; set; }
+    public int Season { get; set; }
+    public int Division { get; set; }
+    public int TeamId { get; set; }
+    public Team Team { get; set; }
+    public int DriverId { get; set; }
+    public Driver Driver { get; set; }
+}
+
+public class FastestLap
+    {
+        [Key]
+        public int Id { get; set; }
+        public int DriverId { get; set; }
+        public int RaceId { get; set; }
+        public Driver Driver { get; set; }
+
+        [JsonIgnore]
+        public Race Race { get; set; }
+    }
 
 public class RaceResultNotification
 {

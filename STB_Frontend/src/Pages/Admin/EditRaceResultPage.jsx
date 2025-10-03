@@ -138,6 +138,7 @@ function EditRaceResults() {
       Time: updated?.time ?? base.time
     };
 
+    console.log("Saving DTO:", dto);
     const resp = await fetch(`http://localhost:5110/api/raceresult/update/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },

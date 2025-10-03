@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import "./AddRaceResultPage.css";
 import "@/Components/Links.css";
@@ -12,13 +12,22 @@ export default function AddRaceResults() {
   const [searchParams] = useSearchParams();
   const prefillRaceId = searchParams.get("race"); // e.g. ?race=224
 
+  // Races / selection
   const [races, setRaces] = useState([]);
   const [filteredRaces, setFilteredRaces] = useState([]);
   const [existingResults, setExistingResults] = useState(new Set());
   const [selectedRace, setSelectedRace] = useState(null);
 
+  // Rows to submit
   const [raceResults, setRaceResults] = useState([]);
+
+  // Drivers (datalist)
   const [driversList, setDriversList] = useState([]);
+
+  // Teams (dropdown)
+  const [teams, setTeams] = useState([]);
+  const [teamsLoading, setTeamsLoading] = useState(false);
+  const [teamsError, setTeamsError] = useState(null);
 
   // ---------- Access control ----------
   useEffect(() => {
@@ -26,25 +35,21 @@ export default function AddRaceResults() {
     if (role !== "Admin") navigate("/");
   }, [navigate]);
 
-  // ---------- Data fetching ----------
+  // ---------- Load all races, then know which already have results ----------
   useEffect(() => {
-    // fetch all races
     fetch("http://localhost:5110/api/race/races")
       .then((res) => res.json())
       .then((allRaces) => {
-        setRaces(allRaces);
-        // after races, fetch existing results so we can compute availability & preselect
-        fetch("http://localhost:5110/api/race/raceresults")
+        setRaces(allRaces || []);
+        return fetch("http://localhost:5110/api/race/raceresults")
           .then((res) => res.json())
           .then((allResults) => {
-            const withResults = new Set(allResults.map((r) => r.raceId));
+            const withResults = new Set((allResults || []).map((r) => r.raceId));
             setExistingResults(withResults);
 
-            // races you can add results to
-            const available = allRaces.filter((r) => !withResults.has(r.id));
+            const available = (allRaces || []).filter((r) => !withResults.has(r.id));
             setFilteredRaces(available);
 
-            // preselect from query (?race=) if available and has no results
             if (prefillRaceId) {
               const targetId = Number(prefillRaceId);
               const target = available.find((r) => Number(r.id) === targetId);
@@ -53,13 +58,12 @@ export default function AddRaceResults() {
                 initResultsForRace(target, setRaceResults);
               }
             }
-          })
-          .catch((err) => console.error("Error fetching existing results:", err));
+          });
       })
-      .catch((err) => console.error("Error fetching races:", err));
+      .catch((err) => console.error("Error fetching races/results:", err));
   }, [prefillRaceId]);
 
-  // drivers list
+  // ---------- Load drivers ----------
   useEffect(() => {
     fetch("http://localhost:5110/api/driver/all")
       .then((res) => res.json())
@@ -69,6 +73,43 @@ export default function AddRaceResults() {
       .catch((err) => console.error("Error fetching drivers:", err));
   }, []);
 
+  // ---------- Load teams (for dropdown) ----------
+  useEffect(() => {
+    let abort = false;
+    setTeamsLoading(true);
+    setTeamsError(null);
+
+    fetch("http://localhost:5110/api/team")
+      .then((r) => r.json())
+      .then((json) => {
+        if (abort) return;
+        const arr = Array.isArray(json)
+          ? json
+          : Array.isArray(json?.data)
+          ? json.data
+          : Array.isArray(json?.teams)
+          ? json.teams
+          : [];
+        setTeams(arr);
+      })
+      .catch((e) => {
+        if (!abort) setTeamsError(e.message || "Failed to load teams");
+      })
+      .finally(() => {
+        if (!abort) setTeamsLoading(false);
+      });
+
+    return () => {
+      abort = true;
+    };
+  }, []);
+
+  const teamByName = useMemo(() => {
+    const m = new Map();
+    for (const t of teams) m.set(String(t.name), t);
+    return m;
+  }, [teams]);
+
   // ---------- Helpers ----------
   const initResultsForRace = (race, setFn) => {
     const table = race?.sprint === "Yes" ? SPRINT_RACE_POINTS : MAIN_RACE_POINTS;
@@ -77,6 +118,7 @@ export default function AddRaceResults() {
         position: i + 1,
         driver: "",
         team: "",
+        teamId: null, // keep FK alongside display name
         points: table[i] || 0,
         dnf: "No",
         pos_Change: 0,
@@ -123,13 +165,21 @@ export default function AddRaceResults() {
   const handleResultChange = (index, field, value) => {
     setRaceResults((prev) => {
       const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
+      const next = { ...updated[index], [field]: value };
+
+      // if team changed via dropdown or paste, set teamId too
+      if (field === "team") {
+        const t = teamByName.get(String(value));
+        next.teamId = t?.id ?? null;
+      }
 
       // keep pos_Change in sync
       if (field === "position" || field === "qualifying") {
-        const q = parseInt(updated[index].qualifying, 10);
-        updated[index].pos_Change =
-          Number.isFinite(q) && updated[index].position ? q - updated[index].position : 0;
+        const q =
+          field === "qualifying"
+            ? parseInt(value, 10)
+            : parseInt(next.qualifying, 10);
+        next.pos_Change = Number.isFinite(q) && next.position ? q - next.position : 0;
       }
 
       // cascading DNF
@@ -137,7 +187,9 @@ export default function AddRaceResults() {
         for (let i = index; i < updated.length; i++) updated[i].dnf = "Yes";
       }
 
-      // fastest lap: single true, points +1 if main race, pos <= 10, seasons <= 28
+      updated[index] = next;
+
+      // fastest lap recalculation (single true, +1 if main race, pos <= 10, seasons <= 28)
       if (field === "fastestLap") {
         updated.forEach((row, i) => {
           if (i !== index) row.fastestLap = false;
@@ -145,7 +197,7 @@ export default function AddRaceResults() {
 
         updated.forEach((row, i) => {
           const base =
-            selectedRace?.sprint === "Yes" ? SPRINT_RACE_POINTS[i] || 0 : MAIN_RACE_POINTS[i] || 0;
+            selectedRace?.sprint === "Yes" ? (SPRINT_RACE_POINTS[i] || 0) : (MAIN_RACE_POINTS[i] || 0);
           row.points = base;
           if (
             row.fastestLap === true &&
@@ -162,7 +214,7 @@ export default function AddRaceResults() {
     });
   };
 
-  // paste column fill
+  // column paste (kept, and now also maps team -> teamId)
   const handleColumnPaste = (e, startIndex, field) => {
     const text = e.clipboardData?.getData("text");
     if (!text) return;
@@ -207,6 +259,11 @@ export default function AddRaceResults() {
           row.pos_Change = Number.isFinite(q) ? q - row.position : 0;
         }
 
+        if (field === "team") {
+          const t = teamByName.get(String(value));
+          row.teamId = t?.id ?? null;
+        }
+
         updated[idx] = row;
       }
       return updated;
@@ -236,6 +293,7 @@ export default function AddRaceResults() {
       position: r.position,
       driver: r.driver.trim(),
       team: r.team.trim(),
+      teamId: r.teamId ?? null, // <— include FK
       points: r.points,
       dnf: r.dnf,
       qualifying: r.qualifying ? parseInt(r.qualifying, 10) : 0,
@@ -345,14 +403,32 @@ export default function AddRaceResults() {
                 </td>
 
                 <td>
-                  <input
-                    type="text"
-                    value={row.team}
-                    onChange={(e) => handleResultChange(i, "team", e.target.value)}
-                    onKeyDown={(e) => handleTabKeyDown(e, i, "team")}
-                    onPaste={(e) => handleColumnPaste(e, i, "team")}
-                    className="ar-team-input"
-                  />
+                  {teamsLoading ? (
+                    <div className="ar-team-input" style={{ opacity: 0.7 }}>Loading teams…</div>
+                  ) : teamsError ? (
+                    <div className="ar-team-input" style={{ borderColor: "var(--danger)", color: "var(--danger)" }}>
+                      Teams error
+                    </div>
+                  ) : (
+                    <select
+                      value={row.team}
+                      onChange={(e) => handleResultChange(i, "team", e.target.value)}
+                      onKeyDown={(e) => handleTabKeyDown(e, i, "team")}
+                      onPaste={(e) => handleColumnPaste(e, i, "team")}
+                      className="ar-team-input"
+                      required
+                    >
+                      <option value="">Select team…</option>
+                      {teams
+                        .slice()
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((t) => (
+                          <option key={t.id} value={t.name}>
+                            {t.name}
+                          </option>
+                        ))}
+                    </select>
+                  )}
                 </td>
 
                 <td>{row.points}</td>

@@ -33,7 +33,6 @@ public class RaceResultController : ControllerBase
     [HttpPut("update/{id}")]
     public IActionResult UpdateResult(int id, [FromBody] RaceResultDTO newResult)
     {
-        List<int> points = new List<int> {25, 18, 15, 12, 10, 8, 6, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         var result = _context.RaceResults.FirstOrDefault(r => r.Id == id);
 
         if (result == null)
@@ -48,6 +47,7 @@ public class RaceResultController : ControllerBase
         result.Driver = newResult.Driver;
         result.Points = newResult.Points;
         result.Team = newResult.Team;
+        result.TeamId = newResult.TeamId;
         result.DNF = newResult.DNF; // Ensure DNF is stored as string or change model to bool
         result.Qualifying = newResult.Qualifying;
         result.Pos_Change = newResult.Pos_Change;
@@ -86,6 +86,7 @@ public class RaceResultController : ControllerBase
         public int Position { get; set; }
         public string Driver { get; set; }
         public string Team { get; set; }
+        public int TeamId { get; set; }
         public int Points { get; set; }
         public string DNF { get; set; }
         public int Qualifying { get; set; }
