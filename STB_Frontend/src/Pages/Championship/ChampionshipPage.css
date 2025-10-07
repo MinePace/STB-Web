@@ -156,4 +156,114 @@
   font-weight: 800;
 }
 
+/* Hide mobile header by default */
+.header-table--mobile { display: none; }
+.header-table caption { display: none; }
 
+/* === MOBILE: show only the 3rd header row, and only # / Driver / Points === */
+@media (max-width: 700px) {
+  /* keep header table visible */
+  .header-table {
+    display: table !important;
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    background: var(--header-bg);
+    color: var(--text);
+    border-radius: 10px 10px 0 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,.3);
+  }
+
+  /* hide row 1 (title) and row 2 (flags); keep only row 3 */
+  .header-table thead tr:nth-child(1),
+  .header-table thead tr:nth-child(2),
+  .header-table thead tr:nth-child(n+4) {
+    display: none !important;
+  }
+
+  /* in the 3rd row, hide race headers by class, keep the others */
+  .header-table thead tr.header-cols .col-race { display: none !important; }
+  .header-table thead tr.header-cols .col-pos,
+  .header-table thead tr.header-cols .col-driver,
+  .header-table thead tr.header-cols .col-points {
+    display: table-cell !important;
+  }
+
+  /* body: hide race columns as well */
+  .header-table col.col-race,
+  .scrollable-table col.col-race { display: none !important; }
+  .scrollable-table table tbody td:nth-child(n+3):not(:last-child) {
+    display: none !important;
+  }
+
+  /* widths for the remaining 3 columns */
+  .scrollable-table table { table-layout: fixed; width: 100% !important; }
+  .col-pos    { width: 12% !important; }
+  .col-driver { width: 68% !important; }
+  .col-points { width: 20% !important; }
+
+  /* contain layout */
+  .table-container,
+  .scrollable-wrapper {
+    width: 100% !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box;
+  }
+
+  .scrollable-table td {
+    padding: 6px 8px;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-table::before { content: none !important; }
+
+  /* show caption above the header row */
+  .header-table caption.header-caption {
+    display: table-caption;      /* proper table caption */
+    caption-side: top;           /* sits above the thead */
+    text-align: center;
+    font-weight: 750;
+    padding: 8px 0;
+    color: #fff;
+    border-bottom: 1px solid rgba(255,255,255,.15);
+    background: var(--header-bg);
+  }
+
+  /* Table & caption act as one rounded card */
+  .header-table {
+    /* keep your existing styles */
+    border-collapse: separate;      /* needed for clean radii with caption */
+    border-spacing: 0;
+    overflow: hidden;               /* clip inner corners */
+    border-radius: 0 0 10px 10px;   /* bottom corners only (caption owns top) */
+  }
+
+  /* Caption is the top bar */
+  .header-table caption.header-caption {
+    display: table-caption;
+    caption-side: top;
+    background: var(--header-bg);
+    color: #fff;
+    font-weight: 750;
+    text-align: center;
+    padding: 8px 10px;
+    border-radius: 10px 10px 0 0;   /* top corners */
+    border-bottom: 1px solid rgba(255,255,255,.15); /* seam that matches cell borders */
+    margin: 0;
+  }
+
+  /* Remove top border on the first visible header row so it connects to caption */
+  .header-table thead tr.header-cols th {
+    border-top: 0 !important;
+  }
+
+  /* Optional: make the outer edge match the table’s rounded shape */
+  .header-table thead tr.header-cols th:first-child { border-left: 0; }
+  .header-table thead tr.header-cols th:last-child  { border-right: 0; }
+}

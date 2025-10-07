@@ -19,7 +19,7 @@ function Sidebar() {
     { year: 18, divisions: [] },
     { year: 17, divisions: [] },
     { year: 16, divisions: [] },
-    { year: 15, divisions: [] },
+    { year: 15, divisions: ["1"] },
     { year: 14, divisions: [] },  
     { year: 13, divisions: [] },
     { year: 12, divisions: [] },

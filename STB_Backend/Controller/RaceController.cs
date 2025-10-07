@@ -198,7 +198,8 @@ public class RaceController : ControllerBase
                     DNF = result.DNF,
                     Pos_Change = result.Pos_Change,
                     Qualifying = result.Qualifying,
-                    Time = result.Time
+                    Time = result.Time,
+                    TeamId = result.TeamId
                 };
                 _context.RaceResults.AddRange(NewResult);
                 await _context.SaveChangesAsync();
@@ -331,34 +332,21 @@ public class RaceController : ControllerBase
 
         return Ok(new { message = $"{race.Round} added successfully!" });
     }
-
+        
     [HttpPut("update/{id}")]
-    public async Task<IActionResult> UpdateRace(int id, [FromBody] Race updatedRace)
+    public async Task<IActionResult> UpdateRace(int id, [FromBody] RaceUpdateDto dto)
     {
-        var race = await _context.Races
-            .FirstOrDefaultAsync(r => r.Id == id);  // no Include here
+        var race = await _context.Races.FirstOrDefaultAsync(r => r.Id == id);
+        if (race == null) return NotFound("Race not found.");
 
-        if (race == null)
-            return NotFound("Race not found.");
-
-        race.F1_Game = updatedRace.F1_Game;
-        race.Season = updatedRace.Season;
-        race.Division = updatedRace.Division;
-        race.Round = updatedRace.Round;
-        race.Sprint = updatedRace.Sprint;
-        race.YoutubeLink = updatedRace.YoutubeLink;
-        race.Date = updatedRace.Date;
-
-        // Prefer TrackId if provided; otherwise use Track?.Id from the payload
-        var newTrackId = updatedRace.TrackId != 0
-            ? updatedRace.TrackId
-            : (updatedRace.Track?.Id ?? race.TrackId);
-
-        race.TrackId = newTrackId;
-
-        // IMPORTANT: do NOT set race.Track = null
-        // Also make sure EF doesn't try to modify Track
-        _context.Entry(race).Reference(r => r.Track).IsModified = false;
+        race.F1_Game = dto.F1_Game;
+        race.Season = dto.Season;
+        race.Division = dto.Division;
+        race.Round = dto.Round;
+        race.Sprint = dto.Sprint;
+        race.YoutubeLink = dto.YoutubeLink;
+        race.Date = dto.Date;
+        race.TrackId = dto.TrackId;   // <- single source of truth
 
         await _context.SaveChangesAsync();
         return Ok("Race updated successfully.");
@@ -556,10 +544,26 @@ public class RaceResultRequest
     public int Position { get; set; }
     public string Driver { get; set; }
     public string Team { get; set; }
+    public int TeamId { get; set; }
     public int Points { get; set; }
     public string DNF { get; set; }
     public int Pos_Change { get; set; }
     public int Qualifying { get; set; }
     public string? Time { get; set; }
     public bool FastestLap { get; set; }
+}
+
+public sealed class RaceUpdateDto
+{
+    public int F1_Game { get; set; }
+    public int Season { get; set; }
+    public int Division { get; set; }
+    public int Round { get; set; }
+    public string Sprint { get; set; } = "No";
+    public string? YoutubeLink { get; set; }
+    public DateTime? Date { get; set; }
+
+    // Make the FK required instead of the navigation
+    [System.ComponentModel.DataAnnotations.Required]
+    public int TrackId { get; set; }
 }

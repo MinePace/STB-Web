@@ -2,7 +2,7 @@
     position: fixed; /* Zorg dat de sidebar aan de linkerkant blijft plakken */
     top: 0;
     left: 0; /* Zet de zijbalk tegen de linker rand */
-    width: 5%; /* Breedte van de zijbalk */
+    width: 10px;
     height: 100%; /* Laat de zijbalk de volledige hoogte van het scherm innemen */
     background-color: #0040805f; /* Donkerblauw */
     color: #ffffff;
@@ -61,3 +61,11 @@
   color: #91ff95; /* or another highlight color */
   font-weight: bold;
 }
+
+/* Hide sidebar on small screens */
+@media (max-width: 768px) {  /* you can adjust 768px to your liking */
+  .sidebar {
+    display: none;
+  }
+}
+

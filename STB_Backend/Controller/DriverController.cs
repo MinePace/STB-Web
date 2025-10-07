@@ -65,6 +65,7 @@ public class DriverController : ControllerBase
             .Where(r => r.Driver == driverName)
             .ToList();
 
+
         if (!driverResults.Any())
             return NotFound(new { message = "Driver not found" });
 
@@ -73,7 +74,11 @@ public class DriverController : ControllerBase
         var wins = driverResults.Count(r => r.Position == 1);
         var podiums = driverResults.Count(r => r.Position <= 3);
         var averagePosition = driverResults.Average(r => r.Position);
+        var averageQualifying = driverResults.Average(r => r.Qualifying);
         var races = driverResults.Count();
+        var dnfs = driverResults.Count(r => r.DNF == "DNF" || r.DNF == "Yes");
+
+        var fastestLaps = _context.FastestLaps.Include(fl => fl.Driver).Count(fl => fl.Driver.Name == driverName);
 
         var lastRace = _context.Races
             .Where(r => r.RaceResults.Any(rr => rr.Driver == driverName))
@@ -120,7 +125,10 @@ public class DriverController : ControllerBase
             wins,
             podiums,
             averagePosition,
+            averageQualifying,
             races,
+            fastestLaps,
+            dnfs,
             lastRace,
             lastFiveRaces,
             driverOBJ = _context.Drivers.Where(d => d.Name == driverName).Include(d => d.User).FirstOrDefault()

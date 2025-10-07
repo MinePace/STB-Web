@@ -313,11 +313,13 @@ function AddRacePage() {
                     required
                   >
                     <option value="">Select Track</option>
-                    {tracks.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name} ({t.country})
-                      </option>
-                    ))}
+                    {[...tracks]
+                      .sort((a, b) => a.country.localeCompare(b.country))
+                      .map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.country} ({t.name})
+                        </option>
+                      ))}
                   </select>
                 </td>
                 <td style={{ textAlign: "center" }}>

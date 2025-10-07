@@ -328,7 +328,7 @@ function HomePage() {
                   ) : leagueStats ? (
                   <ul>
                     <li>🏁 Races Completed: {seasonStats.racesCompleted}/{seasonStats.seasonTotalRaces}</li>
-                    <li>🏆 Points Podium: {seasonStats.seasonMostPodium.name} ({seasonStats.seasonMostPodium.count})</li>
+                    <li>🏆 Most Podium: {seasonStats.seasonMostPodium.name} ({seasonStats.seasonMostPodium.count})</li>
                   </ul>
                   ) : (
                     <p>No league stats available.</p>

@@ -56,6 +56,18 @@ public class TrackController : ControllerBase
         return Ok(trackraces);
     }
 
+    [HttpPost()]
+    public IActionResult CreateTrack([FromBody] Track newTrack)
+    {
+        if (newTrack == null)
+            return BadRequest(new { message = "Invalid track data." });
+
+        _context.Tracks.Add(newTrack);
+        _context.SaveChanges();
+
+        return CreatedAtAction(nameof(GetTrack), new { id = newTrack.Id }, newTrack);
+    }
+
     [HttpPut("update/{id}")]
     public IActionResult UpdateTrack(int id, [FromBody] Track updatedTrack)
     {

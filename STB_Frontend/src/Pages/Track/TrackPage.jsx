@@ -15,6 +15,9 @@ const MAP_EXCEPTIONS = {
     "Monza": "/track_map/Italy_Monza.avif",
     "Imola": "/track_map/Italy_Imola.avif",
   },
+  Malaysia: {
+    "Sepang": "/track_map/Malaysia.png"
+  }
   // add more…
 };
 

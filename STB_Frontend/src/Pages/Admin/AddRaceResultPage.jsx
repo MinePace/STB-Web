@@ -203,7 +203,8 @@ export default function AddRaceResults() {
             row.fastestLap === true &&
             row.position <= 10 &&
             selectedRace?.sprint !== "Yes" &&
-            Number(selectedRace?.season) <= 28
+            Number(selectedRace?.season) <= 28 &&
+            Number(selectedRace?.season) >= 15
           ) {
             row.points += 1;
           }
@@ -293,44 +294,56 @@ export default function AddRaceResults() {
       position: r.position,
       driver: r.driver.trim(),
       team: r.team.trim(),
-      teamId: r.teamId ?? null, // <— include FK
+      teamId: r.teamId ?? 0,
       points: r.points,
       dnf: r.dnf,
       qualifying: r.qualifying ? parseInt(r.qualifying, 10) : 0,
       pos_Change: r.pos_Change,
       fastestLap: r.fastestLap,
-      Time: r.raceTime.trim(),
+      Time: r.raceTime.trim(),              // NOTE: capital T — confirm your API expects this
     }));
 
+    const url = "http://localhost:5110/api/race/raceresults";
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 15000);
+
     try {
-      const res = await fetch("http://localhost:5110/api/race/raceresults", {
+      console.log("Submitting results →", { url, payload, selectedRace });
+
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+        signal: ctrl.signal,
       });
 
-      if (!res.ok) throw new Error(`Error: ${res.status} ${res.statusText}`);
-      const data = await res.json();
-      alert(`${data.message}`);
+      const contentType = res.headers.get("content-type") || "";
+      const rawBody = await res.text();
+      const body = contentType.includes("json")
+        ? (() => { try { return JSON.parse(rawBody); } catch { return rawBody; } })()
+        : rawBody;
 
-      // remove this race from the available list & move to next
-      setFilteredRaces((prev) => {
-        const updated = prev.filter((r) => r.id !== selectedRace.id);
-        const next = getNextRaceAfter(selectedRace, updated);
+      if (!res.ok) {
+        // Show as much detail as possible from the server
+        const serverMsg =
+          (body && (body.message || body.error || body.title)) || rawBody || "(empty body)";
+        throw new Error(`HTTP ${res.status} ${res.statusText} — ${serverMsg}`);
+      }
 
-        if (next) {
-          setSelectedRace(next);
-          initResultsForRace(next, setRaceResults);
-        } else {
-          setSelectedRace(null);
-          setRaceResults([]);
-          alert("✅ All races have results for this season/division!");
-        }
-        return updated;
-      });
+      console.log("Server OK:", body);
+      alert(body?.message ?? "Results submitted.");
+      // … your “advance to next race” logic here …
     } catch (err) {
-      console.error("❌ Error submitting results:", err);
-      alert("Error submitting results! Check the console for details.");
+      // Network/CORS/abort/JSON errors land here
+      console.error("❌ Error submitting results", {
+        error: err,
+        name: err?.name,
+        message: err?.message,
+        cause: err?.cause,
+      });
+      alert(`Failed to submit: ${err?.message || err}`);
+    } finally {
+      clearTimeout(timer);
     }
   };
 

@@ -204,11 +204,14 @@ function ChampionshipPage() {
       <div ref={tableRef} id="championship-table">
         {/* Fixed Header Table */}
         {/* Fixed Header Table */}
-        <table className="header-table" border="1">
+        <table className="header-table">
+          <caption className="header-caption">
+            Season {season} • Tier {division}
+          </caption>
           {renderColGroup()}
 
           <thead>
-            <tr className="header-title">
+            <tr className="header-cols">
               <th rowSpan={2} colSpan={2}>STB Championship</th>
               <th colSpan={raceCount} >Season {season}</th>
               <th rowSpan={2}>Tier {division}</th>
@@ -230,20 +233,27 @@ function ChampionshipPage() {
               })}
             </tr>
 
-            <tr>
-              <th>#</th>
-              <th>Driver</th>
+            <tr className="header-cols">
+              <th className="col col-pos">#</th>
+              <th className="col col-driver">Driver</th>
+
               {sortedDrivers.raceNumbers?.map((round) => {
                 const groupedRace = sortedDrivers.groupedRaces?.[round];
                 const RaceId = groupedRace?.mainRace?.id || groupedRace?.sprintRace?.id;
                 const countryCode =
                   groupedRace?.mainRace?.track?.countryCode ||
                   groupedRace?.sprintRace?.track?.countryCode;
-                return <th>
-                        <Link className= "primary-link" to={`/STB/Race/${RaceId}`} key={round}>{countryCode}</Link>
-                      </th>
+
+                return (
+                  <th key={round} className="col col-race">
+                    <Link className="primary-link" to={`/STB/Race/${RaceId}`}>
+                      {countryCode}
+                    </Link>
+                  </th>
+                );
               })}
-              <th>Points</th>
+
+              <th className="col col-points">Points</th>
             </tr>
           </thead>
         </table>
@@ -251,7 +261,7 @@ function ChampionshipPage() {
         {/* Scrollable body */}
         <div className="scrollable-wrapper">
           <div className="scrollable-table">
-            <table className="scrollable" border="1">
+            <table className="scrollable">
               {renderColGroup()}
               <tbody>
                 {sortedDrivers.drivers?.map(({ driver, totalPoints, ...driversraces }, index) => (

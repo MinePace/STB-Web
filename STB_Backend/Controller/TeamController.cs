@@ -57,7 +57,7 @@ public class TeamController : ControllerBase
     }
 
     [HttpPost()]
-    public IActionResult CreateTeam([FromBody] Team newTeam)
+    public IActionResult AddTeam([FromBody] Team newTeam)
     {
         if (newTeam == null)
             return BadRequest(new { message = "Invalid team data." });
@@ -69,7 +69,7 @@ public class TeamController : ControllerBase
     }
 
     [HttpPost("teamcolor")]
-    public IActionResult CreateTeamColor([FromBody] SeasonalTeamColor newTeamColor)
+    public IActionResult AddTeamColor([FromBody] SeasonalTeamColor newTeamColor)
     {
         if (newTeamColor == null)
             return BadRequest(new { message = "Invalid teamColor data." });
@@ -81,7 +81,7 @@ public class TeamController : ControllerBase
     }
 
     [HttpPost("teamdriver")]
-    public IActionResult CreateTeamDriver([FromBody] SeasonalTeamDriver newTeamDriver)
+    public IActionResult AddTeamDriver([FromBody] SeasonalTeamDriver newTeamDriver)
     {
         if (newTeamDriver == null)
             return BadRequest(new { message = "Invalid teamDriver data." });

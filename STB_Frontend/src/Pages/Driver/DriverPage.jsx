@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import "./DriverPage.css";
+import "@/Components/Links.css";
 
 function DriverPage() {
   const { driverName } = useParams();
@@ -148,7 +149,7 @@ function DriverPage() {
                       {top10.map((res) => (
                         <div className="tp-result-row" key={res.id ?? `${res.driver}-${res.position}`}>
                           <div className={`tp-pos ${medalClass(res.position)}`}>{posLabel(res)}</div>
-                          <a href={`/STB/Driver/${encodeURIComponent(res.driver)}`} className="tp-driver">
+                          <a href={`/STB/Driver/${encodeURIComponent(res.driver)}`} className="primary-link">
                             {res.driver}
                           </a>
                           <div className="tp-right">
@@ -167,7 +168,7 @@ function DriverPage() {
                           <div className="tp-divider" aria-hidden="true" />
                           <div className="tp-result-row tp-result-row--me" key={myResult.id ?? "me"}>
                             <div className={`tp-pos ${medalClass(myResult.position)}`}>{posLabel(myResult)}</div>
-                            <a href={`/STB/Driver/${encodeURIComponent(myResult.driver)}`} className="tp-driver">
+                            <a href={`/STB/Driver/${encodeURIComponent(myResult.driver)}`} className="primary-link">
                               {myResult.driver}
                             </a>
                             <div className="tp-right">
@@ -266,10 +267,24 @@ function DriverPage() {
                 <div className="stat-label">Poles</div>
               </div>
               <div className="stat">
+                <div className="stat-value">{driverStats.fastestLaps ?? "—"}</div>
+                <div className="stat-label">Fastest Laps</div>
+              </div>
+              <div className="stat">
+                <div className="stat-value">{driverStats.dnfs ?? "—"}</div>
+                <div className="stat-label">DNF's</div>
+              </div>
+              <div className="stat">
                 <div className="stat-value">
                   {driverStats.averagePosition != null ? driverStats.averagePosition.toFixed(2) : "—"}
                 </div>
                 <div className="stat-label">Avg Finish</div>
+              </div>
+              <div className="stat">
+                <div className="stat-value">
+                  {driverStats.averageQualifying != null ? driverStats.averageQualifying.toFixed(2) : "—"}
+                </div>
+                <div className="stat-label">Avg Qualifying</div>
               </div>
               <div className="stat">
                 <div className="stat-value">{driverStats.races ?? "—"}</div>
