@@ -93,12 +93,11 @@ public class DriverController : ControllerBase
             .AsNoTracking()
             .FirstOrDefault();
 
-        var lastFiveRaces = _context.Races
+        var allRaces = _context.Races
             .Where(r => r.RaceResults.Any(rr => rr.Driver == driverName))
             .OrderByDescending(r => r.Division)
             .ThenByDescending(r => r.Season)
             .ThenByDescending(r => r.Round)
-            .Take(5)
             .Select(r => new
             {
                 r.Id,
@@ -114,7 +113,6 @@ public class DriverController : ControllerBase
                 RaceResults = r.RaceResults.OrderBy(rr => rr.Position).ToList()
             })
             .AsNoTracking()
-            .Take(5)
             .ToList();
 
         var stats = new
@@ -130,7 +128,7 @@ public class DriverController : ControllerBase
             fastestLaps,
             dnfs,
             lastRace,
-            lastFiveRaces,
+            allRaces,
             driverOBJ = _context.Drivers.Where(d => d.Name == driverName).Include(d => d.User).FirstOrDefault()
         };
 

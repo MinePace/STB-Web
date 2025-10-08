@@ -9,6 +9,7 @@ import RaceResultPage from "./Pages/Race/RaceResult/RaceResultPage";
 import HomePage from "./Pages/Home/HomePage";
 import LoginPage from "./Pages/Login/LoginPage";
 import TrackPage from "./Pages/Track/TrackPage";
+import HistoryPage from "./Pages/History/HistoryPage";
 
 import AdminPage from "./Pages/Admin/AdminPage";
 
@@ -30,6 +31,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/STB/Driver/:driverName" element={<Layout showSidebar={true}><DriverPage /></Layout>} />
       <Route path="/STB/Race/:raceId" element={<Layout showSidebar={true}><RaceResultPage /></Layout>} />
       <Route path="/STB/Track/:trackId" element={<Layout showSidebar={true}><TrackPage /></Layout>} />
+      <Route path="/STB/History" element={<Layout showSidebar={true}><HistoryPage /></Layout>} />
       <Route path="/admin" element={<AdminPage />} />
       <Route path="/login" element={<Layout showSidebar={true}><LoginPage /></Layout>} />
       

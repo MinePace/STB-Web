@@ -20,14 +20,132 @@ public class RaceResultController : ControllerBase
     [HttpGet("{id}")]
     public IActionResult GetResults(int id)
     {
-        var results  = _context.RaceResults
+        var results = _context.RaceResults
             .Where(d => d.RaceId == id)
             .ToListAsync();
 
         if (results == null)
-        return NotFound(new { message = "No results were found with this raceId." });
+            return NotFound(new { message = "No results were found with this raceId." });
 
         return Ok(results);
+    }
+
+    public record RaceStepDto(
+        int RaceId, int Round, string Name, bool Sprint, DateTime? Date,
+        IReadOnlyList<StandingDto> Standings);
+
+    public record StandingDto(
+        int Rank, string Driver, int? TeamId, int PointsThisRace, int Cumulative);
+
+    [HttpGet("seasonprogress/{season:int}/{division:int}/race-points")]
+    public async Task<IActionResult> SeasonProgress(
+        int season, int division,
+        [FromQuery] bool aggregateByRound = false)
+    {
+        // 1) Pull races + results for this season/division
+        var races = await _context.Races
+            .Include(r => r.Track)
+            .Include(r => r.RaceResults)
+            .Where(r => r.Season == season && r.Division == division)
+            .Select(r => new {
+                r.Id,
+                r.Season,
+                r.Division,
+                r.Round,
+                Name = r.Track.RaceName,
+                Sprint = r.Sprint,  // <-- this is probably a string in your DB ("Yes"/"No")
+                r.Date,
+                Results = r.RaceResults.Select(res => new {
+                    res.Driver,
+                    res.TeamId,
+                    res.Points
+                })
+            })
+            .ToListAsync();
+
+        if (races.Count == 0)
+            return NotFound(new { message = "No results were found with these parameters." });
+
+        // 2) Convert "Yes"/"No" sprint field to bool
+        //    and build tuple collection
+        IEnumerable<(int RaceId, int Round, string Name, bool Sprint, DateTime? Date,
+                    IEnumerable<(string Driver, int? TeamId, int Points)> Results)> steps;
+
+        if (!aggregateByRound)
+        {
+            steps = races
+                .OrderBy(r => r.Round)
+                .ThenBy(r => r.Sprint)
+                .Select(r =>
+                (
+                    RaceId: r.Id,
+                    Round: r.Round,
+                    Name: r.Name,
+                    Sprint: string.Equals(r.Sprint, "Yes", StringComparison.OrdinalIgnoreCase),
+                    Date: r.Date,
+                    Results: r.Results.Select(x => (x.Driver, (int?)x.TeamId, x.Points))
+                ));
+        }
+        else
+        {
+            steps = races
+                .GroupBy(r => r.Round)
+                .OrderBy(g => g.Key)
+                .Select(g =>
+                {
+                    var header = g.OrderBy(r => r.Sprint).First();
+                    var merged = g.SelectMany(r => r.Results)
+                                .GroupBy(x => new { x.Driver, x.TeamId })
+                                .Select(x => (x.Key.Driver, (int?)x.Key.TeamId, Points: x.Sum(z => z.Points)));
+                    return (
+                        RaceId: header.Id,
+                        Round: header.Round,
+                        Name: header.Name,
+                        Sprint: false,
+                        Date: header.Date,
+                        Results: merged
+                    );
+                });
+        }
+
+        // 3) Build cumulative standings
+        var cumulative = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var outSteps = new List<object>();
+
+        foreach (var s in steps)
+        {
+            // add points from this step
+            foreach (var (driver, _, pts) in s.Results)
+            {
+                cumulative[driver] = cumulative.GetValueOrDefault(driver) + pts;
+            }
+
+            // top 15 cumulative
+            var standings = cumulative
+                .OrderByDescending(kv => kv.Value)
+                .ThenBy(kv => kv.Key)
+                .Select((kv, i) => new {
+                    Rank = i + 1,
+                    Driver = kv.Key,
+                    TeamId = s.Results.FirstOrDefault(r => 
+                        string.Equals(r.Driver, kv.Key, StringComparison.OrdinalIgnoreCase)).TeamId,
+                    PointsThisRace = s.Results.Where(r => 
+                        string.Equals(r.Driver, kv.Key, StringComparison.OrdinalIgnoreCase)).Sum(r => r.Points),
+                    Cumulative = kv.Value
+                })
+                .ToList();
+
+            outSteps.Add(new {
+                RaceId = s.RaceId,
+                Round = s.Round,
+                RaceName = s.Name,
+                Sprint = s.Sprint,
+                Date = s.Date,
+                Standings = standings
+            });
+        }
+
+        return Ok(outSteps);
     }
 
     [HttpPut("update/{id}")]

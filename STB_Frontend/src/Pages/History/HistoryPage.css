@@ -1,0 +1,233 @@
+/* Page fills viewport minus fixed 60px topbar */
+.history-page {
+  height: calc(100vh - 60px);
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+/* Full-width column layout so the chart can stretch independently of controls */
+.sp-shell {/* Fill viewport below your fixed 60px topbar */
+.history-page {
+  height: calc(100vh - 60px);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.sp-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sp-title {
+  color: #eaf2ff;
+  margin: 8px 0 12px;
+  font-size: 48px;
+  font-weight: 800;
+}
+
+.sp-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  color: #eaf2ff;
+}
+.sp-controls input[type="number"] {
+  width: 80px;
+}
+.sp-controls label input[type="number"] + * {
+  width: 60px;
+}
+.sp-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sp-msg { color: #eaf2ff; opacity: .95; margin-top: 12px; }
+.sp-err { color: #ffb4b4; }
+
+/* Card */
+.sp-card {
+  flex: 1 1 auto;
+  min-height: 280px;
+  width: 100%;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 12px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* Horizontal scroll when chart width exceeds container */
+.sp-chart-scroll {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.sp-chart-scroll::-webkit-scrollbar { height: 8px; }
+.sp-chart-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.25);
+  border-radius: 6px;
+}
+.sp-chart-scroll::-webkit-scrollbar-track { background: transparent; }
+
+/* Legend */
+.sp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  color: #eaf2ff;
+  padding-top: 6px;
+}
+.sp-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.sp-legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 4px;
+  border-radius: 2px;
+}
+
+/* Tooltip */
+.sp-tooltip {
+  background: #0b2a57;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 8px;
+  padding: 10px;
+  color: #eaf2ff;
+  min-width: 180px;
+}
+.sp-tooltip-title { font-weight: 800; margin-bottom: 6px; }
+.sp-tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.3;
+}
+.sp-tooltip-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+.sp-tooltip-name { flex: 1; }
+.sp-tooltip-val { opacity: .9; }
+.sp-tooltip-note { margin-top: 6px; opacity: .7; font-size: 12px; }
+
+@media (max-width: 700px) {
+  .history-page { height: calc(100vh - 60px); }
+  .sp-title { font-size: 36px; }
+}
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* Title */
+.sp-title {
+  color: #eaf2ff;
+  margin: 4px 0 12px;
+  font-size: 44px;
+  line-height: 1.15;
+  font-weight: 800;
+}
+
+/* Controls row */
+.sp-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  color: #eaf2ff;
+  margin-bottom: 12px;
+}
+
+.sp-controls input[type="number"] {
+  width: 84px;
+  padding: 4px 8px;
+}
+
+.sp-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Status text */
+.sp-msg {
+  color: #eaf2ff;
+  opacity: 0.95;
+  margin-top: 8px;
+}
+.sp-msg--err { color: #ffb7b7; }
+
+/* Chart card fills remaining height, not width-locked to controls */
+.sp-card {
+  flex: 1 1 auto;                /* take all leftover vertical space */
+  min-height: 300px;
+  width: 100%;
+  background: rgba(0,0,0,0.12);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 12px;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+/* Legend */
+.sp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  color: #eaf2ff;
+  padding-top: 8px;
+}
+.sp-legend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+.sp-legend__swatch {
+  width: 14px;
+  height: 5px;
+  border-radius: 2px;
+}
+
+/* Tooltip */
+.sp-tooltip {
+  background: #0b2a57;
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 8px;
+  padding: 10px;
+  color: #eaf2ff;
+  min-width: 180px;
+}
+.sp-tooltip__title { font-weight: 800; margin-bottom: 6px; }
+.sp-tooltip__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.25;
+}
+.sp-tooltip__dot {
+  width: 10px; height: 10px; border-radius: 2px;
+}
+.sp-tooltip__name { flex: 1; }
+.sp-tooltip__pts { opacity: .9; }
+.sp-tooltip__hint { margin-top: 6px; opacity: .7; font-size: 12px; }
+
+/* Optional: on very small screens keep the height behavior */
+@media (max-width: 700px) {
+  .history-page { height: calc(100vh - 60px); }
+}
