@@ -1,0 +1,83 @@
+.nat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.country-flag {
+  width: 24px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.nat-text {
+  font-weight: 600;
+  color: #fff;
+}
+
+.nat-text.clickable {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.flag-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.flag-modal {
+  background: #1e1e1e;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  color: white;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.flag-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.flag-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.flag-option:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.flag-option img {
+  width: 28px;
+  height: 18px;
+  border-radius: 2px;
+}
+
+.close-btn {
+  margin-top: 14px;
+  background: #333;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background: #555;
+}

@@ -6,7 +6,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between; /* Space between logo and nav */
-    padding: 0 20px;
     position: fixed;
     top: 0;
     left: 0;
@@ -26,7 +25,7 @@
     height: 60px; /* Adjust based on your logo size */
     width: auto; /* Keeps aspect ratio */
     margin-left: 0; /* Ensures no unintended margin */
-    padding: 0px 10px; /* Adds spacing inside the topbar */
+    padding: 0px 0px; /* Adds spacing inside the topbar */
   }
   
   .nav-container {
@@ -42,7 +41,6 @@
     gap: 15px;
     list-style: none;
     margin: 0;
-    padding: 0;
     white-space: nowrap;
   }
   
@@ -69,32 +67,6 @@
   
   .logout-button:hover {
     background-color: darkred;
-  }
-
-  .social-link {
-    display: flex;
-    align-items: center;
-    padding: 0 5px;
-  }
-  
-  .youtube-icon {
-    width: 32px; /* Adjust size as needed */
-    height: 24px;
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .youtube-icon:hover {
-    transform: scale(1.2);
-  }
-
-  .discord-icon {
-    width: 24px; /* Adjust size as needed */
-    height: 24px;
-    transition: transform 0.2s ease-in-out;
-  }
-  
-  .discord-icon:hover {
-    transform: scale(1.2);
   }
   
   /* Social dropdown inside topbar */

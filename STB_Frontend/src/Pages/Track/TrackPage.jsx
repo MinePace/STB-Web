@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import "./TrackPage.css";
+import "@/Components/Links.css";
 
 /* ---------- maps & helpers at module scope ---------- */
 
@@ -75,6 +76,11 @@ function TrackPage() {
 
   const [trackInfo, setTrackInfo] = useState(null);
   const [trackRaces, setTrackRaces] = useState([]);
+  const mostWins = useMemo(
+    () => topWinnerFirstAchievedBySeason(trackRaces, { includeSprint: true }),
+    [trackRaces]
+  );
+
   const [loadingInfo, setLoadingInfo] = useState(true);
   const [loadingRaces, setLoadingRaces] = useState(true);
   const [errorInfo, setErrorInfo] = useState(null);
@@ -181,6 +187,21 @@ function TrackPage() {
               <div className="tp-stat-value">{trackRaces.length}</div>
               <div className="tp-stat-label">Events at Track</div>
             </div>
+            <div className="tp-stat">
+              <div className="tp-stat-value">{mostWins?.count ?? "—"}</div>
+              <div className="tp-stat-sub">
+  <span className="tp-stat-label">Most wins:</span>
+  {mostWins?.name && (
+    <Link
+      className="primary-link tp-stat-winner"
+      to={`/STB/Driver/${encodeURIComponent(mostWins.name)}`}
+    >
+      {mostWins.name}
+    </Link>
+  )}
+</div>
+
+            </div>
           </section>
         </div>
 
@@ -275,7 +296,7 @@ function TrackPage() {
                             </div>
                             <Link
                               to={`/STB/Driver/${encodeURIComponent(res.driver)}`}
-                              className="tp-driver"
+                              className="primary-link"
                             >
                               {res.driver}
                             </Link>
@@ -353,5 +374,52 @@ function compareBySeasonRound(a, b) {
   const rb = Number(b.round ?? -Infinity);
   return rb - ra; // round DESC
 }
+function topWinnerFirstAchievedBySeason(races, { includeSprint = true } = {}) {
+  if (!Array.isArray(races) || races.length === 0) return null;
+
+  // season ↑, round ↑ (numbers; missing treated as +∞ so they come last)
+  const asc = [...races].sort((a, b) => {
+    const sa = Number(a?.season);
+    const sb = Number(b?.season);
+    if (sa !== sb) return (isNaN(sa) ? Infinity : sa) - (isNaN(sb) ? Infinity : sb);
+
+    const ra = Number(a?.round);
+    const rb = Number(b?.round);
+    return (isNaN(ra) ? Infinity : ra) - (isNaN(rb) ? Infinity : rb);
+  });
+
+  const counts = new Map();
+  let leaderName = null;
+  let leaderCount = 0;
+
+  for (const r of asc) {
+    if (!includeSprint && r?.sprint === "Yes") continue;
+
+    const winner = (r?.raceResults || []).find(rr => rr?.position === 1);
+    if (!winner?.driver) continue;
+
+    const next = (counts.get(winner.driver) || 0) + 1;
+    counts.set(winner.driver, next);
+
+    // Use ">" so the first to surpass becomes/keeps the leader.
+    if (next > leaderCount) {
+      leaderCount = next;
+      leaderName = winner.driver;
+    }
+  }
+
+  if (!leaderName) return null;
+  return { count: leaderCount, name: leaderName };
+}
+
+function joinWithDelimiters(items, comma = ", ", last = " and ") {
+  const out = [];
+  items.forEach((el, i) => {
+    if (i > 0) out.push(<span key={`sep-${i}`}>{i === items.length - 1 ? last : comma}</span>);
+    out.push(el);
+  });
+  return out;
+}
+
 
 export default TrackPage;

@@ -11,6 +11,9 @@ function DriverPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [newCountry, setNewCountry] = useState("");
+  const [savingCountry, setSavingCountry] = useState(false);
 
   useEffect(() => {
     const fetchDriverStats = async () => {
@@ -70,6 +73,47 @@ function DriverPage() {
       }
     } catch (err) {
       console.error("Error claiming driver:", err);
+    }
+  };
+
+  const updateDriverCountry = async () => {
+    console.log("Inside updateDriverCountry ✅", {
+      driverStats,
+      driverId: driverStats?.driverOBJ?.id,
+      newCountry,
+    });
+
+    if (!driverStats?.driverOBJ?.id || !newCountry) {
+      console.warn("⛔ Exiting early — missing data", {
+        driverId: driverStats?.driverOBJ?.id,
+        newCountry,
+      });
+      return;
+    }
+
+    try {
+      setSavingCountry(true);
+      const driverId = driverStats.driverOBJ.id;
+      console.log("Selected driver ID:", driverId, "New country:", newCountry);
+      const res = await fetch(`http://localhost:5110/api/driver/updateCountry/${driverId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ country: newCountry }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update country");
+
+      const updated = await res.json();
+      setDriverStats((prev) => ({
+        ...prev,
+        driverOBJ: { ...prev.driverOBJ, country: updated.country },
+      }));
+      setShowPopup(false);
+    } catch (err) {
+      console.error("Error updating country:", err);
+      alert("Could not update driver country.");
+    } finally {
+      setSavingCountry(false);
     }
   };
 
@@ -290,18 +334,18 @@ function DriverPage() {
                 .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
 
               // top 10
-              const top10 = results.filter(r => typeof r.position === "number" && r.position >= 1 && r.position <= 3)
-                                  .slice(0, 3);
+              const top10 = results.filter(r => typeof r.position === "number" && r.position >= 1 && r.position <= 5)
+                                  .slice(0, 5);
 
               // this driver's result
               const myResult = results.find(rr => rr.driver === driverStats.driver);
-              const showMyExtra = myResult && (typeof myResult.position !== "number" || myResult.position > 3);
+              const showMyExtra = myResult && (typeof myResult.position !== "number" || myResult.position > 5);
 
               return (
                 <div className="last-race">
                   {/* meta */}
                   <div className="lr-meta">
-                    <a href={`/STB/Race/${raceLabel}`}>{trackLabel}</a>
+                    <a href={`/STB/Race/${raceLabel}`} className= "primary-link">{trackLabel}</a>
                     <div><strong>Date:</strong> {dateLabel}</div>
                   </div>
 
@@ -384,14 +428,14 @@ function DriverPage() {
                     const title = `${trackLabel} • ${labelPos}${isSprint ? " • Sprint" : ""}${myResult ? ` • ${pts} pts` : ""}`;
 
                     return (
-                      <a
+                      <div
                         key={race.id ?? `${raceLabel}-${idx}`}
                         className="race-chip race-chip--stacked"
                         href={`/STB/Race/${raceLabel}`}
                         title={title}
                         aria-label={title}
                       >
-                        <span className="race-chip-name">{trackLabel}</span>
+                        <a href= {`/STB/Race/${raceLabel}`} className="primary-link">{trackLabel}</a>
                         <span className="race-chip-divider" aria-hidden="true" />
                         <div className="race-chip-stats">
                           <span
@@ -406,7 +450,7 @@ function DriverPage() {
                           )}
                           {isSprint && <span className="race-chip-sprint">SPR</span>}
                         </div>
-                      </a>
+                      </div>
                     );
                   })}
                 </div>
@@ -545,6 +589,65 @@ function DriverPage() {
           </div>
         </article>
       </div>
+
+      {/* Dark overlay + popup */}
+      <button
+        className="floating-button"
+        onClick={() => {
+          setNewCountry(driverStats?.driverOBJ?.country || "");
+          setShowPopup(true);
+        }}
+        aria-label="Edit Driver Country"
+      >
+        🌍
+      </button>
+
+      {/* Overlay + Slide-up Drawer */}
+      {showPopup && (
+      <div className="overlay" onClick={() => setShowPopup(false)}>
+        <div
+          className="country-drawer"
+          onClick={(e) => e.stopPropagation()} // ✅ stop overlay from catching clicks
+        >
+          <header className="drawer-header">
+            <h2>Change Driver Country</h2>
+            <button className="drawer-close" onClick={() => setShowPopup(false)}>✖</button>
+          </header>
+
+          <div className="drawer-body">
+            <label htmlFor="countrySelect">Select Country:</label>
+            <select
+              id="countrySelect"
+              value={newCountry}
+              onChange={(e) => setNewCountry(e.target.value)}
+            >
+              <option value="">— Select a country —</option>
+              <option value="Great Britain">🇬🇧 United Kingdom</option>
+              <option value="USA">🇺🇸 United States</option>
+              <option value="France">🇫🇷 France</option>
+              <option value="GER">🇩🇪 Germany</option>
+              <option value="ITA">🇮🇹 Italy</option>
+              <option value="ESP">🇪🇸 Spain</option>
+              <option value="BRA">🇧🇷 Brazil</option>
+              <option value="JPN">🇯🇵 Japan</option>
+              <option value="AUS">🇦🇺 Australia</option>
+              <option value="CAN">🇨🇦 Canada</option>
+            </select>
+
+            <button
+              onClick={() => {
+                console.log("💾 Save clicked");
+                updateDriverCountry();
+              }}
+              className="save-button"
+              disabled={savingCountry || !newCountry}
+            >
+              {savingCountry ? "Saving..." : "💾 Save"}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </div>
   );
 }

@@ -238,6 +238,21 @@ public class DriverController : ControllerBase
         return Ok(new { message = "Driver Updated", driver });
     }
 
+    [HttpPut("updateCountry/{driverId}")]
+    public IActionResult UpdateDriverCountry(int driverId, [FromBody] CountryRequest request)
+    {
+        var driver = _context.Drivers.FirstOrDefault(d => d.Id == driverId);
+        if (driver == null)
+            return NotFound(new { message = "Driver not found" });
+
+        driver.Country = request.Country;
+
+        _context.Drivers.Update(driver);
+        _context.SaveChanges();
+
+        return Ok(new { message = "Driver Updated", driver });
+    }
+
     public class ClaimDriverRequest
     {
         public string Username { get; set; } // ✅ Define the username field correctly
@@ -248,6 +263,10 @@ public class DriverController : ControllerBase
         public int Id { get; set; }
         public string Name { get; set; }
         public string? Country { get; set; }
-        public int? UserId { get; set; }
+    }
+
+    public class CountryRequest
+    {
+        public string Country { get; set; }
     }
 }

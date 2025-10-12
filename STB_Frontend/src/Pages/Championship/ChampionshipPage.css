@@ -11,7 +11,12 @@
 }
 
 /* === Page container bits you already have (kept) === */
-.table-container { width: 100%; }
+.table-container {
+  width: 90%;
+  max-width: min(92vw, 1400px); /* controls how wide it can get */
+  margin: 0 auto;               /* centers inside main content */
+  padding: 0 12px;
+}
 
 /* === Header table (separate table only for thead) === */
 .header-table {
@@ -53,9 +58,9 @@
   width: 100%;
   max-width: 100%;
   overflow-y: auto;
-  overflow-x: hidden;
   max-height: 60vh;
   margin: 0 auto;
+  box-shadow: 0 2px 5px rgba(0,0,0,.3);
 }
 
 /* Slender scrollbar */

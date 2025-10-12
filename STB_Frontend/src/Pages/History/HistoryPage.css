@@ -1,233 +1,123 @@
-/* Page fills viewport minus fixed 60px topbar */
-.history-page {
-  height: calc(100vh - 60px);
-  width: 100%;
-  padding: 16px;
+/* Page wrapper (same gradient + centered width as driver page) */
+.hp-shell {
+  min-height: 100vh;
+  padding: 32px 20px 64px;
   box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+  max-width: 1500px;
+  margin: 0 auto;
 }
 
-/* Full-width column layout so the chart can stretch independently of controls */
-.sp-shell {/* Fill viewport below your fixed 60px topbar */
-.history-page {
-  height: calc(100vh - 60px);
-  padding: 16px;
-  box-sizing: border-box;
+/* Banner */
+.hp-banner {
+  background: rgba(255, 255, 255, 0.15);
+  color: #d6c315;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.25);
+  padding: 10px 22px;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 12px;
+}
+.hp-banner-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+  text-align: center;
+  margin: 0;
 }
 
-.sp-shell {
+/* States */
+.hp-state {
+  text-align: center;
+  margin: 18px 0;
+  font-weight: 700;
+}
+.hp-state--err { color: #ffb4b4; }
+
+/* Panels grid — adaptive layout */
+.hp-panels {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 panels on wide screens */
+  gap: 18px;
+  grid-auto-flow: dense;
+}
+
+/* 3 panels up to 1600px width */
+@media (max-width: 1600px) {
+  .hp-panels {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* 2 panels up to 1150px width */
+@media (max-width: 1150px) {
+  .hp-panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 1 panel on mobile */
+@media (max-width: 700px) {
+  .hp-panels {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hp-panel {
+  background: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.3);
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
-.sp-title {
-  color: #eaf2ff;
-  margin: 8px 0 12px;
-  font-size: 48px;
+.hp-panel--thin { min-height: auto; }
+
+.hp-panel-header {
   font-weight: 800;
+  font-size: 20px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  text-align: center;
 }
-
-.sp-controls {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-  color: #eaf2ff;
-}
-.sp-controls input[type="number"] {
-  width: 80px;
-}
-.sp-controls label input[type="number"] + * {
-  width: 60px;
-}
-.sp-check {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.sp-msg { color: #eaf2ff; opacity: .95; margin-top: 12px; }
-.sp-err { color: #ffb4b4; }
-
-/* Card */
-.sp-card {
-  flex: 1 1 auto;
-  min-height: 280px;
-  width: 100%;
-  background: rgba(0,0,0,0.12);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 12px;
+.hp-panel-body {
   padding: 12px;
-  box-sizing: border-box;
 }
 
-/* Horizontal scroll when chart width exceeds container */
-.sp-chart-scroll {
-  width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-.sp-chart-scroll::-webkit-scrollbar { height: 8px; }
-.sp-chart-scroll::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,.25);
-  border-radius: 6px;
-}
-.sp-chart-scroll::-webkit-scrollbar-track { background: transparent; }
-
-/* Legend */
-.sp-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  color: #eaf2ff;
-  padding-top: 6px;
-}
-.sp-legend-item {
-  display: inline-flex;
+/* Rows in panel body (same compact style you had) */
+.hp-row {
+  display: grid;
+  grid-template-columns: 65px 1fr auto auto;
   align-items: center;
   gap: 6px;
-  white-space: nowrap;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
 }
-.sp-legend-swatch {
-  display: inline-block;
-  width: 12px;
-  height: 4px;
-  border-radius: 2px;
+.hp-row:last-child { border-bottom: none; padding-bottom: 2px; }
+
+.hp-row-left { 
+  font-weight: 700; 
+  color: #d9e4ff; 
+}
+.hp-row-mid { 
+  overflow: hidden; 
+  color: #d6c315;
+  font-weight: bold;
+  text-overflow: ellipsis; 
+  white-space: nowrap; 
+}
+.hp-row-stat { 
+  font-variant-numeric: tabular-nums; 
+  min-width: 66px; 
+  text-align: right; 
+  opacity: 0.95; 
 }
 
-/* Tooltip */
-.sp-tooltip {
-  background: #0b2a57;
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 8px;
-  padding: 10px;
-  color: #eaf2ff;
-  min-width: 180px;
-}
-.sp-tooltip-title { font-weight: 800; margin-bottom: 6px; }
-.sp-tooltip-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  line-height: 1.3;
-}
-.sp-tooltip-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-}
-.sp-tooltip-name { flex: 1; }
-.sp-tooltip-val { opacity: .9; }
-.sp-tooltip-note { margin-top: 6px; opacity: .7; font-size: 12px; }
-
-@media (max-width: 700px) {
-  .history-page { height: calc(100vh - 60px); }
-  .sp-title { font-size: 36px; }
-}
-
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  align-items: stretch;
-}
-
-/* Title */
-.sp-title {
-  color: #eaf2ff;
-  margin: 4px 0 12px;
-  font-size: 44px;
-  line-height: 1.15;
-  font-weight: 800;
-}
-
-/* Controls row */
-.sp-controls {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: center;
-  color: #eaf2ff;
-  margin-bottom: 12px;
-}
-
-.sp-controls input[type="number"] {
-  width: 84px;
-  padding: 4px 8px;
-}
-
-.sp-check {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Status text */
-.sp-msg {
-  color: #eaf2ff;
-  opacity: 0.95;
-  margin-top: 8px;
-}
-.sp-msg--err { color: #ffb7b7; }
-
-/* Chart card fills remaining height, not width-locked to controls */
-.sp-card {
-  flex: 1 1 auto;                /* take all leftover vertical space */
-  min-height: 300px;
-  width: 100%;
-  background: rgba(0,0,0,0.12);
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 12px;
-  padding: 12px;
-  box-sizing: border-box;
-}
-
-/* Legend */
-.sp-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-  color: #eaf2ff;
-  padding-top: 8px;
-}
-.sp-legend__item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 600;
-}
-.sp-legend__swatch {
-  width: 14px;
-  height: 5px;
-  border-radius: 2px;
-}
-
-/* Tooltip */
-.sp-tooltip {
-  background: #0b2a57;
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 8px;
-  padding: 10px;
-  color: #eaf2ff;
-  min-width: 180px;
-}
-.sp-tooltip__title { font-weight: 800; margin-bottom: 6px; }
-.sp-tooltip__row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  line-height: 1.25;
-}
-.sp-tooltip__dot {
-  width: 10px; height: 10px; border-radius: 2px;
-}
-.sp-tooltip__name { flex: 1; }
-.sp-tooltip__pts { opacity: .9; }
-.sp-tooltip__hint { margin-top: 6px; opacity: .7; font-size: 12px; }
-
-/* Optional: on very small screens keep the height behavior */
-@media (max-width: 700px) {
-  .history-page { height: calc(100vh - 60px); }
-}
+.hp-row-ongoing { grid-column: 2 / -1; font-style: italic; opacity: 0.9; }
+.hp-no-data { opacity: 0.7; color: #b0c3ff; }

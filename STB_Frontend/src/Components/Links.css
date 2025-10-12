@@ -24,6 +24,31 @@ a.primary-link:active {
   letter-spacing: -.45px;
 }
 
+/* ----- Champions Link ----- */
+a.champions-link {
+  display: inline-block;
+  font-weight: bold;
+  color: #d6c315;
+  text-decoration: none;
+  padding: 0px 1px;
+  border-radius: 8px;
+  transition: background .2s ease, transform .15s ease, letter-spacing .25s, color .2s;
+}
+
+a.champions-link:hover,
+a.champions-link:focus-visible {
+  background: rgba(0,129,235,0.25);
+  color: #4caeff;
+  letter-spacing: .5px;
+  transform: translateY(-1px);
+}
+
+a.champions-link:active {
+  transform: scale(0.97);
+  background: rgba(0, 100, 182, 0.25);
+  letter-spacing: -.45px;
+}
+
 /* ----- Driver Link ----- */
 .driver-link {
   color: #ffffff;
@@ -128,3 +153,17 @@ a.division-link:hover {
 a.division-link--raced {
   color: #91ff95;
 }
+
+/* =========================================================
+   Touch / mobile devices — always show underlines on links
+   ========================================================= */
+@media (hover: none) and (pointer: coarse) {
+  a.primary-link,
+  a.champions-link,
+  a.driver-link,
+  a.division-link,
+  a.topbar-link {
+    text-decoration: underline;
+  }
+}
+

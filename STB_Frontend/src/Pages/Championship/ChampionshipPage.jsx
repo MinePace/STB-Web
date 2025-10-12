@@ -140,39 +140,116 @@ function ChampionshipPage() {
   };
 
 
-  // Function to download table as an image
-  const downloadTableAsImage = () => {
-    if (tableRef.current) {
-      const scrollableWrapper = document.querySelector(".scrollable-wrapper");
+  // Robust "no-UI-change" capture for the championship table.
+const downloadTableAsImage = async () => {
+  const root = tableRef.current;             // wrap BOTH header + scroll body
+  if (!root) return;
 
-      // Backup original styles
-      const originalOverflow = scrollableWrapper.style.overflow;
-      const originalMaxHeight = scrollableWrapper.style.maxHeight;
-      const originalVisibility = scrollableWrapper.style.visibility;
+  // Prefer an id to find the element in the cloned DOM
+  const ROOT_SELECTOR = root.id ? `#${root.id}` : "[data-championship-root]";
 
-      // Hide the scrollbar but keep content visible
-      scrollableWrapper.style.overflow = "hidden"; // Prevent scrollbar from appearing
-      scrollableWrapper.style.maxHeight = "none"; // Allow full capture
-      scrollableWrapper.style.visibility = "visible"; // Ensure it's not hidden
+  const totalW = root.scrollWidth;           // full table size
+  const totalH = root.scrollHeight;
 
-      html2canvas(tableRef.current, {
-        scale: 2, // High quality
-        useCORS: true,
-        windowWidth: document.documentElement.scrollWidth,
-        windowHeight: tableRef.current.scrollHeight,
-      }).then((canvas) => {
-        const link = document.createElement("a");
-        link.href = canvas.toDataURL("image/png");
-        link.download = `Championship_Season_${season}_Tier_${division}.png`;
-        link.click();
+  // Quality + tiling knobs
+  const SCALE   = 2;                          // image sharpness
+  const TILE_W  = 1400;                       // viewport width per tile
+  const TILE_H  = 1000;                       // viewport height per tile
+  const MAX_DIM = 16000;                      // bitmap safety guard (Chrome)
 
-        // Restore the original styles
-        scrollableWrapper.style.overflow = originalOverflow;
-        scrollableWrapper.style.maxHeight = originalMaxHeight;
-        scrollableWrapper.style.visibility = originalVisibility;
-      });
+  // Decide if one shot is enough
+  const oneShotOK =
+    totalW * SCALE <= MAX_DIM && totalH * SCALE <= MAX_DIM;
+
+  const makeShot = (vx, vy, vw, vh, scale = SCALE) =>
+    html2canvas(root, {
+      scale,
+      useCORS: true,
+      backgroundColor: null,                  // keep alpha; set to '#0b4e8b' to force blue
+      windowWidth: vw,
+      windowHeight: vh,
+      scrollX: 0,
+      scrollY: 0,
+      onclone: (doc) => {
+        // Transparent background in the cloned document
+        doc.body.style.background = "transparent";
+
+        const clonedRoot =
+          doc.querySelector(ROOT_SELECTOR) || doc.body.firstElementChild;
+
+        // Expand the scroller ONLY in the clone, and position to our tile
+        const scroller = clonedRoot?.querySelector(".scrollable-wrapper");
+        if (scroller) {
+          scroller.style.overflow   = "hidden";
+          scroller.style.maxHeight  = "none";
+          scroller.style.maxWidth   = "none";
+          scroller.style.visibility = "visible";
+          scroller.scrollLeft = vx;
+          scroller.scrollTop  = vy;
+        }
+
+        // hide scrollbars in the clone (nice clean capture)
+        const css = doc.createElement("style");
+        css.textContent = `
+          .scrollable-wrapper { scrollbar-width: none !important; }
+          .scrollable-wrapper::-webkit-scrollbar { display: none !important; }
+        `;
+        doc.head.appendChild(css);
+      },
+    });
+
+  let finalCanvas;
+
+  if (oneShotOK) {
+    // Single capture (fast path, no UI change)
+    const safeScale = Math.min(
+      SCALE,
+      MAX_DIM / Math.max(1, totalW),
+      MAX_DIM / Math.max(1, totalH)
+    );
+    finalCanvas = await makeShot(0, 0, totalW, totalH, safeScale);
+  } else {
+    // Tiled capture (still no UI change because it happens in the clone)
+    const cols = Math.ceil(totalW / TILE_W);
+    const rows = Math.ceil(totalH / TILE_H);
+
+    finalCanvas = document.createElement("canvas");
+    finalCanvas.width  = Math.min(totalW * SCALE, MAX_DIM);
+    finalCanvas.height = Math.min(totalH * SCALE, MAX_DIM);
+    const ctx = finalCanvas.getContext("2d");
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const vx = c * TILE_W;
+        const vy = r * TILE_H;
+        const vw = Math.min(TILE_W, totalW - vx);
+        const vh = Math.min(TILE_H, totalH - vy);
+
+        const tile = await makeShot(vx, vy, vw, vh, SCALE);
+
+        // Place the tile's pixels at the right spot
+        ctx.drawImage(
+          tile,
+          0, 0, tile.width, tile.height,
+          Math.floor(vx * SCALE), Math.floor(vy * SCALE),
+          Math.floor(vw * SCALE), Math.floor(vh * SCALE)
+        );
+      }
     }
-  };
+  }
+
+  // Download (blob avoids enormous data URLs)
+  finalCanvas.toBlob((blob) => {
+    if (!blob) return;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Championship_Season_${season}_Tier_${division}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, "image/png");
+};
+
 
   const raceCount = sortedDrivers.raceNumbers?.length || 0;
 

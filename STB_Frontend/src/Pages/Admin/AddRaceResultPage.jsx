@@ -373,7 +373,7 @@ export default function AddRaceResults() {
       {/* Results Form */}
       <div className="ar-form">
         <h2>Add Results for {selectedRace?.track?.raceName ?? "—"}</h2>
-        <p style={{ fontSize: 12, color: "#444951ff" }}>
+        <p style={{ fontSize: 12, color: "#8a909aff" }}>
           Tip: you can paste multiple rows from Excel/Sheets. Focus a cell in Driver, Team, Qualifying or Race Time,
           then paste — it fills down from the focused row.
         </p>

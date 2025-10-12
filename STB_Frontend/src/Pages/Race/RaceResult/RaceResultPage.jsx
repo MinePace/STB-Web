@@ -121,17 +121,23 @@ function RaceResultPage() {
     "Cadillac": ""
   };
 
-  // 📸 Function to capture screenshot
+  // 📸 Function to capture screenshot with transparent corners/background
   const captureScreenshot = () => {
-  const table = document.querySelector(".result-table");
-  if (!table) return;
-    html2canvas(table).then((canvas) => {
+    const table = document.querySelector(".result-table");
+    if (!table) return;
+
+    html2canvas(table, {
+      backgroundColor: null,   // ← keep alpha channel (no white background)
+      useCORS: true,           // if you load any images/fonts
+      scale: 2                 // optional: sharper export
+    }).then((canvas) => {
       const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
+      link.href = canvas.toDataURL("image/png"); // PNG supports transparency
       link.download = `Race_Results_${raceId}.png`;
       link.click();
     });
   };
+
 
   const hasAnyTime = raceResults.some(r => r.time && r.time.trim() !== "");
 
@@ -179,7 +185,7 @@ function RaceResultPage() {
                 {raceResults.length > 0 && (
                   <tr>
                     <th>Pos</th>
-                    <th>Driver</th>
+                    <th className="driver-col">Driver</th>
                     <th>Team</th>
                     <th>Points</th>
                     {hasAnyTime && <th>Time</th>}
@@ -201,7 +207,7 @@ function RaceResultPage() {
                         <td className={isDNF ? "dnf-cell" : ""}>
                           {isDNF ? "DNF" : row.position}
                         </td>
-                        <td>
+                        <td className="driver-col">
                           <Link
                             to={`/STB/Driver/${encodeURIComponent(row.driver)}`}
                             className={`driver-link ${isFastestLap ? "fastest-lap" : ""}`}

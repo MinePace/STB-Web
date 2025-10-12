@@ -1,6 +1,6 @@
 /* ----- Container ----- */
 .tp-container {
-  max-width: 1100px;
+  max-width: 1300px;
   margin: 2rem auto;
   padding: 1.25rem;
   border-radius: 16px;
@@ -26,7 +26,7 @@
 /* ----- Header ----- */
 .tp-header {
   text-align: center;
-  padding: 0.5rem 0 1rem;
+  padding: 0.1rem 0 0;
 }
 .tp-flag {
   width: 56px;
@@ -53,12 +53,12 @@
 /* ----- Stats ----- */
 .tp-stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   margin: 1rem 0 1.5rem;
 }
 .tp-stat {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 10px;
   padding: 14px 16px;
@@ -79,7 +79,7 @@
 .tp-map-card {
   position: sticky;
   top: 18px; /* sticks while scrolling */
-  background: rgba(22, 27, 56, 0.55);
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
   padding: 10px;
@@ -116,15 +116,21 @@
   gap: 14px;
 }
 .tp-rounds-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
-@media (max-width: 900px) {
+@media (max-width: 1450px) {
+  .tp-rounds-2 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 1175px) {
+  .tp-rounds-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
   .tp-rounds-2 { grid-template-columns: 1fr; }
 }
 
 /* ----- Round card ----- */
 .tp-round-card {
-  background: rgba(22, 27, 56, 0.55);
+  background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
   padding: 14px;
@@ -177,10 +183,9 @@
   color: #dfe6ff;
   font-weight: 600;
   font-size: 0.85rem;
-  padding: 10px 12px;
 }
 .tp-results-body .tp-result-row {
-  padding: 10px 12px;
+  padding: 5px 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 .tp-right { text-align: right; }
@@ -202,7 +207,7 @@
   border: 1px solid rgba(255,255,255,0.14);
   background: transparent;
   color: #e9efff;
-  padding: 6px 10px;
+  padding: 1px 10px;
   border-radius: 8px;
   cursor: pointer;
   text-decoration: none; /* remove underline */
@@ -224,7 +229,11 @@
 
 /* ----- Position + medals ----- */
 .tp-pos { font-weight: 700; color: #e8edff; }
-.tp-medal { border-radius: 999px; padding: 4px 10px; text-align: center; }
+.tp-medal { 
+  border-radius: 999px; 
+  padding: 2px 10px; 
+  text-align: center; 
+}
 .tp-medal-1 { background: linear-gradient(180deg, #ffef9e, #ffd452); color: #1f1700; border: #ffd452}
 .tp-medal-2 { background: linear-gradient(180deg, #f0f3f9, #d9e1f0); color: #20232a; border: #d9e1f0}
 .tp-medal-3 { background: linear-gradient(180deg, #ffd2a6, #ffa85a); color: #241200; border: #ffa85a}
@@ -235,7 +244,7 @@
   display: inline-block;
   min-width: 36px;
   text-align: center;
-  padding: 4px 8px;
+  padding: 2px 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.14);
@@ -258,8 +267,27 @@
 }
 .tp-error { color: #ffd5d5; }
 
+/* ----- Winner Stat ----- */
+.tp-stat-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #cbd4ff;
+}
+.tp-stat-winner {
+  display: block;
+}
+.tp-stat-winner:hover {
+  transform: none;
+  letter-spacing: normal;
+  background: transparent;
+}
+
+
 /* ----- Responsive tweaks ----- */
 @media (max-width: 640px) {
   .tp-stats { grid-template-columns: 1fr; }
   .tp-results-head, .tp-result-row { grid-template-columns: 56px 1fr 64px; }
+}
+@media (max-width: 1150px) {
+  .tp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) }
 }

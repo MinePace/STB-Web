@@ -6,7 +6,6 @@
     height: 100%; /* Laat de zijbalk de volledige hoogte van het scherm innemen */
     background-color: #0040805f; /* Donkerblauw */
     color: #ffffff;
-    padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Voeg een subtiele schaduw toe */
     z-index: 1000; /* Zorg dat de zijbalk altijd bovenaan blijft */
     transition: color 0.2s;

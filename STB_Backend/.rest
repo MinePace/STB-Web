@@ -117,4 +117,4 @@ GET  http://localhost:5110/api/driver/stats/Joey1854
 
 ##########
 
-GET http://localhost:5110/api/raceresult/seasonprogress/29/1/race-points
+GET http://localhost:5110/api/history/champions
