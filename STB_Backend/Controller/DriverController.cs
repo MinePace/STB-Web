@@ -152,16 +152,13 @@ public class DriverController : ControllerBase
     }
 
     [HttpGet("all")]
-    public IActionResult GetAllDrivers(int season)
+    public IActionResult GetAllDrivers()
     {
-        var driver  = _context.RaceResults
-            .Where(d => d.Driver != null)
-            .Select(d => d.Driver) // Only get the driver names
-            .Distinct()
+        var driver  = _context.Drivers
             .ToList();
 
         if (driver == null)
-        return NotFound(new { message = "No driver was found with this id." });
+        return NotFound(new { message = "No drivers were found." });
 
         return Ok(driver);
     }

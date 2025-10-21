@@ -82,13 +82,13 @@ function SocialDropdown({ label = "Socials", links = [] }) {
 }
 
 function Topbar() {
+  const [menuOpen, setMenuOpen] = useState(false); // ← added
   const [claimedDriver, setClaimedDriver] = useState(null);
   const isLoggedIn = localStorage.getItem("token") !== null;
   const username = localStorage.getItem("name") || "";
   const role = localStorage.getItem("role") || "user";
   const navigate = useNavigate();
 
-  // socials config (easy to extend)
   const SOCIAL_LINKS = [
     { id: "youtube", name: "YouTube", href: "https://www.youtube.com/@stbracingleague", icon: "/youtube.png" },
     { id: "discord", name: "Discord", href: "https://discord.gg/Qe2wQNrg", icon: "/discord.webp" },
@@ -104,10 +104,6 @@ function Topbar() {
         .catch((err) => console.error("Error fetching claimed driver:", err));
     }
   }, [isLoggedIn, username]);
-
-  useShortcut("d", () => claimedDriver && navigate(`/STB/Driver/${claimedDriver.name}`),
-    { alt: false, shift: false, caps: true });
-  useShortcut("h", () => navigate("/"), { alt: true, shift: true });
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -125,25 +121,31 @@ function Topbar() {
         </Link>
       </div>
 
-      <div className="nav-container">
-        <ul className="nav-links">
-          <li><Link to="/" className="topbar-link">Home</Link></li>
+      {/* Hamburger menu button (only visible on small screens) */}
+      <button
+        className="menu-toggle"
+        aria-label="Toggle menu"
+        onClick={() => setMenuOpen((prev) => !prev)}
+      >
+        ☰
+      </button>
 
-          {/* socials dropdown inside topbar */}
-          <li>
-            <SocialDropdown label="Socials" links={SOCIAL_LINKS} />
-          </li>
+      <div className={`nav-container ${menuOpen ? "open" : ""}`}>
+        <ul className="nav-links">
+          <li><Link to="/" className="topbar-link" onClick={() => setMenuOpen(false)}>Home</Link></li>
+
+          <li><SocialDropdown label="Socials" links={SOCIAL_LINKS} /></li>
 
           {role === "Admin" && (
-            <li><Link to="/admin" className="topbar-link">Admin Hub</Link></li>
+            <li><Link to="/admin" className="topbar-link" onClick={() => setMenuOpen(false)}>Admin Hub</Link></li>
           )}
 
           {isLoggedIn && claimedDriver ? (
-            <li><Link to={`/STB/Driver/${claimedDriver.name}`} className="topbar-link">My Driver</Link></li>
+            <li><Link to={`/STB/Driver/${claimedDriver.name}`} className="topbar-link" onClick={() => setMenuOpen(false)}>My Driver</Link></li>
           ) : isLoggedIn ? (
             <li><span className="no-driver-message">You need to claim a driver first!</span></li>
           ) : (
-            <li><Link to="/login" className="topbar-link">Login</Link></li>
+            <li><Link to="/login" className="topbar-link" onClick={() => setMenuOpen(false)}>Login</Link></li>
           )}
 
           {isLoggedIn && (

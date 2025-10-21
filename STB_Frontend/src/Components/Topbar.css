@@ -149,9 +149,87 @@
   opacity:.8; 
 }
 
-/* Hide topbar completely on small screens */
+/* Desktop default (hide hamburger) */
+.menu-toggle {
+  display: none;
+}
+
+/* Responsive topbar (mobile-friendly) */
 @media (max-width: 700px) {
   .topbar {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px 12px;
+  }
+
+  .logo {
+    height: 45px;
+  }
+
+  /* Hamburger button */
+  .menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 32px;
+    cursor: pointer;
+    margin-left: auto;
+    z-index: 1100; /* keep above menu */
+  }
+
+  /* Slim right-aligned dropdown */
+  .nav-container {
+    position: absolute;
+    top: 60px; /* directly below topbar */
+    right: 10px;
+    width: 220px; /* slimmer width */
+    background-color: #003366;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
     display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 0;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+  }
+
+  .nav-container.open {
+    display: flex;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    width: 100%;
+    gap: 6px;
+    text-align: left;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-links li {
+    width: 100%;
+  }
+
+  .nav-links a,
+  .logout-button {
+    width: 100%;
+    text-align: left;
+    padding: 8px 14px;
+    display: block;
+    font-size: 15px;
+  }
+
+  .logout-button {
+    margin-top: 6px;
+    align-self: stretch;
+  }
+
+  /* Optional: social dropdown adjusts width inside */
+  .socialdd__menu {
+    position: relative;
+    width: 100%;
+    border-radius: 6px;
   }
 }
+

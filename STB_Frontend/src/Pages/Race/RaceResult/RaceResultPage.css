@@ -148,3 +148,139 @@ body, html {
   margin-top: 40px;
   font-weight: 700;
 }
+
+/* ===========================================================
+   📱 Responsive: Race Results Page (Mobile & Tablet)
+   =========================================================== */
+
+/* Tablet adjustments (≤ 1000px) */
+@media (max-width: 1000px) {
+  .result-table th,
+  .result-table td {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .table-title {
+    font-size: 1.3rem;
+  }
+
+  .table-subtitle {
+    font-size: 1.1rem;
+  }
+
+  .country-flag {
+    width: 36px;
+  }
+
+  .download-button {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .video-player {
+    left: 5%;
+    width: 260px;
+    height: 160px;
+  }
+}
+
+/* Small screens (≤ 700px) — stack layout & scrollable table */
+@media (max-width: 700px) {
+  .table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .result-table {
+    min-width: 600px; /* allow horizontal scroll instead of cramping */
+    font-size: 13px;
+    margin-top: 10px;
+  }
+
+  .result-table th.driver-col,
+  .result-table td.driver-col {
+    width: 60px;   /* narrower */
+    min-width: 100px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-weight: 700;
+  }
+
+  .table-title {
+    font-size: 1.1rem;
+    padding: 8px;
+  }
+
+  .table-subtitle {
+    font-size: 1rem;
+    padding: 6px;
+  }
+
+  .country-flag {
+    width: 28px;
+    margin-left: 6px;
+  }
+
+  .download-button {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+    display: block;
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .race-header {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  /* Center the video below table */
+  .video-player {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    max-width: 360px;
+    height: 200px;
+    margin: 16px auto;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+}
+
+/* Tiny phones (≤ 420px) */
+@media (max-width: 420px) {
+  .result-table th,
+  .result-table td {
+    padding: 6px;
+    font-size: 12px;
+  }
+
+  .table-title,
+  .table-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .result-table th.driver-col,
+  .result-table td.driver-col {
+    width: 60px;   /* narrower */
+    min-width: 100px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font-weight: 700;
+  }
+
+  .download-button {
+    max-width: 180px;
+    font-size: 12px;
+  }
+
+  .video-player {
+    height: 180px;
+  }
+}

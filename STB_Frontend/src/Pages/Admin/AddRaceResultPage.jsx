@@ -17,6 +17,7 @@ export default function AddRaceResults() {
   const [filteredRaces, setFilteredRaces] = useState([]);
   const [existingResults, setExistingResults] = useState(new Set());
   const [selectedRace, setSelectedRace] = useState(null);
+  const [teamDriverLinks, setTeamDriverLinks] = useState([]);
 
   // Rows to submit
   const [raceResults, setRaceResults] = useState([]);
@@ -154,18 +155,39 @@ export default function AddRaceResults() {
   };
 
   // ---------- UI handlers ----------
-  const handleRaceSelect = (e) => {
+  const handleRaceSelect = async (e) => {
     const id = e.target.value;
     const race = filteredRaces.find((r) => String(r.id) === id);
     if (!race) return;
     setSelectedRace(race);
     initResultsForRace(race, setRaceResults);
+
+    try {
+      const res = await fetch(
+        `http://localhost:5110/api/team/teamdriver/${race.season}/${race.division}`
+      );
+      if (!res.ok) throw new Error("Failed to fetch team-driver links");
+      const data = await res.json();
+      setTeamDriverLinks(data || []);
+    } catch (err) {
+      console.error("TeamDriver fetch error:", err);
+      setTeamDriverLinks([]);
+    }
   };
 
   const handleResultChange = (index, field, value) => {
     setRaceResults((prev) => {
       const updated = [...prev];
       const next = { ...updated[index], [field]: value };
+
+      if (field === "driver") {
+        const name = String(value).trim().toLowerCase();
+        const found = driverTeamMap.get(name);
+        if (found) {
+          next.team = found.teamName;
+          next.teamId = found.teamId;
+        }
+      }
 
       // if team changed via dropdown or paste, set teamId too
       if (field === "team") {
@@ -254,6 +276,15 @@ export default function AddRaceResults() {
         }
 
         const row = { ...updated[idx], [field]: value };
+
+        if (field === "driver") {
+          const name = String(value).trim().toLowerCase();
+          const found = driverTeamMap.get(name);
+          if (found) {
+            row.team = found.teamName;
+            row.teamId = found.teamId;
+          }
+        }
 
         if (field === "qualifying") {
           const q = parseInt(row.qualifying, 10);
@@ -347,6 +378,19 @@ export default function AddRaceResults() {
     }
   };
 
+  const driverTeamMap = useMemo(() => {
+    const map = new Map();
+    teamDriverLinks.forEach((t) => {
+      (t.drivers || []).forEach((driverName) => {
+        map.set(driverName.toLowerCase().trim(), {
+          teamId: t.teamId,
+          teamName: t.teamName,
+        });
+      });
+    });
+    return map;
+  }, [teamDriverLinks]);
+
   // ---------- Render ----------
   return (
     <div className="ar-container">
@@ -410,7 +454,7 @@ export default function AddRaceResults() {
                   />
                   <datalist id="drivers-list">
                     {driversList.map((d, idx) => (
-                      <option key={idx} value={d} />
+                      <option key={idx} value={d.name} />
                     ))}
                   </datalist>
                 </td>

@@ -33,6 +33,7 @@ function EditRacePage() {
   const [teams, setTeams] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [loadingTeamDrivers, setLoadingTeamDrivers] = useState(false);
+  const [savingTeamDrivers, setSavingTeamDrivers] = useState(false);
 
   // UI state
   const [saving, setSaving] = useState(false);
@@ -516,29 +517,159 @@ function EditRacePage() {
 
           {loadingTeamDrivers ? (
             <div className="toast">Loading teams and drivers…</div>
-          ) : teamDrivers.length === 0 ? (
-            <div className="toast">No team-driver assignments for this division yet.</div>
           ) : (
-            <div className="table-wrap">
-              <table className="season-table">
-                <thead>
-                  <tr>
-                    <th>Team</th>
-                    <th>Driver</th>
-                    <th>Country</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {teamDrivers.map((td, idx) => (
-                    <tr key={idx}>
-                      <td>{td.team?.name || "—"}</td>
-                      <td>{td.driver?.name || "—"}</td>
-                      <td>{td.driver?.country || "—"}</td>
-                    </tr>
+            <>
+              {teamDrivers.map((td, idx) => (
+                <div
+                  key={idx}
+                  className="team-card"
+                  style={{
+                    border: "1px dashed var(--border)",
+                    borderRadius: "10px",
+                    padding: "12px",
+                    marginBottom: "12px",
+                    background: "var(--muted)",
+                  }}
+                >
+                  {/* Select Team */}
+                  <select
+                    className="select"
+                    value={td.teamId || ""}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setTeamDrivers((prev) => {
+                        const copy = [...prev];
+                        copy[idx].teamId = val;
+                        return copy;
+                      });
+                    }}
+                  >
+                    <option value="">Select Team…</option>
+                    {teams.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Driver Inputs */}
+                  {(td.drivers || ["", ""]).map((d, j) => (
+                    <input
+                      key={j}
+                      list="drivers-list"
+                      className="input"
+                      placeholder="Driver name"
+                      value={d}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setTeamDrivers((prev) => {
+                          const copy = [...prev];
+                          if (!copy[idx].drivers) copy[idx].drivers = [];
+                          copy[idx].drivers[j] = val;
+                          return copy;
+                        });
+                      }}
+                    />
                   ))}
-                </tbody>
-              </table>
-            </div>
+
+                  {/* Add second driver if missing */}
+                  {(!td.drivers || td.drivers.length < 2) && (
+                    <button
+                      type="button"
+                      className="button small"
+                      onClick={() =>
+                        setTeamDrivers((prev) => {
+                          const copy = [...prev];
+                          if (!copy[idx].drivers) copy[idx].drivers = [];
+                          copy[idx].drivers.push("");
+                          return copy;
+                        })
+                      }
+                    >
+                      + Add Driver
+                    </button>
+                  )}
+                </div>
+              ))}
+
+              {/* Add new Team row */}
+              <button
+                type="button"
+                className="button"
+                onClick={() =>
+                  setTeamDrivers((prev) => [
+                    ...prev,
+                    {
+                      season: Number(selectedSeason),
+                      division: Number(selectedDivision),
+                      teamId: "",
+                      drivers: [""],
+                    },
+                  ])
+                }
+              >
+                + Add Team
+              </button>
+
+              {/* Driver list datalist */}
+              <datalist id="drivers-list">
+                {drivers.map((d) => (
+                  <option key={d.id} value={d.name} />
+                ))}
+              </datalist>
+
+              {/* Save Assignments */}
+              <button
+                className="submit-button"
+                style={{ marginTop: 16 }}
+                disabled={savingTeamDrivers}
+                onClick={async () => {
+                  setSavingTeamDrivers(true);
+                  const errors = [];
+
+                  for (const td of teamDrivers) {
+                    if (!td.teamId) continue;
+
+                    for (const driverName of td.drivers || []) {
+                      if (!driverName) continue;
+
+                      try {
+                        const payload = {
+                          season: Number(selectedSeason),
+                          division: Number(selectedDivision),
+                          teamId: Number(td.teamId),
+                          driver: driverName.trim(),
+                        };
+
+                        const res = await fetch(
+                          "http://localhost:5110/api/team/teamdriver",
+                          {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(payload),
+                          }
+                        );
+
+                        if (!res.ok) {
+                          const txt = await res.text().catch(() => "");
+                          throw new Error(txt || `HTTP ${res.status}`);
+                        }
+                      } catch (e) {
+                        errors.push(e.message);
+                      }
+                    }
+                  }
+
+                  setSavingTeamDrivers(false);
+
+                  if (errors.length)
+                    alert("Some errors occurred:\n" + errors.join("\n"));
+                  else alert("Team assignments saved successfully!");
+                }}
+              >
+                {savingTeamDrivers ? "Saving…" : "Save Assignments"}
+              </button>
+            </>
           )}
         </div>
       )}

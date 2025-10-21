@@ -164,7 +164,7 @@ function RaceResultPage() {
               <thead>
                 <tr>
                   <th colSpan="6" className="table-title">
-                    {`Season ${race.season} • Round ${race.round} ${race.sprint === "Yes" ? "(Sprint)" : ""} • Tier ${race.division}`}
+                    {`Season ${race.season} • Tier ${race.division} • Round ${race.round} ${race.sprint === "Yes" ? "(Sprint)" : ""}`}
                   </th>
                 </tr>
                 <tr>
