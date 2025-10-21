@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
@@ -7,6 +7,8 @@ import "@/Components/Links.css";
 
 function RaceResultPage() {
   const { raceId } = useParams(); // Haal "type" op uit de URL
+  const [searchParams] = useSearchParams();
+  const prefillDriver = searchParams.get("driver"); // e.g. ?driver=Joey1854
   const [raceResults, setRaceResults] = useState([]);
   const [race, setRaceData] = useState();
   const [fastestLap, setFastestLap] = useState(null);
@@ -201,6 +203,9 @@ function RaceResultPage() {
                     const isFastestLap =
                       fastestLap &&
                       (fastestLap.driver?.name ?? fastestLap.driver) === row.driver;
+                    const isdriverPrefill =
+                      prefillDriver &&
+                      decodeURIComponent(prefillDriver).toLowerCase() === row.driver.toLowerCase();
 
                     return (
                       <tr key={index}>
@@ -210,7 +215,7 @@ function RaceResultPage() {
                         <td className="driver-col">
                           <Link
                             to={`/STB/Driver/${encodeURIComponent(row.driver)}`}
-                            className={`driver-link ${isFastestLap ? "fastest-lap" : ""}`}
+                            className={`primary-link ${isdriverPrefill ? "driver-link-season" : (isFastestLap ? "fastest-lap" : "")}`}
                           >
                             {row.driver}
                           </Link>

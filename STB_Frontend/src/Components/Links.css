@@ -64,8 +64,25 @@ a.champions-link:active {
 }
 
 .fastest-lap {
-  color: rgb(174, 61, 255);
+  color: rgb(174, 61, 255) !important;
   font-weight: bold;
+}
+
+.fastest-lap:hover {
+  color: #ff94ff !important;
+  text-decoration: underline;
+}
+
+.driver-link-season {
+  color: #91ff95 !important;
+  text-decoration: none;
+  font-weight: bold !important;
+  transition: color 0.2s;
+}
+
+.driver-link-season:hover {
+  color: #4caeff !important;
+  text-decoration: underline;
 }
 
 /* ----- Download Button ----- */

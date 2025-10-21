@@ -14,22 +14,9 @@ function DriverPage() {
   const [showPopup, setShowPopup] = useState(false);
   const [newCountry, setNewCountry] = useState("");
   const [savingCountry, setSavingCountry] = useState(false);
+  const [flags, setFlags] = useState([]);
 
   useEffect(() => {
-    const fetchDriverStats = async () => {
-      try {
-        const res = await fetch(`http://localhost:5110/api/driver/stats/${driverName}`);
-        if (!res.ok) throw new Error("Failed to fetch driver stats");
-        const data = await res.json();
-        setDriverStats(data);
-      } catch (err) {
-        console.error(err);
-        setError("Could not load driver stats.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
     const fetchUser = async () => {
       const token = localStorage.getItem("token");
       const name = localStorage.getItem("name");
@@ -52,6 +39,27 @@ function DriverPage() {
     fetchDriverStats();
     fetchUser();
   }, [driverName]);
+
+  useEffect(() => {
+    fetch("/flags/1_manifest.json")
+      .then(res => res.json())
+      .then(setFlags)
+      .catch(err => console.error("Error loading flags manifest:", err));
+  }, []);
+
+  const fetchDriverStats = async () => {
+    try {
+      const res = await fetch(`http://localhost:5110/api/driver/stats/${driverName}`);
+      if (!res.ok) throw new Error("Failed to fetch driver stats");
+      const data = await res.json();
+      setDriverStats(data);
+    } catch (err) {
+      console.error(err);
+      setError("No Driver has been claimed. Please claim a driver by going to Drivers profile and click the claim button.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const claimDriver = async () => {
     if (!user || driverStats?.driverOBJ?.user) return;
@@ -104,10 +112,9 @@ function DriverPage() {
       if (!res.ok) throw new Error("Failed to update country");
 
       const updated = await res.json();
-      setDriverStats((prev) => ({
-        ...prev,
-        driverOBJ: { ...prev.driverOBJ, country: updated.country },
-      }));
+
+      await fetchDriverStats();  // 👈 call the same fetcher as in useEffect
+
       setShowPopup(false);
     } catch (err) {
       console.error("Error updating country:", err);
@@ -345,6 +352,8 @@ function DriverPage() {
                 <div className="last-race">
                   {/* meta */}
                   <div className="lr-meta">
+                    <a href={`/STB/Championship/${race.season}/${race.division}?driver=${driverStats.driver}`} className= "primary-link">Season {race.season} Tier {race.division}</a>
+                    <h>•</h>
                     <a href={`/STB/Race/${raceLabel}`} className= "primary-link">{trackLabel}</a>
                     <div><strong>Date:</strong> {dateLabel}</div>
                   </div>
@@ -435,7 +444,7 @@ function DriverPage() {
                         title={title}
                         aria-label={title}
                       >
-                        <a href= {`/STB/Race/${raceLabel}`} className="primary-link">{trackLabel}</a>
+                        <a href= {`/STB/Race/${raceLabel}?driver=${driverStats.driver}`} className="primary-link">{trackLabel}</a>
                         <span className="race-chip-divider" aria-hidden="true" />
                         <div className="race-chip-stats">
                           <span
@@ -622,16 +631,15 @@ function DriverPage() {
               onChange={(e) => setNewCountry(e.target.value)}
             >
               <option value="">— Select a country —</option>
-              <option value="Great Britain">🇬🇧 United Kingdom</option>
-              <option value="USA">🇺🇸 United States</option>
-              <option value="France">🇫🇷 France</option>
-              <option value="GER">🇩🇪 Germany</option>
-              <option value="ITA">🇮🇹 Italy</option>
-              <option value="ESP">🇪🇸 Spain</option>
-              <option value="BRA">🇧🇷 Brazil</option>
-              <option value="JPN">🇯🇵 Japan</option>
-              <option value="AUS">🇦🇺 Australia</option>
-              <option value="CAN">🇨🇦 Canada</option>
+              {flags.map((flagFile) => {
+                const country = flagFile.replace(".png", "");
+                const flagSrc = `/flags/${flagFile}`;
+                return (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                );
+              })}
             </select>
 
             <button

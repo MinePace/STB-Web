@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas"; // Import html2canvas
@@ -7,6 +7,8 @@ import "@/Components/Links.css"
 
 function ChampionshipPage() {
   const { season, division } = useParams();
+  const [searchParams] = useSearchParams();
+  const prefillDriver = searchParams.get("driver"); // e.g. ?driver=Joey1854
   const [races, setRaces] = useState([]);
   const [raceResults, setRaceResults] = useState([]);
   const [sortedDrivers, setSortedDrivers] = useState([]);
@@ -348,8 +350,9 @@ const downloadTableAsImage = async () => {
                       <Link
                         to={`/STB/Driver/${encodeURIComponent(driver)}`}
                         className={`primary-link ${
-                          claimedDriver && driver.trim().toLowerCase() === claimedDriver.name.trim().toLowerCase()
-                            ? "driver-link--claimed"
+                          (claimedDriver?.name && driver.trim().toLowerCase() === claimedDriver.name.trim().toLowerCase()) 
+                          || prefillDriver === driver
+                            ? "driver-link-season "
                             : ""
                         }`}
                       >

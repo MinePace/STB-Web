@@ -92,6 +92,21 @@ public class TeamController : ControllerBase
         return CreatedAtAction(nameof(GetTeam), new { id = newTeamDriver.Id }, newTeamDriver);
     }
 
+    [HttpGet("teamdriver/{season}/{division}")]
+    public IActionResult GetTeamDriver(int season, int division)
+    {
+        var TeamDrivers = _context.SeasonalTeamDrivers
+            .Where(td => td.Season == season && td.Division == division)
+            .Include(td => td.Team)
+            .Include(td => td.Driver)
+            .ToList();
+
+        if (TeamDrivers == null)
+            return BadRequest(new { message = "No TeamDriver data for this season." });
+
+        return Ok(TeamDrivers);
+    }
+
     [HttpPut("update/{id}")]
     public IActionResult UpdateTeam(int id, [FromBody] Team updatedTeam)
     {

@@ -118,60 +118,63 @@
 .season-table tbody tr:nth-child(even) { background: #fafcff; }
 .season-table tbody tr:hover { background: var(--accent-veil); }
 
-/* ===== Column sizing (fixes) ===== */
-/* 1) Round — compact */
+/* ===== Column sizing (optimized widths) ===== */
+
+/* 1) Round — very compact */
 .season-table th:nth-child(1),
 .season-table td:nth-child(1) {
-  width: 70px;
-  max-width: 80px;
+  width: 45px;
+  max-width: 60px;
+  text-align: center;
 }
 .season-table td:nth-child(1) .cell-input {
-  width: 70px;
+  width: 55px;
   text-align: center;
   padding-right: 0;
 }
 
-/* 2) Track — give it breathing room */
+/* 2) Track — enough room for long names */
 .season-table th:nth-child(2),
 .season-table td:nth-child(2) {
-  min-width: 360px;
+  min-width: 200px;
+  max-width: 200px;
 }
 
-/* 3) Sprint — compact */
+/* 3) Sprint — short yes/no dropdown */
 .season-table th:nth-child(3),
 .season-table td:nth-child(3) {
-  width: 120px;
-  max-width: 140px;
-  text-align: center;
+  width: 60px;
+  max-width: 60px;
 }
 
-/* 4) Race Date — fixed-ish */
+/* 4) Race Date — date input width */
 .season-table th:nth-child(4),
 .season-table td:nth-child(4) {
-  width: 170px;
-  max-width: 190px;
+  width: 90px;
+  max-width: 100px;
 }
 
-/* 5) YouTube — takes remaining space */
+/* 5) YouTube — takes remaining space, flexible */
 .season-table th:nth-child(5),
 .season-table td:nth-child(5) {
   width: auto;
+  min-width: 260px;
 }
 
 /* Make YouTube input resilient for long URLs */
 .season-table td:nth-child(5) .cell-input {
   width: 100%;
   box-sizing: border-box;
-  min-width: 280px;
   font-size: 13px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;    /* tidy when not editing */
+  white-space: nowrap;
 }
 .season-table td:nth-child(5) .cell-input:focus {
-  white-space: normal;    /* show full URL on focus */
+  white-space: normal;
   word-break: break-all;
 }
+
 
 /* ===== Changed row highlight ===== */
 .season-table tbody tr[style] {

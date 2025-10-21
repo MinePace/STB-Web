@@ -18,7 +18,7 @@
 
 .season-item {
     position: relative; /* Maak de season-label de parent voor absolute positioning */
-    margin: 10px 0;
+    margin: 8px 0;
 }
 
 .season-label {

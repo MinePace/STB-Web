@@ -28,6 +28,12 @@ function EditRacePage() {
   const [tracksLoading, setTracksLoading] = useState(false);
   const [tracksError, setTracksError] = useState(null);
 
+  // ----- Teams & Drivers -----
+  const [teamDrivers, setTeamDrivers] = useState([]);
+  const [teams, setTeams] = useState([]);
+  const [drivers, setDrivers] = useState([]);
+  const [loadingTeamDrivers, setLoadingTeamDrivers] = useState(false);
+
   // UI state
   const [saving, setSaving] = useState(false);
 
@@ -61,6 +67,29 @@ function EditRacePage() {
       })
       .catch((e) => console.error("races error:", e));
   }, [selectedSeason]);
+
+  // ----- Load team-driver mappings -----
+  useEffect(() => {
+    if (!selectedSeason || !selectedDivision) {
+      setTeamDrivers([]);
+      return;
+    }
+
+    setLoadingTeamDrivers(true);
+
+    Promise.all([
+      fetch(`http://localhost:5110/api/team/teamdriver/${selectedSeason}/${selectedDivision}`).then((r) => r.json()),
+      fetch(`http://localhost:5110/api/team`).then((r) => r.json()),
+      fetch(`http://localhost:5110/api/driver/all`).then((r) => r.json()),
+    ])
+      .then(([teamDriverData, teamList, driverList]) => {
+        setTeamDrivers(teamDriverData || []);
+        setTeams(teamList || []);
+        setDrivers(driverList || []);
+      })
+      .catch((e) => console.error("TeamDrivers load error:", e))
+      .finally(() => setLoadingTeamDrivers(false));
+  }, [selectedSeason, selectedDivision]);
 
   // ----- Filter by division into editable rows -----
   useEffect(() => {
@@ -354,7 +383,7 @@ function EditRacePage() {
               <tr>
                 <th>Round</th>
                 <th>Track</th>
-                <th>Sprint WKND</th>
+                <th>Sprint</th>
                 <th>Race Date</th>
                 <th>YouTube</th>
               </tr>
@@ -403,7 +432,7 @@ function EditRacePage() {
                               .sort((a, b) => String(a.name).localeCompare(String(b.name)))
                               .map((t) => (
                                 <option key={t.id} value={t.id}>
-                                  {t.name} · {t.raceName} · {t.country}
+                                  {t.name} · {t.country}
                                 </option>
                               ))}
                           </select>
@@ -477,6 +506,40 @@ function EditRacePage() {
       ) : (
         <div className="toast" style={{ background: "var(--muted)" }}>
           Select a season and division to load races.
+        </div>
+      )}
+
+      {/* ===== TeamDrivers Section ===== */}
+      {selectedSeason && selectedDivision && (
+        <div className="card" style={{ marginTop: 24 }}>
+          <h2 style={{ color: "var(--brand)", marginBottom: 10 }}>Teams & Drivers</h2>
+
+          {loadingTeamDrivers ? (
+            <div className="toast">Loading teams and drivers…</div>
+          ) : teamDrivers.length === 0 ? (
+            <div className="toast">No team-driver assignments for this division yet.</div>
+          ) : (
+            <div className="table-wrap">
+              <table className="season-table">
+                <thead>
+                  <tr>
+                    <th>Team</th>
+                    <th>Driver</th>
+                    <th>Country</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamDrivers.map((td, idx) => (
+                    <tr key={idx}>
+                      <td>{td.team?.name || "—"}</td>
+                      <td>{td.driver?.name || "—"}</td>
+                      <td>{td.driver?.country || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
     </div>

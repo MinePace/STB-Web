@@ -83,29 +83,6 @@
 }
 .col-points { width: var(--points-col-w); }
 
-/* Make the driver column text behave well */
-/* Keep your existing rules. Add this one: */
-.driver-link.driver-link--claimed {
-  color: #91ff95;         /* green */
-  font-weight: 800;       /* stronger if you want */
-  transition: color .2s ease;
-}
-.driver-link.driver-link--claimed:hover {
-  color: #4caeff;         /* green */
-  transition: color .2s ease;
-}
-
-.driver-link {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 700;
-}
-.driver-link:hover { 
-  color: #4caeff; 
-  text-decoration: none; 
-  transition: color .2 ease;
-}
-
 /* Flags should never size the column */
 .race-flag {
   width: 100%;

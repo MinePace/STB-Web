@@ -20,7 +20,7 @@ function AdminHub() {
       <div className="admin-links">
         <ul>
           <li>
-            <Link to="/STB/Add/Race">Add a New Race</Link>
+            <Link to="/STB/Add/Race">Add a New Season</Link>
           </li>
           <li>
             <Link to="/STB/Add/Track">Add a New Track</Link>
@@ -29,7 +29,7 @@ function AdminHub() {
             <Link to="/STB/Add/RaceResults">Add a Race Results</Link>
           </li>
           <li>
-            <Link to="/STB/Edit/Race">Edit Existing Races</Link>
+            <Link to="/STB/Edit/Race">Edit Existing Seasons</Link>
           </li>
           <li>
             <Link to="/STB/Edit/RaceResults">Edit Race Results</Link>
