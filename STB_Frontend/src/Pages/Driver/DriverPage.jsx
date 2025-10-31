@@ -354,7 +354,7 @@ function DriverPage() {
                   <div className="lr-meta">
                     <a href={`/STB/Championship/${race.season}/${race.division}?driver=${driverStats.driver}`} className= "primary-link">Season {race.season} Tier {race.division}</a>
                     <h>•</h>
-                    <a href={`/STB/Race/${raceLabel}`} className= "primary-link">{trackLabel}</a>
+                    <a href={`/STB/Race/${raceLabel}?driver=${driverStats.driver}`} className= "primary-link">{trackLabel}</a>
                     <div><strong>Date:</strong> {dateLabel}</div>
                   </div>
 

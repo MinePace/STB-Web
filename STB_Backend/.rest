@@ -113,8 +113,18 @@ Content-Type: application/json
 
 ##########
 
-GET  http://localhost:5110/api/driver/stats/Joey1854
+GET  http://localhost:5110/api/discordbot/tier-info/3
 
 ##########
 
-GET http://localhost:5110/api/team/teamdriver/21/2
+GET  http://localhost:5110/api/discordbot/get-race/1/10
+
+##########
+
+PUT http://localhost:5110/api/driver/updateDiscord
+Content-Type: application/json
+
+{
+  "DriverName": "II Mafio II",
+  "DiscordId": "584668797353459730"
+}

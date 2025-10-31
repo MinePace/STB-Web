@@ -67,7 +67,6 @@ body, html {
 /* Keep the team name readable but single-line */
 .team-name {
   white-space: nowrap;
-  text-shadow: 0px 0px 5px rgba(255, 255, 255, 0.714);
   font-weight: bold;
 }
 

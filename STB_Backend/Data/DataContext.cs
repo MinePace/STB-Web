@@ -97,6 +97,7 @@ public class Driver
     public string? Country { get; set; }
     public User? User { get; set; }
     public int? UserId { get; set; }
+    public string? DiscordId { get; set; }
 }
 
 public class Team

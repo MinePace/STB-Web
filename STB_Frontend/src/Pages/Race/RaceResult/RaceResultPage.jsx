@@ -189,7 +189,6 @@ function RaceResultPage() {
                     <th>Pos</th>
                     <th className="driver-col">Driver</th>
                     <th>Team</th>
-                    <th>Points</th>
                     {hasAnyTime && <th>Time</th>}
                     <th>Grid</th>
                   </tr>
@@ -223,7 +222,6 @@ function RaceResultPage() {
                         <td className="team-name" style={{ color: teamColors[row.team] || "white" }}>
                           {row.team}
                         </td>
-                        <td>{row.points}</td>
                         {hasAnyTime && (
                           <td>
                             {row.time ? (index === 0 ? row.time : `+${row.time}`) : ""}

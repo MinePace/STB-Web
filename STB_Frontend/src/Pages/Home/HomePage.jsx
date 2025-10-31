@@ -80,7 +80,7 @@ function HomePage() {
           },
         });
 
-        const currentSeasonResponse = await fetch("http://localhost:5110/api/race/stats/season/29");
+        const currentSeasonResponse = await fetch("http://localhost:5110/api/race/stats/season/30");
         if (!currentSeasonResponse.ok) {
           throw new Error("Failed to fetch current season stats.");
         }

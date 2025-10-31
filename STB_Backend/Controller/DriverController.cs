@@ -250,6 +250,21 @@ public class DriverController : ControllerBase
         return Ok(new { message = "Driver Updated", driver });
     }
 
+    [HttpPut("updateDiscord")]
+    public async Task<IActionResult> UpdateDiscordIdByName([FromBody] UpdateDiscordDto dto)
+    {
+        var driver = await _context.Drivers
+            .FirstOrDefaultAsync(d => d.Name.ToLower() == dto.DriverName.ToLower());
+
+        if (driver == null)
+            return NotFound(new { message = "Driver not found." });
+
+        driver.DiscordId = dto.DiscordId;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = $"Discord ID updated for {driver.Name}.", driver });
+    }
+
     public class ClaimDriverRequest
     {
         public string Username { get; set; } // ✅ Define the username field correctly
@@ -265,5 +280,11 @@ public class DriverController : ControllerBase
     public class CountryRequest
     {
         public string Country { get; set; }
+    }
+
+    public class UpdateDiscordDto
+    {
+        public string DriverName { get; set; } = string.Empty;
+        public string DiscordId { get; set; } = string.Empty;
     }
 }

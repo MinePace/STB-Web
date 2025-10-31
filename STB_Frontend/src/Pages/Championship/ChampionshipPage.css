@@ -71,7 +71,7 @@
   border-radius: 3px;
 }
 
-.scrollable-table td:nth-child(2), .scrollable-table td:last-child { background-color: rgb(147, 59, 59); }
+.scrollable-table td:nth-child(2), .scrollable-table td:last-child { background-color: #194081; }
 
 /* --- Column-specific sizing via <colgroup> classes --- */
 .col-pos    { width: var(--pos-col-w); }
@@ -123,7 +123,7 @@
 .scrollable-table tbody tr:hover { background: var(--row-hover); } /* Round cols */
 .scrollable-table tbody tr:hover td:nth-child(2),   /* Driver col */
 .scrollable-table tbody tr:hover td:last-child {   /* Points col */
-  background: rgb(183, 84, 84);
+  background: #3669c2;
 }
 
 

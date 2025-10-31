@@ -188,6 +188,11 @@ const downloadTableAsImage = async () => {
           scroller.style.visibility = "visible";
           scroller.scrollLeft = vx;
           scroller.scrollTop  = vy;
+
+          const rows = scroller.querySelectorAll("tbody tr");
+          rows.forEach((row, i) => {
+            if (i >= 25) row.style.display = "none";
+          });
         }
 
         // hide scrollbars in the clone (nice clean capture)
