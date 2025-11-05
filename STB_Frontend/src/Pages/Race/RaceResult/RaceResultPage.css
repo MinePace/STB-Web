@@ -1,5 +1,12 @@
-body, html {
-  overflow-x: hidden; /* prevents horizontal scrollbars */
+html, body {
+  overflow-x: hidden;
+}
+
+/* ====== Tabel COntainer ====== */
+.table-container {
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* ====== Base Table ====== */
@@ -68,6 +75,21 @@ body, html {
 .team-name {
   white-space: nowrap;
   font-weight: bold;
+}
+
+/* Penalty section behind Time */
+.penalty-inline {
+  color: #ff6b6b;
+  margin-left: 4px;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.bonus-inline {
+  color: #4ade80;
+  margin-left: 4px;
+  font-size: 0.9em;
+  font-weight: 600;
 }
 
 /* ====== Title Row (Season & Round) ====== */

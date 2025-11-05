@@ -170,6 +170,7 @@ public class RaceResultController : ControllerBase
         result.Qualifying = newResult.Qualifying;
         result.Pos_Change = newResult.Pos_Change;
         result.Time = newResult.Time;
+        result.Penalty = newResult.Penalty;
 
         try
         {
@@ -210,5 +211,6 @@ public class RaceResultController : ControllerBase
         public int Qualifying { get; set; }
         public int Pos_Change { get; set; }
         public string? Time { get; set; }
+        public int? Penalty { get; set; }
     }
 }

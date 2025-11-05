@@ -135,7 +135,8 @@ function EditRaceResults() {
       DNF: updated?.dnf ?? base.dnf,
       Qualifying: updated?.qualifying ?? base.qualifying,
       Pos_Change: updated?.pos_Change ?? base.pos_Change,
-      Time: updated?.time ?? base.time
+      Time: updated?.time ?? base.time,
+      Penalty: updated?.penalty ?? base.penalty,
     };
 
     console.log("Saving DTO:", dto);
@@ -146,6 +147,58 @@ function EditRaceResults() {
     });
 
     alert(resp.ok ? "Race result updated successfully!" : "Failed to update result.");
+  };
+
+  // 💾 Save all edited race results
+  const handleSaveAll = async () => {
+    if (Object.keys(editedResults).length === 0) {
+      alert("No changes to save.");
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to save all edited results?")) return;
+
+    const updates = Object.entries(editedResults).map(([id, updated]) => {
+      const base = raceResults.find(r => r.id === parseInt(id));
+      if (!base && !updated) return null;
+
+      const dto = {
+        Position: updated?.position ?? base.position,
+        Driver: updated?.driver ?? base.driver,
+        Team: updated?.team ?? base.team,
+        Points: updated?.points ?? base.points,
+        DNF: updated?.dnf ?? base.dnf,
+        Qualifying: updated?.qualifying ?? base.qualifying,
+        Pos_Change: updated?.pos_Change ?? base.pos_Change,
+        Time: updated?.time ?? base.time,
+        Penalty: updated?.penalty ?? base.penalty,
+      };
+
+      return fetch(`http://localhost:5110/api/raceresult/update/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dto)
+      }).then(res => ({
+        id,
+        success: res.ok
+      }));
+    }).filter(Boolean);
+
+    const results = await Promise.all(updates);
+    const failed = results.filter(r => !r.success);
+
+    if (failed.length > 0) {
+      alert(`⚠️ ${failed.length} result(s) failed to save.`);
+    } else {
+      alert("✅ All race results saved successfully!");
+    }
+
+    // optional: clear edits and refetch latest data
+    setEditedResults({});
+    fetch(`http://localhost:5110/api/race/race/${selectedRace}`)
+      .then(res => res.json())
+      .then(data => setRaceResults(data?.raceResults ?? []))
+      .catch(err => console.error("Error refreshing data:", err));
   };
 
   const handleDelete = async (id) => {
@@ -307,6 +360,7 @@ function EditRaceResults() {
                     <th>Quali</th>
                     <th>Pos Δ</th>
                     <th>Time</th>
+                    <th>Penalty</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -380,6 +434,22 @@ function EditRaceResults() {
                                   />
                                 </td>
                                 <td>
+                                  <input
+                                    type="number"
+                                    className="compact-input"
+                                    value={editedResults[result.id]?.penalty ?? result.penalty ?? 0}
+                                    step="1"
+                                    onChange={(e) => {
+                                      // Allow only integers (no decimals)
+                                      let v = e.target.value;
+                                      if (v === "") v = "";
+                                      else if (/^-?\d+$/.test(v)) v = parseInt(v);
+                                      else return; // reject invalid input like letters or decimals
+                                      handleInputChange(result.id, "penalty", v);
+                                    }}
+                                  />
+                                </td>
+                                <td>
                                   <button className="submit-button" onClick={() => handleSave(result.id)}>Save</button>
                                   <button className="delete-btn" onClick={() => handleDelete(result.id)}>Delete</button>
                                 </td>
@@ -395,8 +465,16 @@ function EditRaceResults() {
               </table>
             </>
           )}
-
-          <button className="cancel-btn" onClick={() => navigate(-1)}>Cancel</button>
+          <div style={{ marginTop: "20px" }}>
+            <button
+              className="submit-button"
+              style={{ marginRight: "10px" }}
+              onClick={handleSaveAll}
+            >
+              💾 Save All
+            </button>
+            <button className="cancel-btn" onClick={() => navigate(-1)}>Cancel</button>
+          </div>
         </>
       )}
     </div>

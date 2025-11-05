@@ -44,6 +44,7 @@ public class RaceResult
     public int Pos_Change { get; set; }
     public int Qualifying { get; set; }
     public string? Time { get; set; }
+    public int? Penalty { get; set; } = 0;
 }
 
 public class User

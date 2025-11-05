@@ -431,7 +431,6 @@ export default function AddRaceResults() {
               <th>Points</th>
               <th>DNF</th>
               <th>Qualifying</th>
-              <th>Pos Change</th>
               <th>Fastest Lap</th>
               <th>Race Time</th>
             </tr>
@@ -511,8 +510,6 @@ export default function AddRaceResults() {
                     className="ar-quali-input"
                   />
                 </td>
-
-                <td>{row.pos_Change}</td>
 
                 <td>
                   <input

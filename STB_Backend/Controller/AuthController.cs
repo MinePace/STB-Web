@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 [Route("api/auth")]
 [ApiController]
@@ -57,6 +58,60 @@ public class AuthController : ControllerBase
         _context.SaveChanges();
 
         return Ok(new { message = "Registration successful", loginCount = 1 });
+    }
+
+    [HttpPost("upload-result")]
+    public async Task<IActionResult> UploadRaceResult(
+        [FromForm] int season,
+        [FromForm] int tier,
+        [FromForm] int round,
+        [FromForm] IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("No file uploaded.");
+
+        var savePath = Path.Combine("..", "STB_Frontend", "public", "results", $"season{season}", $"tier{tier}");
+        if (!Directory.Exists(savePath))
+            Directory.CreateDirectory(savePath);
+
+        var filePath = Path.Combine(savePath, $"round{round}.png");
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+            await file.CopyToAsync(stream);
+
+        Console.WriteLine($"✅ Uploaded race result image for Tier {tier}, Round {round}");
+        Console.WriteLine($"📡 Attempting to notify bot...");
+
+        // ✅ Notify the Discord bot
+        try
+        {
+            using var client = new HttpClient();
+            var botUrl = "http://localhost:3000/api/notify-new-result";
+            var payload = new
+            {
+                season,
+                tier,
+                round,
+                imagePath = $"/results/season{season}/tier{tier}/round{round}.png",
+                isFinal = false
+            };
+
+            var json = JsonSerializer.Serialize(payload);
+            Console.WriteLine($"📦 Sending payload: {json}");
+
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(botUrl, content);
+            var responseText = await response.Content.ReadAsStringAsync();
+
+            Console.WriteLine($"[BOT_NOTIFY] Sent POST to {botUrl} (Tier {tier}, Round {round})");
+            Console.WriteLine($"[BOT_NOTIFY] Response: {response.StatusCode} → {responseText}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[WARN] Could not notify bot: {ex.Message}");
+        }
+
+        return Ok(new { message = "Upload successful", path = filePath });
     }
 
     // 🔹 Wachtwoord hash functie

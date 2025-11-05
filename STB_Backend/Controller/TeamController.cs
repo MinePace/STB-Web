@@ -147,6 +147,37 @@ public class TeamController : ControllerBase
         return CreatedAtAction(nameof(GetTeamDriver), new { season = teamDriver.Season, division = teamDriver.Division }, teamDriver);
     }
 
+    [HttpDelete("teamdriver")]
+    public async Task<IActionResult> DeleteTeamDriver([FromBody] TeamDriverRequest td)
+    {
+        if (string.IsNullOrWhiteSpace(td.Driver))
+            return BadRequest(new { message = "Driver name is required." });
+
+        // 1️⃣ Find the driver by name
+        var driver = await _context.Drivers
+            .FirstOrDefaultAsync(d => d.Name.ToLower() == td.Driver.Trim().ToLower());
+
+        if (driver == null)
+            return NotFound(new { message = "Driver not found." });
+
+        // 2️⃣ Find the SeasonalTeamDriver entry
+        var teamDriver = await _context.SeasonalTeamDrivers
+            .FirstOrDefaultAsync(td =>
+                td.Season == td.Season &&
+                td.Division == td.Division &&
+                td.TeamId == td.TeamId &&
+                td.DriverId == driver.Id);
+
+        if (teamDriver == null)
+            return NotFound(new { message = "TeamDriver link not found." });
+
+        // 3️⃣ Delete the entry
+        _context.SeasonalTeamDrivers.Remove(teamDriver);
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "TeamDriver link deleted successfully." });
+    }
+
     [HttpGet("teamdriver/{season}/{division}")]
     public IActionResult GetTeamDriver(int season, int division)
     {

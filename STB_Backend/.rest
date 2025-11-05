@@ -113,7 +113,7 @@ Content-Type: application/json
 
 ##########
 
-GET  http://localhost:5110/api/discordbot/tier-info/3
+GET  http://localhost:5110/api/discordbot/fulltime-drivers/30/4
 
 ##########
 
@@ -125,6 +125,18 @@ PUT http://localhost:5110/api/driver/updateDiscord
 Content-Type: application/json
 
 {
-  "DriverName": "II Mafio II",
-  "DiscordId": "584668797353459730"
+  "DriverName": "Unknown Destiny",
+  "DiscordId": "782299179145101332"
+}
+
+##########
+
+DELETE http://localhost:5110/api/team/teamdriver
+Content-Type: application/json
+
+{
+  "SeasonId": 30,
+  "DivisionId": 4,
+  "TeamId": 3,
+  "Driver": "vett"
 }

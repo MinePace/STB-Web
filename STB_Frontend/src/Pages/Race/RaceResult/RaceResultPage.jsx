@@ -123,25 +123,53 @@ function RaceResultPage() {
     "Cadillac": ""
   };
 
-  // 📸 Function to capture screenshot with transparent corners/background
-  const captureScreenshot = () => {
+  async function captureScreenshot({ raceId, season, tier, round }) {
     const table = document.querySelector(".result-table");
     if (!table) return;
 
     html2canvas(table, {
-      backgroundColor: null,   // ← keep alpha channel (no white background)
-      useCORS: true,           // if you load any images/fonts
-      scale: 2                 // optional: sharper export
-    }).then((canvas) => {
-      const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png"); // PNG supports transparency
-      link.download = `Race_Results_${raceId}.png`;
-      link.click();
-    });
-  };
+      backgroundColor: null, // Keep transparent background
+      useCORS: true,
+      scale: 2
+    }).then(async (canvas) => {
+      // Convert to Blob (better for upload)
+      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+      const file = new File([blob], `Round${round}.png`, { type: "image/png" });
 
+      // 💾 Local download (still optional)
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `Race_Results_Round${round}.png`;
+      link.click();
+
+      // 🌍 Upload to backend to save in /public/results/season#/tier#/
+      const formData = new FormData();
+      formData.append("season", season);
+      formData.append("tier", tier);
+      formData.append("round", round);
+      formData.append("file", file);
+
+      try {
+        const response = await fetch(`http://localhost:5110/api/auth/upload-result`, {
+          method: "POST",
+          body: formData
+        });
+
+        if (response.ok) {
+          console.log(`✅ Uploaded race result image for Tier ${tier}, Round ${round}`);
+        } else {
+          console.error("❌ Failed to upload race result image:", response.statusText);
+        }
+      } catch (err) {
+        console.error("⚠️ Upload error:", err);
+      }
+    });
+  }
 
   const hasAnyTime = raceResults.some(r => r.time && r.time.trim() !== "");
+  const season = race ? race.season : "unknown";
+  const tier = race ? race.division : "unknown";
+  const round = race ? race.round : "unknown";
 
   return (
     <div className="race-page-container">
@@ -156,7 +184,10 @@ function RaceResultPage() {
           {/* Header & basic info always visible */}
           <div className="table-container">
             {raceResults.length > 0 && (
-              <button className="download-button" onClick={captureScreenshot}>
+              <button
+                className="download-button"
+                onClick={() => captureScreenshot({ season, tier, round })}
+              >
                 📸 Save Screenshot
               </button>
             )}
@@ -224,7 +255,16 @@ function RaceResultPage() {
                         </td>
                         {hasAnyTime && (
                           <td>
-                            {row.time ? (index === 0 ? row.time : `+${row.time}`) : ""}
+                            {row.time ? (
+                              <>
+                                {index === 0 ? row.time : `+${row.time}`}
+                                {row.penalty !== 0 && row.penalty !== null && (
+                                  <span className={row.penalty > 0 ? "penalty-inline" : "bonus-inline"}>
+                                    ({row.penalty > 0 ? `+${row.penalty}s` : `${row.penalty}s`})
+                                  </span>
+                                )}
+                              </>
+                            ) : ""}
                           </td>
                         )}
                         <td>{row.qualifying}</td>
