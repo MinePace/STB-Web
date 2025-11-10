@@ -100,7 +100,7 @@ function RaceResultPage() {
   }, [raceId]);
   
   const teamColors = {
-    "Red Bull": "rgb(23, 38, 122)",
+    "Red Bull": "rgba(59, 73, 149, 1)",
     "Mercedes": "rgb(109, 230, 205)",
     "Ferrari": "rgb(231, 0, 0)",
     "McLaren": "rgb(255, 145, 19)",
@@ -148,6 +148,8 @@ function RaceResultPage() {
       formData.append("tier", tier);
       formData.append("round", round);
       formData.append("file", file);
+      formData.append("country", race.track?.country);
+      formData.append("circuit", race.track?.name);
 
       try {
         const response = await fetch(`http://localhost:5110/api/auth/upload-result`, {

@@ -65,7 +65,9 @@ public class AuthController : ControllerBase
         [FromForm] int season,
         [FromForm] int tier,
         [FromForm] int round,
-        [FromForm] IFormFile file)
+        [FromForm] IFormFile file,
+        [FromForm] string country,
+        [FromForm] string circuit)
     {
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded.");
@@ -93,7 +95,9 @@ public class AuthController : ControllerBase
                 tier,
                 round,
                 imagePath = $"/results/season{season}/tier{tier}/round{round}.png",
-                isFinal = false
+                isFinal = false,
+                country,
+                circuit
             };
 
             var json = JsonSerializer.Serialize(payload);

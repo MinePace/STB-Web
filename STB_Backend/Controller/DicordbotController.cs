@@ -328,4 +328,338 @@ public class DiscordbotController : ControllerBase
             race.Date
         });
     }
+
+    [HttpGet("hall-of-fame")]
+    public async Task<IActionResult> GetHallofFame()
+    {
+        // Load all races with their results
+        var races = await _context.Races
+            .Include(r => r.RaceResults)
+            .AsNoTracking()
+            .ToListAsync();
+
+        if (races.Count == 0)
+            return Ok(Array.Empty<object>());
+
+        // 🧩 Load all drivers once (for name-to-DiscordId lookup)
+        var drivers = await _context.Drivers
+            .Select(d => new { d.Name, d.DiscordId })
+            .ToListAsync();
+
+        var result = races
+            .GroupBy(r => r.Season)
+            .OrderBy(g => g.Key)
+            .Select(seasonGroup =>
+            {
+                var season = seasonGroup.Key;
+
+                var winners = seasonGroup
+                    .GroupBy(r => r.Division)
+                    .OrderBy(g => g.Key)
+                    .Select(divGroup =>
+                    {
+                        // ✅ Only include divisions where *every race* has results
+                        bool finished = divGroup.All(r => r.RaceResults != null && r.RaceResults.Any());
+                        if (!finished)
+                            return null;
+
+                        // 🧮 Aggregate all driver stats for this season/division
+                        var driverAgg = divGroup
+                            .SelectMany(r => r.RaceResults)
+                            .Where(rr => !string.IsNullOrEmpty(rr.Driver))
+                            .GroupBy(rr => rr.Driver)
+                            .Select(g => new
+                            {
+                                DriverName = g.Key,
+                                Points = g.Sum(x => x.Points),
+                                Wins = g.Count(x => x.Position == 1)
+                            })
+                            .OrderByDescending(x => x.Points)
+                            .ThenByDescending(x => x.Wins)
+                            .ThenBy(x => x.DriverName)
+                            .FirstOrDefault();
+
+                        if (driverAgg == null)
+                            return null;
+
+                        // 🧭 Try to find DiscordId by driver name (case-insensitive)
+                        var discordId = drivers
+                            .FirstOrDefault(d => d.Name.ToLower() == driverAgg.DriverName.ToLower())
+                            ?.DiscordId;
+
+                        return new
+                        {
+                            Division = divGroup.Key,
+                            Driver = driverAgg.DriverName,
+                            DiscordId = discordId,
+                            Points = driverAgg.Points,
+                            Wins = driverAgg.Wins,
+                            Finished = true
+                        };
+                    })
+                    .Where(w => w != null)
+                    .ToList();
+
+                if (!winners.Any())
+                    return null;
+
+                return new
+                {
+                    Season = season,
+                    Winners = winners
+                };
+            })
+            .Where(s => s != null)
+            .ToList();
+
+        return Ok(result);
+    }
+
+    [HttpGet("history-stats")]
+    public async Task<IActionResult> GetHistoryStats()
+    {
+        var allResults = await _context.RaceResults
+            .AsNoTracking()
+            .ToListAsync();
+
+        if (!allResults.Any())
+            return Ok(new { message = "No race results found." });
+
+        var drivers = await _context.Drivers
+            .Select(d => new { d.Name, d.DiscordId })
+            .ToListAsync();
+
+        Func<string, string?> getDiscordId = (name) =>
+            drivers.FirstOrDefault(d => d.Name.ToLower() == name.ToLower())?.DiscordId;
+
+        // 🏆 Top 10 by Wins
+        var topWins = allResults
+            .Where(r => r.Position == 1)
+            .GroupBy(r => r.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Wins = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderByDescending(x => x.Wins)
+            .Take(10)
+            .ToList();
+
+        // 🥈 Top 10 by Podiums
+        var topPodiums = allResults
+            .Where(r => r.Position >= 1 && r.Position <= 3)
+            .GroupBy(r => r.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Podiums = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderByDescending(x => x.Podiums)
+            .Take(10)
+            .ToList();
+
+        // 💯 Top 10 by Total Points
+        var topPoints = allResults
+            .GroupBy(r => r.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Points = g.Sum(r => r.Points),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderByDescending(x => x.Points)
+            .Take(10)
+            .ToList();
+
+        // 🎯 Top 10 by Poles
+        var topPoles = allResults
+            .Where(r => r.Qualifying == 1)
+            .GroupBy(r => r.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Poles = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderByDescending(x => x.Poles)
+            .Take(10)
+            .ToList();
+
+        // 🏁 Average Finish (≥15 races)
+        var avgFinish = allResults
+            .GroupBy(r => r.Driver)
+            .Where(g => g.Count() >= 15)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                AvgFinish = Math.Round(g.Average(r => r.Position), 2),
+                Races = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderBy(x => x.AvgFinish)
+            .ThenByDescending(x => x.Races)
+            .Take(10)
+            .ToList();
+
+        // 🎯 Average Qualifying (≥15 races)
+        var avgQualifying = allResults
+            .Where(r => r.Qualifying > 0) // ignore missing data
+            .GroupBy(r => r.Driver)
+            .Where(g => g.Count() >= 15)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                AvgQuali = Math.Round(g.Average(r => r.Qualifying), 2),
+                Races = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderBy(x => x.AvgQuali)
+            .ThenByDescending(x => x.Races)
+            .Take(10)
+            .ToList();
+
+        var result = new
+        {
+            generatedAt = DateTime.UtcNow,
+            totalRaces = allResults.Select(r => r.RaceId).Distinct().Count(),
+            totalDrivers = drivers.Count,
+            filters = new { minRacesForAverages = 15 },
+            topWins,
+            topPodiums,
+            topPoints,
+            topPoles,
+            avgFinish,
+            avgQualifying
+        };
+
+        return Ok(result);
+    }
+
+    [HttpGet("history-stats/{division}")]
+    public async Task<IActionResult> GetHistoryStatsByDivision(int division)
+    {
+        // Load race results only for this division
+        var allResults = await _context.RaceResults
+            .Include(r => r.Race)
+            .Where(r => r.Race.Division == division)
+            .AsNoTracking()
+            .ToListAsync();
+
+        if (!allResults.Any())
+            return Ok(new { message = $"No race results found for Division {division}." });
+
+        var drivers = await _context.Drivers
+            .Select(d => new { d.Name, d.DiscordId })
+            .ToListAsync();
+
+        Func<string, string?> getDiscordId = (name) =>
+            drivers.FirstOrDefault(d => d.Name.ToLower() == name.ToLower())?.DiscordId;
+
+        // 🏆 Top 10 by Wins
+        var topWins = allResults
+            .Where(r => r.Position == 1)
+            .GroupBy(r => r.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Wins = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderByDescending(x => x.Wins)
+            .Take(10)
+            .ToList();
+
+        // 🥈 Top 10 by Podiums
+        var topPodiums = allResults
+            .Where(r => r.Position >= 1 && r.Position <= 3)
+            .GroupBy(r => r.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Podiums = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderByDescending(x => x.Podiums)
+            .Take(10)
+            .ToList();
+
+        // 💯 Top 10 by Points
+        var topPoints = allResults
+            .GroupBy(r => r.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Points = g.Sum(r => r.Points),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderByDescending(x => x.Points)
+            .Take(10)
+            .ToList();
+
+        // 🎯 Top 10 by Poles
+        var topPoles = allResults
+            .Where(r => r.Qualifying == 1)
+            .GroupBy(r => r.Driver)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                Poles = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderByDescending(x => x.Poles)
+            .Take(10)
+            .ToList();
+
+        // 🏁 Average Finish (≥15 races)
+        var avgFinish = allResults
+            .GroupBy(r => r.Driver)
+            .Where(g => g.Count() >= 15)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                AvgFinish = Math.Round(g.Average(r => r.Position), 2),
+                Races = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderBy(x => x.AvgFinish)
+            .ThenByDescending(x => x.Races)
+            .Take(10)
+            .ToList();
+
+        // 🎯 Average Qualifying (≥15 races)
+        var avgQualifying = allResults
+            .Where(r => r.Qualifying > 0)
+            .GroupBy(r => r.Driver)
+            .Where(g => g.Count() >= 15)
+            .Select(g => new
+            {
+                Driver = g.Key,
+                AvgQuali = Math.Round(g.Average(r => r.Qualifying), 2),
+                Races = g.Count(),
+                DiscordId = getDiscordId(g.Key)
+            })
+            .OrderBy(x => x.AvgQuali)
+            .ThenByDescending(x => x.Races)
+            .Take(10)
+            .ToList();
+
+        var result = new
+        {
+            division,
+            generatedAt = DateTime.UtcNow,
+            totalRaces = allResults.Select(r => r.RaceId).Distinct().Count(),
+            totalDrivers = drivers.Count,
+            filters = new { minRacesForAverages = 15 },
+            topWins,
+            topPodiums,
+            topPoints,
+            topPoles,
+            avgFinish,
+            avgQualifying
+        };
+
+        return Ok(result);
+    }
 }

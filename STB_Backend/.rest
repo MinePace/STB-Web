@@ -113,11 +113,11 @@ Content-Type: application/json
 
 ##########
 
-GET  http://localhost:5110/api/discordbot/fulltime-drivers/30/4
+GET  http://localhost:5110/api/team/teamdriver/30/1
 
 ##########
 
-GET  http://localhost:5110/api/discordbot/get-race/1/10
+GET  http://localhost:5110/api/fastestlap/30/5
 
 ##########
 
@@ -125,18 +125,19 @@ PUT http://localhost:5110/api/driver/updateDiscord
 Content-Type: application/json
 
 {
-  "DriverName": "Unknown Destiny",
-  "DiscordId": "782299179145101332"
+  "DriverName": "SKY PedroPPC",
+  "DiscordId": "1023001658713710612"
 }
 
 ##########
 
-DELETE http://localhost:5110/api/team/teamdriver
-Content-Type: application/json
-
-{
-  "SeasonId": 30,
-  "DivisionId": 4,
-  "TeamId": 3,
-  "Driver": "vett"
-}
+eastiew208
+Brianm147475
+georgehutch14
+Kiskit
+Fi55ter
+DJ D4nny
+AlexG_IV2
+Silentpistol
+Boshmaster22
+SKY PedroPPC

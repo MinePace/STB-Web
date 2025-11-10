@@ -103,7 +103,7 @@ public sealed class WinnerDto
 {
     public int Division { get; set; }
     public string Driver { get; set; } = "";
-    public int Points { get; set; }
+    public decimal Points { get; set; }
     public int Wins { get; set; }
     public bool Finished { get; set; }
     public string? Message { get; set; } 

@@ -368,14 +368,22 @@ const downloadTableAsImage = async () => {
                       const groupedRace = sortedDrivers.groupedRaces?.[round];
                       const RaceId = groupedRace?.mainRace?.id || groupedRace?.sprintRace?.id;
 
+                      const fastestLap = fastestLapData.some(
+                        (lap) => lap.raceId === RaceId && lap.driver.name === driver
+                      );
+
                       const pos = sortedDrivers.racePositions?.[round]?.[driver];
                       const bg =
-                        pos === 1 ? "rgb(255, 215, 0)" :
-                        pos === 2 ? "rgb(211, 211, 211)" :
-                        pos === 3 ? "rgb(165, 107, 49)" : "transparent";
+                        pos === 1 ? "rgb(255, 215, 0)" : // Gold
+                        pos === 2 ? "rgb(211, 211, 211)" : // Silver
+                        pos === 3 ? "rgb(165, 107, 49)" : // Bronze
+                        "transparent";
+
+                      const textColor =
+                        fastestLap ? "rgba(225, 116, 255, 1)" : "white";
 
                       return (
-                        <td key={round} style={{ backgroundColor: bg }}>
+                        <td key={round} style={{ backgroundColor: bg, color: textColor }}>
                           {driversraces[round] === "DNF" ? (
                             <Link to={`/STB/Race/${RaceId}`} className="race-dnf">DNF</Link>
                           ) : RaceId ? (

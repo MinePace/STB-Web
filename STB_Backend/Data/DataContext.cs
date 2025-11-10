@@ -39,7 +39,7 @@ public class RaceResult
     public string Driver { get; set; }
     public int TeamId { get; set; }
     public string Team { get; set; }
-    public int Points { get; set; }
+    public decimal Points { get; set; }
     public string DNF { get; set; }
     public int Pos_Change { get; set; }
     public int Qualifying { get; set; }

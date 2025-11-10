@@ -57,6 +57,24 @@ export default function AddRaceResults() {
               if (target) {
                 setSelectedRace(target);
                 initResultsForRace(target, setRaceResults);
+
+                // 👇 Automatically load seasonal team-driver links (same as handleRaceSelect)
+                try {
+                  const loadLinks = async () => {
+                    console.log(`📡 Auto-fetching team-driver links for S${target.season} T${target.division}`);
+                    const res = await fetch(
+                      `http://localhost:5110/api/team/teamdriver/${target.season}/${target.division}`
+                    );
+                    if (!res.ok) throw new Error("Failed to fetch team-driver links");
+                    const data = await res.json();
+                    console.log("🟩 [Auto-load team-driver links]", data);
+                    setTeamDriverLinks(data || []);
+                  };
+                  loadLinks();
+                } catch (err) {
+                  console.error("TeamDriver auto-fetch error:", err);
+                  setTeamDriverLinks([]);
+                }
               }
             }
           });

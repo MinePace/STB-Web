@@ -69,7 +69,7 @@ public class RaceResultController : ControllerBase
         // 2) Convert "Yes"/"No" sprint field to bool
         //    and build tuple collection
         IEnumerable<(int RaceId, int Round, string Name, bool Sprint, DateTime? Date,
-                    IEnumerable<(string Driver, int? TeamId, int Points)> Results)> steps;
+                    IEnumerable<(string Driver, int? TeamId, decimal Points)> Results)> steps;
 
         if (!aggregateByRound)
         {
@@ -109,7 +109,7 @@ public class RaceResultController : ControllerBase
         }
 
         // 3) Build cumulative standings
-        var cumulative = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var cumulative = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
         var outSteps = new List<object>();
 
         foreach (var s in steps)
@@ -206,7 +206,7 @@ public class RaceResultController : ControllerBase
         public string Driver { get; set; }
         public string Team { get; set; }
         public int TeamId { get; set; }
-        public int Points { get; set; }
+        public decimal Points { get; set; }
         public string DNF { get; set; }
         public int Qualifying { get; set; }
         public int Pos_Change { get; set; }
