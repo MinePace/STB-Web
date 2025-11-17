@@ -32,7 +32,9 @@ public class DiscordbotController : ControllerBase
     public IActionResult GetDriverStats(string driverName)
     {
         var driverResults = _context.RaceResults
-            .Where(r => r.Driver == driverName)
+            .Include(r => r.Driver)
+            .Include(r => r.Team)
+            .Where(r => r.Driver.Name == driverName)
             .ToList();
 
 
@@ -51,7 +53,7 @@ public class DiscordbotController : ControllerBase
         var fastestLaps = _context.FastestLaps.Include(fl => fl.Driver).Count(fl => fl.Driver.Name == driverName);
 
         var lastRace = _context.Races
-            .Where(r => r.RaceResults.Any(rr => rr.Driver == driverName))
+            .Where(r => r.RaceResults.Any(rr => rr.Driver.Name == driverName))
             .OrderByDescending(r => r.Division)
             .ThenByDescending(r => r.Season)
             .ThenByDescending(r => r.Round)
@@ -73,7 +75,7 @@ public class DiscordbotController : ControllerBase
             .FirstOrDefault();
 
         var allRaces = _context.Races
-            .Where(r => r.RaceResults.Any(rr => rr.Driver == driverName))
+            .Where(r => r.RaceResults.Any(rr => rr.Driver.Name == driverName))
             .OrderByDescending(r => r.Division)
             .ThenByDescending(r => r.Season)
             .ThenByDescending(r => r.Round)
@@ -124,6 +126,9 @@ public class DiscordbotController : ControllerBase
         var races = _context.Races
             .Where(r => r.Season == latestSeason && r.Division == tier)
             .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Team)
             .AsNoTracking()
             .ToList();
 
@@ -170,11 +175,15 @@ public class DiscordbotController : ControllerBase
         // 5️⃣ Calculate total points per driver
         var championship = races
             .SelectMany(r => r.RaceResults)
-            .GroupBy(rr => rr.Driver)
+            .GroupBy(rr => rr.Driver.Name)
             .Select(g => new
             {
                 Driver = g.Key,
-                Points = g.Sum(rr => rr.Points)
+                DiscordId = _context.Drivers
+                    .Where(d => d.Name == g.Key)
+                    .Select(d => d.DiscordId)
+                    .FirstOrDefault(),
+                Points = g.Sum(rr => (decimal)rr.Points)
             })
             .OrderByDescending(x => x.Points)
             .ToList();
@@ -182,12 +191,12 @@ public class DiscordbotController : ControllerBase
         // 6️⃣ Calculate total points per team (Constructors)
         var constructors = races
             .SelectMany(r => r.RaceResults)
-            .Where(rr => !string.IsNullOrEmpty(rr.Team))
-            .GroupBy(rr => rr.Team)
+            .Where(rr => !string.IsNullOrEmpty(rr.Team.Name))
+            .GroupBy(rr => rr.Team.Name)
             .Select(g => new
             {
                 Team = g.Key,
-                Points = g.Sum(rr => rr.Points)
+                Points = g.Sum(rr => (decimal)rr.Points)
             })
             .OrderByDescending(x => x.Points)
             .Take(3) // Only top 3
@@ -335,6 +344,9 @@ public class DiscordbotController : ControllerBase
         // Load all races with their results
         var races = await _context.Races
             .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Team)
             .AsNoTracking()
             .ToListAsync();
 
@@ -366,17 +378,17 @@ public class DiscordbotController : ControllerBase
                         // 🧮 Aggregate all driver stats for this season/division
                         var driverAgg = divGroup
                             .SelectMany(r => r.RaceResults)
-                            .Where(rr => !string.IsNullOrEmpty(rr.Driver))
+                            .Where(rr => !string.IsNullOrEmpty(rr.Driver.Name))
                             .GroupBy(rr => rr.Driver)
                             .Select(g => new
                             {
-                                DriverName = g.Key,
+                                Driver = g.Key,
                                 Points = g.Sum(x => x.Points),
                                 Wins = g.Count(x => x.Position == 1)
                             })
                             .OrderByDescending(x => x.Points)
                             .ThenByDescending(x => x.Wins)
-                            .ThenBy(x => x.DriverName)
+                            .ThenBy(x => x.Driver.Name)
                             .FirstOrDefault();
 
                         if (driverAgg == null)
@@ -384,13 +396,13 @@ public class DiscordbotController : ControllerBase
 
                         // 🧭 Try to find DiscordId by driver name (case-insensitive)
                         var discordId = drivers
-                            .FirstOrDefault(d => d.Name.ToLower() == driverAgg.DriverName.ToLower())
+                            .FirstOrDefault(d => d.Name.ToLower() == driverAgg.Driver.Name.ToLower())
                             ?.DiscordId;
 
                         return new
                         {
                             Division = divGroup.Key,
-                            Driver = driverAgg.DriverName,
+                            Driver = driverAgg.Driver.Name,
                             DiscordId = discordId,
                             Points = driverAgg.Points,
                             Wins = driverAgg.Wins,
@@ -419,6 +431,8 @@ public class DiscordbotController : ControllerBase
     public async Task<IActionResult> GetHistoryStats()
     {
         var allResults = await _context.RaceResults
+            .Include(r => r.Driver)
+            .Include(r => r.Team)
             .AsNoTracking()
             .ToListAsync();
 
@@ -429,8 +443,8 @@ public class DiscordbotController : ControllerBase
             .Select(d => new { d.Name, d.DiscordId })
             .ToListAsync();
 
-        Func<string, string?> getDiscordId = (name) =>
-            drivers.FirstOrDefault(d => d.Name.ToLower() == name.ToLower())?.DiscordId;
+        Func<Driver, string?> getDiscordId = (driver) =>
+            drivers.FirstOrDefault(d => d.Name.ToLower() == driver.Name.ToLower())?.DiscordId;
 
         // 🏆 Top 10 by Wins
         var topWins = allResults
@@ -543,6 +557,8 @@ public class DiscordbotController : ControllerBase
         // Load race results only for this division
         var allResults = await _context.RaceResults
             .Include(r => r.Race)
+            .Include(r => r.Driver)
+            .Include(r => r.Team)
             .Where(r => r.Race.Division == division)
             .AsNoTracking()
             .ToListAsync();
@@ -554,8 +570,8 @@ public class DiscordbotController : ControllerBase
             .Select(d => new { d.Name, d.DiscordId })
             .ToListAsync();
 
-        Func<string, string?> getDiscordId = (name) =>
-            drivers.FirstOrDefault(d => d.Name.ToLower() == name.ToLower())?.DiscordId;
+        Func<Driver, string?> getDiscordId = (driver) =>
+            drivers.FirstOrDefault(d => d.Name.ToLower() == driver.Name.ToLower())?.DiscordId;
 
         // 🏆 Top 10 by Wins
         var topWins = allResults
@@ -661,5 +677,20 @@ public class DiscordbotController : ControllerBase
         };
 
         return Ok(result);
+    }
+
+    [HttpPut("name-change/{discordId}")]
+    public async Task<IActionResult> ChangeDriverName(string discordId, string name)
+    {
+        var driver = await _context.Drivers.FirstOrDefaultAsync(d => d.DiscordId == discordId);
+        if (driver == null)
+            return NotFound(new { message = "Driver not found for the provided Discord ID." });
+
+        var oldName = driver.Name;
+
+        driver.Name = name;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Driver name updated successfully.", driver, oldName });
     }
 }

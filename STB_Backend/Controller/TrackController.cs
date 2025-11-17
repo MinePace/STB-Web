@@ -31,7 +31,7 @@ public class TrackController : ControllerBase
     }
 
     [HttpGet()]
-    public IActionResult GetAllTrack(int id)
+    public IActionResult GetAllTrack()
     {
         var tracks = _context.Tracks
             .ToListAsync();
@@ -48,6 +48,9 @@ public class TrackController : ControllerBase
         var trackraces = _context.Races
             .Where(r => r.Track.Id == id)
             .Include(r => r.RaceResults)
+                .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+                .ThenInclude(rr => rr.Team)
             .ToList();
 
         if (trackraces == null)

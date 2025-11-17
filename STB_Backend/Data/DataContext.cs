@@ -36,9 +36,10 @@ public class RaceResult
     [JsonIgnore]
     public Race Race { get; set; }
     public int Position { get; set; }
-    public string Driver { get; set; }
+    public int DriverId { get; set; }
+    public Driver Driver { get; set; }
     public int TeamId { get; set; }
-    public string Team { get; set; }
+    public Team Team { get; set; }
     public decimal Points { get; set; }
     public string DNF { get; set; }
     public int Pos_Change { get; set; }

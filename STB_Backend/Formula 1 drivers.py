@@ -1,58 +1,27 @@
-import sqlite3
-import os
-from contextlib import closing
+import requests
 
-DB_PATH = r"C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\Data\Data.db"
+API_URL = "http://localhost:5110/api/driver/updateDiscord"
 
-def main():
-    if not os.path.exists(DB_PATH):
-        print(f"[ERROR] Database not found: {DB_PATH}")
-        return 1
+# 📝 Your list of drivers & Discord IDs
+drivers = [
+    {"driverName": "ray", "discordId": "1158822965719351307"},
+    # Add more here...
+]
 
-    with closing(sqlite3.connect(DB_PATH)) as conn:
-        conn.execute("PRAGMA foreign_keys = OFF;")
-        cur = conn.cursor()
+for entry in drivers:
+    payload = {
+        "driverName": entry["driverName"],
+        "discordId": entry["discordId"]
+    }
 
-        # Check if column exists
-        cur.execute("PRAGMA table_info(RaceResults);")
-        cols = [r[1] for r in cur.fetchall()]
-        if "TeamId" not in cols:
-            print("[INFO] RaceResults.TeamId column does not exist — nothing to remove.")
-            return 0
+    try:
+        response = requests.put(API_URL, json=payload)
 
-        print("[INFO] Removing column 'TeamId' from RaceResults...")
+        if response.status_code == 200:
+            print(f"✅ Updated {entry['driverName']} → Discord {entry['discordId']}")
+        else:
+            print(f"❌ Failed for {entry['driverName']}: HTTP {response.status_code}")
+            print(response.text)
 
-        # 1️⃣ Get the current schema (minus TeamId)
-        cur.execute("PRAGMA table_info(RaceResults);")
-        columns = [r[1] for r in cur.fetchall() if r[1].lower() != "teamid"]
-        column_list = ", ".join(columns)
-
-        # 2️⃣ Rename the old table
-        cur.execute("ALTER TABLE RaceResults RENAME TO RaceResults_old;")
-
-        # 3️⃣ Recreate the new RaceResults table (without TeamId)
-        # Extract schema from old table definition
-        cur.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name='RaceResults_old';")
-        create_sql = cur.fetchone()[0]
-
-        # Remove the TeamId column definition from the CREATE TABLE statement
-        import re
-        create_sql_new = re.sub(r",?\s*\"?TeamId\"?\s+\w+(\s+NOT\s+NULL)?(\s+DEFAULT\s+\S+)?", "", create_sql)
-        create_sql_new = create_sql_new.replace("RaceResults_old", "RaceResults")
-
-        conn.executescript(create_sql_new)
-        print("[INFO] New RaceResults table created.")
-
-        # 4️⃣ Copy all data except TeamId
-        conn.execute(f"INSERT INTO RaceResults ({column_list}) SELECT {column_list} FROM RaceResults_old;")
-        print("[INFO] Data copied successfully.")
-
-        # 5️⃣ Drop old table
-        conn.execute("DROP TABLE RaceResults_old;")
-        conn.execute("PRAGMA foreign_keys = ON;")
-        conn.commit()
-
-        print("[SUCCESS] Column 'TeamId' removed successfully!")
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+    except Exception as e:
+        print(f"🔥 Error updating {entry['driverName']}: {e}")

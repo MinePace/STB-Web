@@ -7,7 +7,6 @@ import "@/Components/Links.css";
 
 const MAP_EXCEPTIONS = {
   "United States": {
-    // you can keep short labels; loose matcher will still find them
     "Circuit of the Americas": "/track_map/United_States_COTA.avif",
     "Miami": "/track_map/United_States_Miami.avif",
     "Las Vegas": "/track_map/United_States_Las_Vegas.avif",
@@ -19,34 +18,28 @@ const MAP_EXCEPTIONS = {
   Malaysia: {
     "Sepang": "/track_map/Malaysia.png"
   }
-  // add more…
 };
 
 function slugCountry(c) {
   return encodeURIComponent(String(c).trim().replace(/\s+/g, "_"));
 }
+
 function slugTrack(t) {
   return encodeURIComponent(String(t).trim().replace(/\s+/g, "_"));
 }
 
-// case-insensitive equality
 const eqCI = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
-
-// case-insensitive “includes”
 const incCI = (hay, needle) =>
   String(hay).toLowerCase().includes(String(needle).toLowerCase());
 
-/** Build the ordered list of map candidates for this track */
 function getMapCandidates({ country, name }) {
   const out = [];
 
   if (country && MAP_EXCEPTIONS[country]) {
     const byCountry = MAP_EXCEPTIONS[country];
 
-    // 1a) exact key match
     if (byCountry[name]) out.push(byCountry[name]);
     else {
-      // 1b) loose match: any exception key contained in the track name (or vice versa)
       const keys = Object.keys(byCountry);
       const k = keys.find(
         (key) => eqCI(key, name) || incCI(name, key) || incCI(key, name)
@@ -55,17 +48,14 @@ function getMapCandidates({ country, name }) {
     }
   }
 
-  // 2) country + track (follow your underscore convention)
   if (country && name) {
     out.push(`/track_map/${slugCountry(country)}_${slugTrack(name)}.avif`);
   }
 
-  // 3) country fallback
   if (country) {
     out.push(`/track_map/${slugCountry(country)}.avif`);
   }
 
-  console.log("[TrackPage] Map candidates for:", { country, name }, "→", out);
   return out;
 }
 
@@ -76,6 +66,7 @@ function TrackPage() {
 
   const [trackInfo, setTrackInfo] = useState(null);
   const [trackRaces, setTrackRaces] = useState([]);
+
   const mostWins = useMemo(
     () => topWinnerFirstAchievedBySeason(trackRaces, { includeSprint: true }),
     [trackRaces]
@@ -87,8 +78,8 @@ function TrackPage() {
   const [errorRaces, setErrorRaces] = useState(null);
 
   const [mapOk, setMapOk] = useState(true);
-  const [mapIdx, setMapIdx] = useState(0); // index into candidates
-  const [expanded, setExpanded] = useState({});
+  const [mapIdx, setMapIdx] = useState(0);
+  const [expanded] = useState({});
 
   useEffect(() => {
     let abort = false;
@@ -98,18 +89,11 @@ function TrackPage() {
         const res = await fetch(
           `http://localhost:5110/api/track/${encodeURIComponent(trackId || "")}`
         );
-        if (!res.ok) {
-          let msg = `Failed to fetch track info (${res.status})`;
-          try {
-            const body = await res.json();
-            if (body?.message) msg = body.message;
-          } catch {}
-          throw new Error(msg);
-        }
+        if (!res.ok) throw new Error("Failed to fetch track info");
         const data = await res.json();
         if (!abort) setTrackInfo(data);
       } catch (err) {
-        if (!abort) setErrorInfo(err.message || "Could not load track info.");
+        if (!abort) setErrorInfo(err.message);
       } finally {
         if (!abort) setLoadingInfo(false);
       }
@@ -118,21 +102,18 @@ function TrackPage() {
     (async () => {
       try {
         const res = await fetch(
-          `http://localhost:5110/api/track/races/${encodeURIComponent(
-            trackId || ""
-          )}`
+          `http://localhost:5110/api/track/races/${encodeURIComponent(trackId || "")}`
         );
-        if (!res.ok) throw new Error(`Failed to fetch track races (${res.status})`);
+        if (!res.ok) throw new Error("Failed to fetch track races");
         const races = await res.json();
         if (!abort) setTrackRaces(Array.isArray(races) ? races : []);
       } catch (err) {
-        if (!abort) setErrorRaces(err.message || "Could not load track races.");
+        if (!abort) setErrorRaces(err.message);
       } finally {
         if (!abort) setLoadingRaces(false);
       }
     })();
 
-    // reset map fallback state whenever the track changes
     setMapOk(true);
     setMapIdx(0);
 
@@ -148,10 +129,8 @@ function TrackPage() {
 
   const { name, raceName, country, length, turns } = trackInfo;
 
-  // build candidates and pick current one
   const mapCandidates = getMapCandidates({ country, name });
   const mapSrc = mapOk && mapCandidates.length ? mapCandidates[mapIdx] : null;
-  console.log("[TrackPage] Using map candidate index", mapIdx, "→", mapSrc);
 
   return (
     <div className="tp-container">
@@ -163,12 +142,10 @@ function TrackPage() {
               <img
                 src={`/flags/${country}.png`}
                 alt={`${country} flag`}
-                title={country}
                 className="tp-flag"
-                aria-hidden="true"
               />
             )}
-            <h1 className="tp-title">{name ?? "Unknown Track"}</h1>
+            <h1 className="tp-title">{name}</h1>
             <p className="tp-subtitle">
               {[raceName, country].filter(Boolean).join(" · ") || "—"}
             </p>
@@ -179,28 +156,30 @@ function TrackPage() {
               <div className="tp-stat-value">{formatLength(length)}</div>
               <div className="tp-stat-label">Track Length</div>
             </div>
+
             <div className="tp-stat">
               <div className="tp-stat-value">{turns ?? "—"}</div>
               <div className="tp-stat-label">Turns</div>
             </div>
+
             <div className="tp-stat">
               <div className="tp-stat-value">{trackRaces.length}</div>
               <div className="tp-stat-label">Events at Track</div>
             </div>
+
             <div className="tp-stat">
               <div className="tp-stat-value">{mostWins?.count ?? "—"}</div>
               <div className="tp-stat-sub">
-  <span className="tp-stat-label">Most wins:</span>
-  {mostWins?.name && (
-    <Link
-      className="primary-link tp-stat-winner"
-      to={`/STB/Driver/${encodeURIComponent(mostWins.name)}`}
-    >
-      {mostWins.name}
-    </Link>
-  )}
-</div>
-
+                <span className="tp-stat-label">Most wins:</span>
+                {mostWins?.name && (
+                  <Link
+                    to={`/STB/Driver/${encodeURIComponent(mostWins.name)}`}
+                    className="primary-link tp-stat-winner"
+                  >
+                    {mostWins.name}
+                  </Link>
+                )}
+              </div>
             </div>
           </section>
         </div>
@@ -214,35 +193,16 @@ function TrackPage() {
                 className="tp-map"
                 loading="lazy"
                 onError={() => {
-                  console.warn("[TrackPage] Failed to load map:", mapSrc);
                   setMapIdx((i) => {
                     const next = i + 1;
-                    if (next < mapCandidates.length) {
-                      console.log(
-                        "[TrackPage] Trying next map candidate:",
-                        mapCandidates[next]
-                      );
-                      return next;
-                    }
+                    if (next < mapCandidates.length) return next;
                     setMapOk(false);
                     return i;
                   });
                 }}
               />
             ) : (
-              <div className="tp-map-fallback">
-                No map available
-                {mapCandidates?.length ? (
-                  <details style={{ marginTop: 8 }}>
-                    <summary>Tried paths</summary>
-                    <ul style={{ marginTop: 6 }}>
-                      {mapCandidates.map((p, i) => (
-                        <li key={i}>{p}</li>
-                      ))}
-                    </ul>
-                  </details>
-                ) : null}
-              </div>
+              <div className="tp-map-fallback">No map available</div>
             )}
           </div>
         </aside>
@@ -251,10 +211,9 @@ function TrackPage() {
       {/* EVENTS & RESULTS */}
       <section className="tp-section">
         <h2 className="tp-section-title">Events & Results</h2>
-        {errorRaces && <div className="tp-error">⚠️ {errorRaces}</div>}
 
         {trackRaces.length === 0 ? (
-          <div className="tp-empty">No events found for this track.</div>
+          <div className="tp-empty">No events found.</div>
         ) : (
           <div className="tp-rounds tp-rounds-2">
             {trackRaces
@@ -264,10 +223,8 @@ function TrackPage() {
                 const results = (r.raceResults ?? [])
                   .slice()
                   .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
-                const MAX = 3;
-                const showAll = !!expanded[r.id];
-                const visible = showAll ? results : results.slice(0, MAX);
-                const hiddenCount = results.length - visible.length;
+
+                const visible = results.slice(0, 3);
 
                 return (
                   <article className="tp-round-card" key={r.id}>
@@ -276,9 +233,9 @@ function TrackPage() {
                       <div className="tp-round-sub">
                         Season {r.season} · Tier {r.division} · Round {r.round}
                         {r.date ? ` - ${formatDate(r.date)}` : ""}
-                        {r.sprint === "Yes" ? (
+                        {r.sprint === "Yes" && (
                           <span className="tp-badge tp-badge-sprint">Sprint</span>
-                        ) : null}
+                        )}
                       </div>
                     </div>
 
@@ -288,18 +245,21 @@ function TrackPage() {
                         <div>Driver</div>
                         <div className="tp-right">Pts</div>
                       </div>
+
                       <div className="tp-results-body">
                         {visible.map((res, i) => (
                           <div className="tp-result-row" key={i}>
                             <div className={`tp-pos ${medalClass(res.position)}`}>
                               {posLabel(res)}
                             </div>
+
                             <Link
-                              to={`/STB/Driver/${encodeURIComponent(res.driver)}`}
+                              to={`/STB/Driver/${encodeURIComponent(res.driver?.name ?? "")}`}
                               className="primary-link"
                             >
-                              {res.driver}
+                              {res.driver?.name ?? "Unknown"}
                             </Link>
+
                             <div className="tp-right">
                               {isDNF(res) ? (
                                 <span className="tp-tag tp-tag-dnf">DNF</span>
@@ -312,12 +272,8 @@ function TrackPage() {
                       </div>
                     </div>
 
-                    {hiddenCount > 0 && (
-                      <Link
-                        to={`/STB/Race/${r.id}`}
-                        className="tp-showmore"
-                        aria-label={`Go to results for race ${r.id}`}
-                      >
+                    {results.length > 3 && (
+                      <Link to={`/STB/Race/${r.id}`} className="tp-showmore">
                         View Race Result
                       </Link>
                     )}
@@ -332,14 +288,15 @@ function TrackPage() {
 }
 
 /* ---------- helpers ---------- */
+
 function formatLength(val) {
   if (val == null) return "—";
   return `${Number(val).toFixed(3)} km`;
 }
+
 function formatDate(d) {
   try {
-    const dt = new Date(d);
-    return dt.toLocaleDateString(undefined, {
+    return new Date(d).toLocaleDateString(undefined, {
       year: "numeric",
       month: "short",
       day: "2-digit",
@@ -348,36 +305,41 @@ function formatDate(d) {
     return d ?? "—";
   }
 }
+
 function isDNF(res) {
   return res?.dnf === "Yes" || res?.dnf === "DNF";
 }
+
 function posLabel(res) {
   if (typeof res?.position === "number") return `P${res.position}`;
   return isDNF(res) ? "DNF" : "—";
 }
+
 function toPosSortKey(res) {
   return typeof res?.position === "number"
     ? res.position
     : Number.POSITIVE_INFINITY;
 }
+
 function medalClass(position) {
   if (position === 1) return "tp-medal tp-medal-1";
   if (position === 2) return "tp-medal tp-medal-2";
   if (position === 3) return "tp-medal tp-medal-3";
   return "";
 }
+
 function compareBySeasonRound(a, b) {
   const sa = Number(a.season ?? -Infinity);
   const sb = Number(b.season ?? -Infinity);
-  if (sb !== sa) return sb - sa; // season DESC
+  if (sb !== sa) return sb - sa;
   const ra = Number(a.round ?? -Infinity);
   const rb = Number(b.round ?? -Infinity);
-  return rb - ra; // round DESC
+  return rb - ra;
 }
+
 function topWinnerFirstAchievedBySeason(races, { includeSprint = true } = {}) {
   if (!Array.isArray(races) || races.length === 0) return null;
 
-  // season ↑, round ↑ (numbers; missing treated as +∞ so they come last)
   const asc = [...races].sort((a, b) => {
     const sa = Number(a?.season);
     const sb = Number(b?.season);
@@ -396,30 +358,21 @@ function topWinnerFirstAchievedBySeason(races, { includeSprint = true } = {}) {
     if (!includeSprint && r?.sprint === "Yes") continue;
 
     const winner = (r?.raceResults || []).find(rr => rr?.position === 1);
-    if (!winner?.driver) continue;
+    if (!winner?.driver?.name) continue;
 
-    const next = (counts.get(winner.driver) || 0) + 1;
-    counts.set(winner.driver, next);
+    const driverName = winner.driver.name;
 
-    // Use ">" so the first to surpass becomes/keeps the leader.
+    const next = (counts.get(driverName) || 0) + 1;
+    counts.set(driverName, next);
+
     if (next > leaderCount) {
       leaderCount = next;
-      leaderName = winner.driver;
+      leaderName = driverName;
     }
   }
 
   if (!leaderName) return null;
   return { count: leaderCount, name: leaderName };
 }
-
-function joinWithDelimiters(items, comma = ", ", last = " and ") {
-  const out = [];
-  items.forEach((el, i) => {
-    if (i > 0) out.push(<span key={`sep-${i}`}>{i === items.length - 1 ? last : comma}</span>);
-    out.push(el);
-  });
-  return out;
-}
-
 
 export default TrackPage;

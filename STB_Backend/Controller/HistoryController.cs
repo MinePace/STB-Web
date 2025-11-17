@@ -24,6 +24,9 @@ public class HistoryController : ControllerBase
         // Load all races with their results. NoTracking for speed.
         var races = await _context.Races
             .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Team)
             .AsNoTracking()
             .ToListAsync();
 
@@ -62,13 +65,13 @@ public class HistoryController : ControllerBase
                             .GroupBy(rr => rr.Driver) // if you have DriverId use rr.DriverId instead
                             .Select(g => new
                             {
-                                DriverName = g.Key,                    // if Driver is nav: g.First().Driver.Name
+                                Driver = g.Key,                    // if Driver is nav: g.First().Driver.Name
                                 Points = g.Sum(x => x.Points),         // adjust if your points field differs
                                 Wins = g.Count(x => x.Position == 1)   // adjust if your win condition differs
                             })
                             .OrderByDescending(x => x.Points)
                             .ThenByDescending(x => x.Wins)
-                            .ThenBy(x => x.DriverName)
+                            .ThenBy(x => x.Driver)
                             .FirstOrDefault();
 
                         if (driverAgg == null)
@@ -85,7 +88,7 @@ public class HistoryController : ControllerBase
                         return new WinnerDto
                         {
                             Division = divGroup.Key,
-                            Driver = driverAgg.DriverName,
+                            Driver = driverAgg.Driver.Name,
                             Points = driverAgg.Points,
                             Wins = driverAgg.Wins,
                             Finished = true

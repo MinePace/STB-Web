@@ -62,7 +62,9 @@ public class DriverController : ControllerBase
     public IActionResult GetDriverStats(string driverName)
     {
         var driverResults = _context.RaceResults
-            .Where(r => r.Driver == driverName)
+            .Where(r => r.Driver.Name == driverName)
+            .Include(r => r.Driver)
+            .Include(r => r.Team)
             .ToList();
 
 
@@ -81,7 +83,11 @@ public class DriverController : ControllerBase
         var fastestLaps = _context.FastestLaps.Include(fl => fl.Driver).Count(fl => fl.Driver.Name == driverName);
 
         var lastRace = _context.Races
-            .Where(r => r.RaceResults.Any(rr => rr.Driver == driverName))
+            .Where(r => r.RaceResults.Any(rr => rr.Driver.Name == driverName))
+            .Include(r => r.RaceResults)
+                .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+                .ThenInclude(rr => rr.Team)
             .OrderByDescending(r => r.Division)
             .ThenByDescending(r => r.Season)
             .ThenByDescending(r => r.Round)
@@ -94,7 +100,11 @@ public class DriverController : ControllerBase
             .FirstOrDefault();
 
         var allRaces = _context.Races
-            .Where(r => r.RaceResults.Any(rr => rr.Driver == driverName))
+            .Where(r => r.RaceResults.Any(rr => rr.Driver.Name == driverName))
+            .Include(r => r.RaceResults)
+                .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+                .ThenInclude(rr => rr.Team)
             .OrderByDescending(r => r.Division)
             .ThenByDescending(r => r.Season)
             .ThenByDescending(r => r.Round)
@@ -141,7 +151,7 @@ public class DriverController : ControllerBase
         var driver  = _context.RaceResults
             .Where(d => d.Race.Season == season)
             .Where(d => d.Driver != null)
-            .Select(d => d.Driver) // Only get the driver names
+            .Select(d => d.Driver.Name) // Only get the driver names
             .Distinct()
             .ToList();
 
@@ -179,7 +189,7 @@ public class DriverController : ControllerBase
         return NotFound(new { message = "No driver was found with this user id." });
 
     var appearances = _context.RaceResults
-        .Where(rr => rr.Driver == driver.Name)
+        .Where(rr => rr.Driver.Name == driver.Name)
         .Select(rr => new
         {
             Season = rr.Race.Season,

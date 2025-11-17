@@ -67,12 +67,15 @@ public class RaceController : ControllerBase
     }
 
     [HttpGet("race/{id}")]
-    public IActionResult GetRacesById(int id)
+    public IActionResult GetRaceById(int id)
     {
         var race = _context.Races
             .Where(r => r.Id == id)
             .Include(r => r.Track)
             .Include(r => r.RaceResults.OrderBy(rr => rr.Position))
+                .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+                .ThenInclude(rr => rr.Team)
             .FirstOrDefault();
 
         var fastestLap = _context.FastestLaps
@@ -136,6 +139,9 @@ public class RaceController : ControllerBase
         var raceResults = _context.Races
             .Where(r => r.Id == raceId)
             .Include(r => r.RaceResults)
+                .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+                .ThenInclude(rr => rr.Team)
             .ToList();
 
         if (!raceResults.Any())
@@ -168,6 +174,10 @@ public class RaceController : ControllerBase
                     _context.Drivers.Add(existingDriver);
                     await _context.SaveChangesAsync();
                 }
+
+                var team = await _context.Teams
+                .FirstOrDefaultAsync(t => t.Name == result.Team);
+
                 if (result.DNF == "Yes")
                 { result.Points = 0; }
                 if (result.FastestLap)
@@ -192,14 +202,15 @@ public class RaceController : ControllerBase
                     RaceId = result.RaceId,
                     Race = await _context.Races.FindAsync(result.RaceId),
                     Position = result.Position,
-                    Driver = result.Driver,
-                    Team = result.Team,
+                    Driver = existingDriver,
+                    DriverId = existingDriver.Id,
+                    Team = team,
+                    TeamId = team.Id,
                     Points = result.Points,
                     DNF = result.DNF,
                     Pos_Change = result.Pos_Change,
                     Qualifying = result.Qualifying,
                     Time = result.Time,
-                    TeamId = result.TeamId
                 };
                 _context.RaceResults.AddRange(NewResult);
                 await _context.SaveChangesAsync();
@@ -213,7 +224,10 @@ public class RaceController : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<ActionResult<RaceResult>> GetRaceResultById(int id)
     {
-        var raceResult = await _context.RaceResults.FindAsync(id);
+        var raceResult = await _context.RaceResults
+        .Include(rr => rr.Driver)
+        .Include(rr => rr.Team)
+        .FirstOrDefaultAsync(rr => rr.Id == id);
         if (raceResult == null)
         {
             return NotFound();
@@ -228,7 +242,11 @@ public class RaceController : ControllerBase
         // Get latest race including track and race results
         var latestRace = _context.Races
             .Include(r => r.Track)
-            .Include(r => r.RaceResults.OrderBy(rr => rr.Position))
+            .Include(r => r.RaceResults
+            .OrderBy(rr => rr.Position))
+            .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Team)
             .Where(r => r.RaceResults.Any()) // 👈 only races with results
             .OrderByDescending(r => r.Season)
             .ThenByDescending(r => r.Round)
@@ -370,7 +388,10 @@ public class RaceController : ControllerBase
     [HttpGet("raceresults")]
     public async Task<ActionResult<RaceResult>> GetAllRaceResults()
     {
-        var raceResult = await _context.RaceResults.ToListAsync();
+        var raceResult = await _context.RaceResults
+        .Include(rr => rr.Driver)
+        .Include(rr => rr.Team)
+        .ToListAsync();
         if (raceResult == null)
         {
             return NotFound();
@@ -438,6 +459,9 @@ public class RaceController : ControllerBase
 
         var racesCompleted = _context.Races
             .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Team)
             .Where(r => r.Season == season)
             .Where(r => r.RaceResults.Any())
             .OrderByDescending(r => r.Round)
@@ -544,7 +568,6 @@ public class RaceResultRequest
     public int Position { get; set; }
     public string Driver { get; set; }
     public string Team { get; set; }
-    public int TeamId { get; set; }
     public int Points { get; set; }
     public string DNF { get; set; }
     public int Pos_Change { get; set; }

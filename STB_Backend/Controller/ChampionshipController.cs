@@ -21,6 +21,9 @@ public class ChampionshipController : ControllerBase
         var championshipResults = _context.Races
             .Where(r => r.Season == season && r.Division == division)
             .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Team)
             .Include(r => r.Track)
             .ToList();
 
@@ -38,6 +41,9 @@ public class ChampionshipController : ControllerBase
             .OrderBy(r => r.Id)
 
             .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Team)
             .Include(r => r.Track)
             .ToList();
 
@@ -55,25 +61,29 @@ public class ChampionshipController : ControllerBase
         // Aggregate totals
         var driverTotals = _context.RaceResults
             .Where(rr => rr.Race.Season == currentSeason)
-            .GroupBy(rr => new { rr.Race.Division, rr.Driver })
+            .Include(rr => rr.Driver)
+            .Include(rr => rr.Team)
+            .GroupBy(rr => new { rr.Race.Division, rr.Driver.Name })
             .Select(g => new
             {
                 g.Key.Division,
-                g.Key.Driver,
+                g.Key.Name,
                 TotalPoints = g.Sum(rr => rr.Points)
             })
             .ToList();
 
         // For each driver, also get his last team (latest race in that season)
         var lastTeams = _context.RaceResults
+            .Include(rr => rr.Driver)
+            .Include(rr => rr.Team)
             .Where(rr => rr.Race.Season == currentSeason)
-            .GroupBy(rr => new { rr.Race.Division, rr.Driver })
+            .GroupBy(rr => new { rr.Race.Division, rr.Driver.Name })
             .Select(g => new
             {
                 g.Key.Division,
-                g.Key.Driver,
+                g.Key.Name,
                 Team = g.OrderByDescending(x => x.Race.Round) // or x.Race.Date if you prefer
-                            .Select(x => x.Team)
+                            .Select(x => x.Team.Name)
                             .FirstOrDefault()
             })
             .ToList();
@@ -81,12 +91,12 @@ public class ChampionshipController : ControllerBase
         // Join totals with last team
         var withTeams = from total in driverTotals
                         join team in lastTeams
-                        on new { total.Division, total.Driver }
-                        equals new { team.Division, team.Driver }
+                        on new { total.Division, total.Name }
+                        equals new { team.Division, team.Name }
                         select new
                         {
                             total.Division,
-                            total.Driver,
+                            total.Name,
                             total.TotalPoints,
                             team.Team
                         };
@@ -98,7 +108,7 @@ public class ChampionshipController : ControllerBase
             {
                 Division = g.Key,
                 Top3 = g.OrderByDescending(x => x.TotalPoints)
-                        .ThenBy(x => x.Driver)
+                        .ThenBy(x => x.Name)
                         .Take(3)
                         .ToList()
             })

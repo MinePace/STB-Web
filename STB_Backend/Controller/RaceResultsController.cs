@@ -21,6 +21,8 @@ public class RaceResultController : ControllerBase
     public IActionResult GetResults(int id)
     {
         var results = _context.RaceResults
+            .Include(r => r.Driver)
+            .Include(r => r.Team)
             .Where(d => d.RaceId == id)
             .ToListAsync();
 
@@ -46,6 +48,9 @@ public class RaceResultController : ControllerBase
         var races = await _context.Races
             .Include(r => r.Track)
             .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Driver)
+            .Include(r => r.RaceResults)
+            .ThenInclude(rr => rr.Team)
             .Where(r => r.Season == season && r.Division == division)
             .Select(r => new {
                 r.Id,
@@ -69,7 +74,7 @@ public class RaceResultController : ControllerBase
         // 2) Convert "Yes"/"No" sprint field to bool
         //    and build tuple collection
         IEnumerable<(int RaceId, int Round, string Name, bool Sprint, DateTime? Date,
-                    IEnumerable<(string Driver, int? TeamId, decimal Points)> Results)> steps;
+                    IEnumerable<(Driver Driver, int? TeamId, decimal Points)> Results)> steps;
 
         if (!aggregateByRound)
         {
@@ -117,7 +122,7 @@ public class RaceResultController : ControllerBase
             // add points from this step
             foreach (var (driver, _, pts) in s.Results)
             {
-                cumulative[driver] = cumulative.GetValueOrDefault(driver) + pts;
+                cumulative[driver.Name] = cumulative.GetValueOrDefault(driver.Name) + pts;
             }
 
             // top 15 cumulative
@@ -128,9 +133,9 @@ public class RaceResultController : ControllerBase
                     Rank = i + 1,
                     Driver = kv.Key,
                     TeamId = s.Results.FirstOrDefault(r => 
-                        string.Equals(r.Driver, kv.Key, StringComparison.OrdinalIgnoreCase)).TeamId,
+                        string.Equals(r.Driver.Name, kv.Key, StringComparison.OrdinalIgnoreCase)).TeamId,
                     PointsThisRace = s.Results.Where(r => 
-                        string.Equals(r.Driver, kv.Key, StringComparison.OrdinalIgnoreCase)).Sum(r => r.Points),
+                        string.Equals(r.Driver.Name, kv.Key, StringComparison.OrdinalIgnoreCase)).Sum(r => r.Points),
                     Cumulative = kv.Value
                 })
                 .ToList();
@@ -156,16 +161,36 @@ public class RaceResultController : ControllerBase
         if (result == null)
             return NotFound(new { message = "No results were found with this raceId." });
 
-        if(newResult.DNF == "Yes"){
+        if (newResult.DNF == "Yes")
+        {
             newResult.Points = 0;
         }
 
+        var driverExists = _context.Drivers
+            .Any(d => d.Name == newResult.Driver);
+
+        if (!driverExists)
+        {
+            return BadRequest(new { message = "Driver does not exist." });
+        }
+
+        // 2️⃣ Validate driver exists
+        var driver = _context.Drivers.FirstOrDefault(d => d.Name == newResult.Driver);
+        if (driver == null)
+            return BadRequest(new { message = $"Driver '{newResult.Driver}' does not exist." });
+
+        // 3️⃣ Validate team exists (BY NAME)
+        var team = _context.Teams.FirstOrDefault(t => t.Name == newResult.Team);
+        if (team == null)
+            return BadRequest(new { message = $"Team '{newResult.Team}' does not exist." });
+
         // ✅ Ensure correct data types & update entity properties
         result.Position = newResult.Position;
-        result.Driver = newResult.Driver;
+        result.Driver = driver;
+        result.DriverId = driver.Id;
         result.Points = newResult.Points;
-        result.Team = newResult.Team;
-        result.TeamId = newResult.TeamId;
+        result.Team = team;
+        result.TeamId = team.Id;
         result.DNF = newResult.DNF; // Ensure DNF is stored as string or change model to bool
         result.Qualifying = newResult.Qualifying;
         result.Pos_Change = newResult.Pos_Change;

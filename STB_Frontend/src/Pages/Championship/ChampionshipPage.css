@@ -249,3 +249,99 @@
   .header-table thead tr.header-cols th:first-child { border-left: 0; }
   .header-table thead tr.header-cols th:last-child  { border-right: 0; }
 }
+
+/* ========================================================
+   CONSTRUCTORS TABLE — FULLY CUSTOMISABLE THEME & SIZING
+   ======================================================== */
+:root {
+  /* Table width */
+  --constructors-width: 650px;
+
+  /* Column widths */
+  --col-pos-width: 40px;
+  --col-team-width: 180px;
+  --col-points-width: 100px;
+
+  /* Colors */
+  --constructors-header-bg: rgb(0, 76, 169);
+  --constructors-row-bg: #194081;
+  --constructors-row-alt-bg: #194081;
+  --constructors-text-color: #ffffff;
+  --constructors-border-color: rgba(255,255,255,0.2);
+
+  /* Hover style */
+  --constructors-hover-bg: rgba(255,255,255,0.15);
+}
+
+/* Table wrapper width */
+.constructors-view .constructors-table-wrapper {
+  max-width: var(--constructors-width);
+  margin: 0 auto;
+}
+
+/* Main table styling */
+.constructors-view table {
+  width: auto;
+  table-layout: auto;
+  border-collapse: collapse;
+  background: var(--constructors-row-bg);
+  color: var(--constructors-text-color);
+  border: 1px solid var(--constructors-border-color);
+  table-layout: fixed;
+}
+
+/* Header */
+.constructors-view .header-table th {
+  background: var(--constructors-header-bg);
+  color: var(--constructors-text-color) !important;
+  border: 1px solid var(--constructors-border-color);
+  padding: 10px 5px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.constructors-view table tbody tr:hover {
+  background: var(--constructors-hover-bg);
+}
+
+/* Body cells */
+.constructors-view td {
+  padding: 10px 6px;
+  text-align: center;
+  color: var(--constructors-text-color) !important;
+  border: 1px solid var(--constructors-border-color);
+}
+
+/* Column widths */
+.col-pos {
+  width: var(--col-pos-width) !important;
+  background-color: rgb(0, 76, 169) !important;
+}
+
+.col-team {
+  width: var(--col-team-width) !important;
+}
+
+.col-points {
+  width: var(--col-points-width) !important;
+}
+
+.points-cell {
+  font-weight: 900;
+}
+
+/* Team cell + logo */
+.team-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px;
+  font-weight: 900;
+}
+
+.team-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.4));
+}

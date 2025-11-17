@@ -5,70 +5,59 @@ import html2canvas from "html2canvas";
 import "./RaceResultPage.css";
 import "@/Components/Links.css";
 
+// helper: convert driver/team object → name string
+const safeName = (entity) =>
+  typeof entity === "object" ? entity?.name ?? "Unknown" : entity ?? "Unknown";
+
 function RaceResultPage() {
-  const { raceId } = useParams(); // Haal "type" op uit de URL
+  const { raceId } = useParams();
   const [searchParams] = useSearchParams();
-  const prefillDriver = searchParams.get("driver"); // e.g. ?driver=Joey1854
+  const prefillDriver = searchParams.get("driver");
   const [raceResults, setRaceResults] = useState([]);
   const [race, setRaceData] = useState();
   const [fastestLap, setFastestLap] = useState(null);
-  const [embedUrl, setEmbedUrl] = useState(""); // Opslag voor de embed-URL
-  
+  const [embedUrl, setEmbedUrl] = useState("");
+
   const role = localStorage.getItem("role") || "user";
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
 
+  // user fetch
   useEffect(() => {
     const token = localStorage.getItem("token");
     const name = localStorage.getItem("name");
     if (!token || !name) return;
 
-    fetch(`http://localhost:5110/api/user/${name}`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    })
-      .then(res => res.ok ? res.json() : null)
-      .then(data => data && setUser(data))
-      .catch(err => console.error("Error fetching user data:", err));
+    fetch(`http://localhost:5110/api/user/${name}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => data && setUser(data))
+      .catch((err) => console.error("Error fetching user data:", err));
   }, []);
 
-  // 🎥 turn any YouTube URL into an <iframe> embed URL
+  // YouTube embed parser
   const extractYouTubeEmbed = (url) => {
     try {
       const u = new URL(url);
-      // already an /embed/ url
       if (u.hostname.includes("youtube") && u.pathname.startsWith("/embed/")) {
         setEmbedUrl(u.toString());
         return;
       }
-
-      // standard watch?v=ID
       let id = u.searchParams.get("v");
-
-      // youtu.be/ID or /shorts/ID or /v/ID
       if (!id) {
         const m =
           u.pathname.match(/^\/(?:shorts|v|embed)\/([A-Za-z0-9_-]{11})/) ||
-          u.pathname.match(/^\/([A-Za-z0-9_-]{11})/); // youtu.be/ID
+          u.pathname.match(/^\/([A-Za-z0-9_-]{11})/);
         id = m?.[1] || null;
       }
-
-      if (id) {
-        setEmbedUrl(`https://www.youtube.com/embed/${id}`);
-      } else {
-        // not a valid YouTube URL
-        setEmbedUrl("");
-        console.warn("extractYouTubeEmbed: no video id in", url);
-      }
+      setEmbedUrl(id ? `https://www.youtube.com/embed/${id}` : "");
     } catch (e) {
-      // invalid URL string
       setEmbedUrl("");
-      console.warn("extractYouTubeEmbed: invalid URL", url);
     }
   };
 
+  // main load
   useEffect(() => {
     setLoading(true);
     setError(null);
@@ -82,8 +71,15 @@ function RaceResultPage() {
         const raceObj = data?.race ?? data;
         const flObj = data?.fastestLap ?? raceObj?.fastestLap ?? null;
 
+        // 🔥 convert incoming results into safe-name format
+        const fixedResults = (raceObj?.raceResults ?? []).map((r) => ({
+          ...r,
+          driverName: safeName(r.driver),
+          teamName: safeName(r.team)
+        }));
+
         setRaceData(raceObj);
-        setRaceResults(raceObj?.raceResults ?? []);
+        setRaceResults(fixedResults);
         setFastestLap(flObj);
 
         if (raceObj?.youtubeLink) extractYouTubeEmbed(raceObj.youtubeLink);
@@ -98,7 +94,7 @@ function RaceResultPage() {
       })
       .finally(() => setLoading(false));
   }, [raceId]);
-  
+
   const teamColors = {
     "Red Bull": "rgba(59, 73, 149, 1)",
     "Mercedes": "rgb(109, 230, 205)",
@@ -127,48 +123,40 @@ function RaceResultPage() {
     const table = document.querySelector(".result-table");
     if (!table) return;
 
-    html2canvas(table, {
-      backgroundColor: null, // Keep transparent background
-      useCORS: true,
-      scale: 2
-    }).then(async (canvas) => {
-      // Convert to Blob (better for upload)
-      const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
-      const file = new File([blob], `Round${round}.png`, { type: "image/png" });
-
-      // 💾 Local download (still optional)
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `Race_Results_Round${round}.png`;
-      link.click();
-
-      // 🌍 Upload to backend to save in /public/results/season#/tier#/
-      const formData = new FormData();
-      formData.append("season", season);
-      formData.append("tier", tier);
-      formData.append("round", round);
-      formData.append("file", file);
-      formData.append("country", race.track?.country);
-      formData.append("circuit", race.track?.name);
-
-      try {
-        const response = await fetch(`http://localhost:5110/api/auth/upload-result`, {
-          method: "POST",
-          body: formData
+    html2canvas(table, { backgroundColor: null, useCORS: true, scale: 2 })
+      .then(async (canvas) => {
+        const blob = await new Promise((resolve) =>
+          canvas.toBlob(resolve, "image/png")
+        );
+        const file = new File([blob], `Round${round}.png`, {
+          type: "image/png"
         });
 
-        if (response.ok) {
-          console.log(`✅ Uploaded race result image for Tier ${tier}, Round ${round}`);
-        } else {
-          console.error("❌ Failed to upload race result image:", response.statusText);
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = `Race_Results_Round${round}.png`;
+        link.click();
+
+        const formData = new FormData();
+        formData.append("season", season);
+        formData.append("tier", tier);
+        formData.append("round", round);
+        formData.append("file", file);
+        formData.append("country", race.track?.country);
+        formData.append("circuit", race.track?.name);
+
+        try {
+          const response = await fetch(
+            `http://localhost:5110/api/auth/upload-result`,
+            { method: "POST", body: formData }
+          );
+        } catch (err) {
+          console.error("Upload error:", err);
         }
-      } catch (err) {
-        console.error("⚠️ Upload error:", err);
-      }
-    });
+      });
   }
 
-  const hasAnyTime = raceResults.some(r => r.time && r.time.trim() !== "");
+  const hasAnyTime = raceResults.some((r) => r.time && r.time.trim() !== "");
   const season = race ? race.season : "unknown";
   const tier = race ? race.division : "unknown";
   const round = race ? race.round : "unknown";
@@ -180,10 +168,9 @@ function RaceResultPage() {
       ) : error ? (
         <div className="error-message">❌ {error}</div>
       ) : !race ? (
-        <div className="error-message">❌ This Race doensn't exist.</div>
+        <div className="error-message">❌ This Race doesn't exist.</div>
       ) : (
         <>
-          {/* Header & basic info always visible */}
           <div className="table-container">
             {raceResults.length > 0 && (
               <button
@@ -197,7 +184,9 @@ function RaceResultPage() {
               <thead>
                 <tr>
                   <th colSpan="6" className="table-title">
-                    {`Season ${race.season} • Tier ${race.division} • Round ${race.round} ${race.sprint === "Yes" ? "(Sprint)" : ""}`}
+                    {`Season ${race.season} • Tier ${race.division} • Round ${race.round} ${
+                      race.sprint === "Yes" ? "(Sprint)" : ""
+                    }`}
                   </th>
                 </tr>
                 <tr>
@@ -209,14 +198,12 @@ function RaceResultPage() {
                           src={`/flags/${race.track.country}.png`}
                           alt={race.track.country}
                           className="country-flag"
-                          title={race.track.country}
                         />
                       )}
                     </div>
                   </th>
                 </tr>
 
-                {/* Only show column headers if we actually have rows */}
                 {raceResults.length > 0 && (
                   <tr>
                     <th>Pos</th>
@@ -231,44 +218,87 @@ function RaceResultPage() {
               {raceResults.length > 0 && (
                 <tbody>
                   {raceResults.map((row, index) => {
-                    const isDNF = row.dnf === "Yes" || row.dnf === "DNF";
+                    // 🔥 All conversions already done in transform!
+                    const driverName = row.driverName;
+                    const teamName = row.teamName;
+
+                    const isDNF =
+                      row.dnf === "Yes" || row.dnf === "DNF";
+
+                    // 🔥 fastest lap fix
                     const isFastestLap =
                       fastestLap &&
-                      (fastestLap.driver?.name ?? fastestLap.driver) === row.driver;
+                      safeName(fastestLap.driver) === driverName;
+
                     const isdriverPrefill =
                       prefillDriver &&
-                      decodeURIComponent(prefillDriver).toLowerCase() === row.driver.toLowerCase();
+                      decodeURIComponent(prefillDriver).toLowerCase() ===
+                        driverName.toLowerCase();
 
                     return (
                       <tr key={index}>
                         <td className={isDNF ? "dnf-cell" : ""}>
                           {isDNF ? "DNF" : row.position}
                         </td>
+
                         <td className="driver-col">
                           <Link
-                            to={`/STB/Driver/${encodeURIComponent(row.driver)}`}
-                            className={`primary-link ${isdriverPrefill ? "driver-link-season" : (isFastestLap ? "fastest-lap" : "")}`}
+                            to={`/STB/Driver/${encodeURIComponent(
+                              driverName
+                            )}`}
+                            className={`primary-link ${
+                              isdriverPrefill
+                                ? "driver-link-season"
+                                : isFastestLap
+                                ? "fastest-lap"
+                                : ""
+                            }`}
                           >
-                            {row.driver}
+                            {driverName}
                           </Link>
                         </td>
-                        <td className="team-name" style={{ color: teamColors[row.team] || "white" }}>
-                          {row.team}
+
+                        <td
+                          className="team-name"
+                          style={{
+                            color:
+                              teamColors[teamName] ??
+                              "white"
+                          }}
+                        >
+                          {teamName}
                         </td>
+
                         {hasAnyTime && (
                           <td>
                             {row.time ? (
                               <>
-                                {index === 0 ? row.time : `+${row.time}`}
-                                {row.penalty !== 0 && row.penalty !== null && (
-                                  <span className={row.penalty > 0 ? "penalty-inline" : "bonus-inline"}>
-                                    ({row.penalty > 0 ? `+${row.penalty}s` : `${row.penalty}s`})
-                                  </span>
-                                )}
+                                {index === 0
+                                  ? row.time
+                                  : `+${row.time}`}
+                                {row.penalty !== 0 &&
+                                  row.penalty !== null && (
+                                    <span
+                                      className={
+                                        row.penalty > 0
+                                          ? "penalty-inline"
+                                          : "bonus-inline"
+                                      }
+                                    >
+                                      (
+                                      {row.penalty > 0
+                                        ? `+${row.penalty}s`
+                                        : `${row.penalty}s`}
+                                      )
+                                    </span>
+                                  )}
                               </>
-                            ) : ""}
+                            ) : (
+                              ""
+                            )}
                           </td>
                         )}
+
                         <td>{row.qualifying}</td>
                       </tr>
                     );
@@ -278,7 +308,6 @@ function RaceResultPage() {
             </table>
           </div>
 
-          {/* No-results notice */}
           {raceResults.length === 0 && (
             <div className="no-results-banner">
               No results are available for this race.
@@ -296,7 +325,6 @@ function RaceResultPage() {
             </div>
           )}
 
-          {/* Optional: video & screenshot only when results exist (or keep them always) */}
           {embedUrl && (
             <div className="video-player">
               <iframe
@@ -313,7 +341,7 @@ function RaceResultPage() {
         </>
       )}
     </div>
-  );  
+  );
 }
 
 export default RaceResultPage;

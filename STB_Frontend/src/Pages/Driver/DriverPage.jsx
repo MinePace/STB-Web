@@ -111,10 +111,8 @@ function DriverPage() {
 
       if (!res.ok) throw new Error("Failed to update country");
 
-      const updated = await res.json();
-
-      await fetchDriverStats();  // 👈 call the same fetcher as in useEffect
-
+      await res.json();
+      await fetchDriverStats();
       setShowPopup(false);
     } catch (err) {
       console.error("Error updating country:", err);
@@ -134,8 +132,8 @@ function DriverPage() {
     : null;
 
   function StartFinishHeatmap({ allRaces, driverName }) {
-    console.log("[Heatmap] driverName prop:", driverName); // sanity check
-    const matrix = getStartFinishMatrix(allRaces, driverName); // pass it through
+    console.log("[Heatmap] driverName prop:", driverName);
+    const matrix = getStartFinishMatrix(allRaces, driverName);
     const max = Math.max(0, ...matrix.flat());
 
     return (
@@ -163,7 +161,6 @@ function DriverPage() {
             gap: 4,
           }}
         >
-          {/* Column headers */}
           <div />
           {Array.from({ length: 20 }, (_, i) => (
             <div
@@ -178,10 +175,8 @@ function DriverPage() {
             </div>
           ))}
 
-          {/* Rows */}
           {matrix.map((row, r) => (
             <React.Fragment key={r}>
-              {/* Row label */}
               <div
                 style={{
                   fontSize: 12,
@@ -191,7 +186,6 @@ function DriverPage() {
               >
                 Start P{r + 1}
               </div>
-              {/* Cells */}
               {row.map((val, c) => (
                 <div
                   key={`${r}-${c}`}
@@ -223,24 +217,26 @@ function DriverPage() {
   // --- tiny donut chart (no deps) ---
   function DonutChart({ data, size = 160, thickness = 28 }) {
     const total = data.reduce((s, d) => s + d.value, 0);
-    const slices = total === 0
-      ? [{ color: "#e5e7eb", value: 1, label: "No data" }]
-      : data;
+    const slices =
+      total === 0
+        ? [{ color: "#e5e7eb", value: 1, label: "No data" }]
+        : data;
 
-    // Build conic-gradient stops
     let acc = 0;
-    const stops = slices.map((s) => {
-      const start = (acc / total) * 360;
-      acc += s.value;
-      const end = (acc / total) * 360;
-      return `${s.color} ${start}deg ${end}deg`;
-    }).join(", ");
-
-    const radius = size / 2;
-    const inner = radius - thickness;
+    const stops = slices
+      .map((s) => {
+        const start = (acc / total) * 360;
+        acc += s.value;
+        const end = (acc / total) * 360;
+        return `${s.color} ${start}deg ${end}deg`;
+      })
+      .join(", ");
 
     return (
-      <div className="donut-wrap" style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+      <div
+        className="donut-wrap"
+        style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}
+      >
         <div
           aria-label="Race distribution donut chart"
           style={{
@@ -275,10 +271,21 @@ function DriverPage() {
           </div>
         </div>
 
-        {/* Legend */}
-        <ul className="donut-legend" style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 8 }}>
+        <ul
+          className="donut-legend"
+          style={{
+            listStyle: "none",
+            padding: 0,
+            margin: 0,
+            display: "grid",
+            gap: 8,
+          }}
+        >
           {data.map((d) => (
-            <li key={d.key} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <li
+              key={d.key}
+              style={{ display: "flex", alignItems: "center", gap: 8 }}
+            >
               <span
                 aria-hidden="true"
                 style={{
@@ -335,30 +342,47 @@ function DriverPage() {
               const raceLabel = asRaceLabel(race);
               const dateLabel = fmtDate(race.date);
 
-              // full results sorted by finish
               const results = (race.raceResults ?? [])
                 .slice()
                 .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
 
-              // top 10
-              const top10 = results.filter(r => typeof r.position === "number" && r.position >= 1 && r.position <= 5)
-                                  .slice(0, 5);
+              const top10 = results
+                .filter(
+                  (r) =>
+                    typeof r.position === "number" &&
+                    r.position >= 1 &&
+                    r.position <= 5
+                )
+                .slice(0, 5);
 
-              // this driver's result
-              const myResult = results.find(rr => rr.driver === driverStats.driver);
-              const showMyExtra = myResult && (typeof myResult.position !== "number" || myResult.position > 5);
+              // use helper to find this driver's row (handles driver objects)
+              const myResult = findMyRow(results, driverStats.driver);
+              const showMyExtra =
+                myResult &&
+                (typeof myResult.position !== "number" ||
+                  myResult.position > 5);
 
               return (
                 <div className="last-race">
-                  {/* meta */}
                   <div className="lr-meta">
-                    <a href={`/STB/Championship/${race.season}/${race.division}?driver=${driverStats.driver}`} className= "primary-link">Season {race.season} Tier {race.division}</a>
+                    <a
+                      href={`/STB/Championship/${race.season}/${race.division}?driver=${driverStats.driver}`}
+                      className="primary-link"
+                    >
+                      Season {race.season} Tier {race.division}
+                    </a>
                     <h>•</h>
-                    <a href={`/STB/Race/${raceLabel}?driver=${driverStats.driver}`} className= "primary-link">{trackLabel}</a>
-                    <div><strong>Date:</strong> {dateLabel}</div>
+                    <a
+                      href={`/STB/Race/${raceLabel}?driver=${driverStats.driver}`}
+                      className="primary-link"
+                    >
+                      {trackLabel}
+                    </a>
+                    <div>
+                      <strong>Date:</strong> {dateLabel}
+                    </div>
                   </div>
 
-                  {/* table (same structure as TrackPage) */}
                   <div className="tp-results" style={{ marginTop: 12 }}>
                     <div className="tp-results-head">
                       <div>Pos</div>
@@ -367,39 +391,80 @@ function DriverPage() {
                     </div>
 
                     <div className="tp-results-body">
-                      {top10.map((res) => (
-                        <div className="tp-result-row" key={res.id ?? `${res.driver}-${res.position}`}>
-                          <div className={`tp-pos ${medalClass(res.position)}`}>{posLabel(res)}</div>
-                          <a href={`/STB/Driver/${encodeURIComponent(res.driver)}`} className="primary-link">
-                            {res.driver}
-                          </a>
-                          <div className="tp-right">
-                            {isDNF(res) ? (
-                              <span className="tp-tag tp-tag-dnf">DNF</span>
-                            ) : (
-                              <span className="tp-tag">{res.points ?? 0}</span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* divider + my driver row if outside top 10 */}
-                      {showMyExtra && (
-                        <>
-                          <div className="tp-divider" aria-hidden="true" />
-                          <div className="tp-result-row tp-result-row--me" key={myResult.id ?? "me"}>
-                            <div className={`tp-pos ${medalClass(myResult.position)}`}>{posLabel(myResult)}</div>
-                            <a href={`/STB/Driver/${encodeURIComponent(myResult.driver)}`} className="primary-link">
-                              {myResult.driver}
+                      {top10.map((res) => {
+                        const name = extractDriverName(res);
+                        return (
+                          <div
+                            className="tp-result-row"
+                            key={res.id ?? `${name}-${res.position}`}
+                          >
+                            <div
+                              className={`tp-pos ${medalClass(
+                                res.position
+                              )}`}
+                            >
+                              {posLabel(res)}
+                            </div>
+                            <a
+                              href={`/STB/Driver/${encodeURIComponent(name)}`}
+                              className="primary-link"
+                            >
+                              {name}
                             </a>
                             <div className="tp-right">
-                              {isDNF(myResult) ? (
-                                <span className="tp-tag tp-tag-dnf">DNF</span>
+                              {isDNF(res) ? (
+                                <span className="tp-tag tp-tag-dnf">
+                                  DNF
+                                </span>
                               ) : (
-                                <span className="tp-tag">{myResult.points ?? 0}</span>
+                                <span className="tp-tag">
+                                  {res.points ?? 0}
+                                </span>
                               )}
                             </div>
                           </div>
+                        );
+                      })}
+
+                      {showMyExtra && myResult && (
+                        <>
+                          <div className="tp-divider" aria-hidden="true" />
+                          {(() => {
+                            const myName = extractDriverName(myResult);
+                            return (
+                              <div
+                                className="tp-result-row tp-result-row--me"
+                                key={myResult.id ?? "me"}
+                              >
+                                <div
+                                  className={`tp-pos ${medalClass(
+                                    myResult.position
+                                  )}`}
+                                >
+                                  {posLabel(myResult)}
+                                </div>
+                                <a
+                                  href={`/STB/Driver/${encodeURIComponent(
+                                    myName
+                                  )}`}
+                                  className="primary-link"
+                                >
+                                  {myName}
+                                </a>
+                                <div className="tp-right">
+                                  {isDNF(myResult) ? (
+                                    <span className="tp-tag tp-tag-dnf">
+                                      DNF
+                                    </span>
+                                  ) : (
+                                    <span className="tp-tag">
+                                      {myResult.points ?? 0}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })()}
                         </>
                       )}
                     </div>
@@ -421,20 +486,40 @@ function DriverPage() {
                 <div className="race-chips">
                   {lastFive.map((race, idx) => {
                     const trackLabel = asTrackLabel(race.track);
-                    const raceLabel  = asRaceLabel(race);
-                    const results    = (race.raceResults ?? []).slice().sort((a,b)=>toPosSortKey(a)-toPosSortKey(b));
-                    const myResult   = results.find(rr => rr.driver === driverStats.driver);
+                    const raceLabel = asRaceLabel(race);
+                    const results = (race.raceResults ?? [])
+                      .slice()
+                      .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
 
-                    const labelPos = myResult ? (isDNF(myResult) ? "DNF" : `P${myResult.position}`) : "—";
-                    const pts      = myResult && !isDNF(myResult) ? (myResult.points ?? 0) : 0;
-
+                    const myResult = findMyRow(
+                      results,
+                      driverStats.driver
+                    );
                     const isSprint =
                       race?.isSprint === true ||
                       race?.sprint === true ||
                       race?.format === "Sprint" ||
                       race?.type === "Sprint";
 
-                    const title = `${trackLabel} • ${labelPos}${isSprint ? " • Sprint" : ""}${myResult ? ` • ${pts} pts` : ""}`;
+                    let labelPos = "—";
+                    let pts = 0;
+
+                    if (myResult) {
+                      if (isDNF(myResult)) {
+                        labelPos = "DNF";
+                      } else if (
+                        typeof myResult.position === "number"
+                      ) {
+                        labelPos = `P${myResult.position}`;
+                      }
+                      if (!isDNF(myResult)) {
+                        pts = myResult.points ?? 0;
+                      }
+                    }
+
+                    const title = `${trackLabel} • ${labelPos}${
+                      isSprint ? " • Sprint" : ""
+                    }${myResult ? ` • ${pts} pts` : ""}`;
 
                     return (
                       <div
@@ -444,20 +529,36 @@ function DriverPage() {
                         title={title}
                         aria-label={title}
                       >
-                        <a href= {`/STB/Race/${raceLabel}?driver=${driverStats.driver}`} className="primary-link">{trackLabel}</a>
-                        <span className="race-chip-divider" aria-hidden="true" />
+                        <a
+                          href={`/STB/Race/${raceLabel}?driver=${driverStats.driver}`}
+                          className="primary-link"
+                        >
+                          {trackLabel}
+                        </a>
+                        <span
+                          className="race-chip-divider"
+                          aria-hidden="true"
+                        />
                         <div className="race-chip-stats">
                           <span
                             className={`race-chip-badge ${
-                              isDNF(myResult) ? "tp-medal tp-medal-dnf" : medalClass(myResult?.position)
+                              isDNF(myResult)
+                                ? "tp-medal tp-medal-dnf"
+                                : medalClass(myResult?.position)
                             }`}
                           >
                             {labelPos}
                           </span>
                           {myResult && !isDNF(myResult) && (
-                            <span className="race-chip-pts">{pts}</span>
+                            <span className="race-chip-pts">
+                              {pts}
+                            </span>
                           )}
-                          {isSprint && <span className="race-chip-sprint">SPR</span>}
+                          {isSprint && (
+                            <span className="race-chip-sprint">
+                              SPR
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -476,7 +577,9 @@ function DriverPage() {
           <div className="panel-body">
             <div className="stats-grid">
               <div className="stat">
-                <div className="stat-value">{driverStats.totalPoints ?? "—"}</div>
+                <div className="stat-value">
+                  {driverStats.totalPoints ?? "—"}
+                </div>
                 <div className="stat-label">Total Points</div>
               </div>
               <div className="stat">
@@ -484,35 +587,49 @@ function DriverPage() {
                 <div className="stat-label">Wins</div>
               </div>
               <div className="stat">
-                <div className="stat-value">{driverStats.podiums ?? "—"}</div>
+                <div className="stat-value">
+                  {driverStats.podiums ?? "—"}
+                </div>
                 <div className="stat-label">Podiums</div>
               </div>
               <div className="stat">
-                <div className="stat-value">{driverStats.poles ?? "—"}</div>
+                <div className="stat-value">
+                  {driverStats.poles ?? "—"}
+                </div>
                 <div className="stat-label">Poles</div>
               </div>
               <div className="stat">
-                <div className="stat-value">{driverStats.fastestLaps ?? "—"}</div>
+                <div className="stat-value">
+                  {driverStats.fastestLaps ?? "—"}
+                </div>
                 <div className="stat-label">Fastest Laps</div>
               </div>
               <div className="stat">
-                <div className="stat-value">{driverStats.dnfs ?? "—"}</div>
+                <div className="stat-value">
+                  {driverStats.dnfs ?? "—"}
+                </div>
                 <div className="stat-label">DNF's</div>
               </div>
               <div className="stat">
                 <div className="stat-value">
-                  {driverStats.averagePosition != null ? driverStats.averagePosition.toFixed(2) : "—"}
+                  {driverStats.averagePosition != null
+                    ? driverStats.averagePosition.toFixed(2)
+                    : "—"}
                 </div>
                 <div className="stat-label">Avg Finish</div>
               </div>
               <div className="stat">
                 <div className="stat-value">
-                  {driverStats.averageQualifying != null ? driverStats.averageQualifying.toFixed(2) : "—"}
+                  {driverStats.averageQualifying != null
+                    ? driverStats.averageQualifying.toFixed(2)
+                    : "—"}
                 </div>
                 <div className="stat-label">Avg Qualifying</div>
               </div>
               <div className="stat">
-                <div className="stat-value">{driverStats.races ?? "—"}</div>
+                <div className="stat-value">
+                  {driverStats.races ?? "—"}
+                </div>
                 <div className="stat-label">Races</div>
               </div>
             </div>
@@ -523,20 +640,28 @@ function DriverPage() {
                 : "🚨 Unclaimed"}
             </p>
 
-            {!driverStats.driverOBJ?.user?.username && user && !user.driverClaimed && (
-              <button onClick={claimDriver} className="claim-button">
-                🚀 Claim this Driver
-              </button>
-            )}
+            {!driverStats.driverOBJ?.user?.username &&
+              user &&
+              !user.driverClaimed && (
+                <button onClick={claimDriver} className="claim-button">
+                  🚀 Claim this Driver
+                </button>
+              )}
           </div>
         </article>
 
         {/* Start vs Finish Heatmap */}
         <article className="panel panel--span2 panel--tall">
-          <header className="panel-header">Start vs Finish (P1–P20)</header>
+          <header className="panel-header">
+            Start vs Finish (P1–P20)
+          </header>
           <div className="panel-body">
-            {Array.isArray(driverStats?.allRaces) && driverStats.allRaces.length ? (
-              <StartFinishHeatmap allRaces={driverStats.allRaces} driverName={driverName} />
+            {Array.isArray(driverStats?.allRaces) &&
+            driverStats.allRaces.length ? (
+              <StartFinishHeatmap
+                allRaces={driverStats.allRaces}
+                driverName={driverName}
+              />
             ) : (
               <div className="empty">No race data yet.</div>
             )}
@@ -545,25 +670,60 @@ function DriverPage() {
 
         {/* Points Positions Bar Chart */}
         <article className="panel">
-          <header className="panel-header">Points Finishes (P1–P10)</header>
+          <header className="panel-header">
+            Points Finishes (P1–P10)
+          </header>
           <div className="panel-body">
             {(() => {
-              const data = getPointsPositionsData(driverStats?.allRaces, driverStats?.driver ?? driverName);
-              const total = data.reduce((sum, d) => sum + d.count, 0);
+              const data = getPointsPositionsData(
+                driverStats?.allRaces,
+                driverStats?.driver ?? driverName
+              );
+              const total = data.reduce(
+                (sum, d) => sum + d.count,
+                0
+              );
 
               return total === 0 ? (
-                <div className="empty">No points finishes yet.</div>
+                <div className="empty">
+                  No points finishes yet.
+                </div>
               ) : (
                 <ResponsiveContainer width="100%" height={220}>
-                  <BarChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                    <XAxis dataKey="position" tick={{ fill: "#fff" }} />
-                    <YAxis tick={{ fill: "#fff" }} allowDecimals={false} />
+                  <BarChart
+                    data={data}
+                    margin={{
+                      top: 10,
+                      right: 10,
+                      left: 0,
+                      bottom: 0,
+                    }}
+                  >
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      opacity={0.2}
+                    />
+                    <XAxis
+                      dataKey="position"
+                      tick={{ fill: "#fff" }}
+                    />
+                    <YAxis
+                      tick={{ fill: "#fff" }}
+                      allowDecimals={false}
+                    />
                     <Tooltip
-                      contentStyle={{ backgroundColor: "#1e293b", border: "none", color: "#fff" }}
+                      contentStyle={{
+                        backgroundColor: "#1e293b",
+                        border: "none",
+                        color: "#fff",
+                      }}
                       labelStyle={{ color: "#f8fafc" }}
                     />
-                    <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar
+                      dataKey="count"
+                      fill="#3b82f6"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               );
@@ -571,24 +731,47 @@ function DriverPage() {
           </div>
         </article>
 
-        {/* Race pie chart*/}
+        {/* Race pie chart */}
         <article className="panel">
           <header className="panel-header">Race Data</header>
           <div className="panel-body">
             {(() => {
               const buckets = aggregateRaceBucketsFromAll(
                 driverStats?.driver ?? driverName,
-                driverStats?.allRaces,           // ✅ pass the array of races
-                driverStats?.driver              // ✅ driver label fallback
+                driverStats?.allRaces,
+                driverStats?.driver
               );
               const data = [
-                { key: "podiums",  label: "Podiums",      value: buckets.podiums,  color: "#f59e0b" }, // amber
-                { key: "points",   label: "Points",       value: buckets.points,   color: "#3b82f6" }, // blue
-                { key: "noPoints", label: "No Points",    value: buckets.noPoints, color: "#10b981" }, // emerald
-                { key: "dnf",      label: "DNF",          value: buckets.dnf,      color: "#ef4444" }, // red
+                {
+                  key: "podiums",
+                  label: "Podiums",
+                  value: buckets.podiums,
+                  color: "#f59e0b",
+                },
+                {
+                  key: "points",
+                  label: "Points",
+                  value: buckets.points,
+                  color: "#3b82f6",
+                },
+                {
+                  key: "noPoints",
+                  label: "No Points",
+                  value: buckets.noPoints,
+                  color: "#10b981",
+                },
+                {
+                  key: "dnf",
+                  label: "DNF",
+                  value: buckets.dnf,
+                  color: "#ef4444",
+                },
               ];
 
-              const total = data.reduce((s,d) => s + d.value, 0);
+              const total = data.reduce(
+                (s, d) => s + d.value,
+                0
+              );
               return total === 0 ? (
                 <div className="empty">No race data yet.</div>
               ) : (
@@ -611,63 +794,81 @@ function DriverPage() {
         🌍
       </button>
 
-      {/* Overlay + Slide-up Drawer */}
       {showPopup && (
-      <div className="overlay" onClick={() => setShowPopup(false)}>
         <div
-          className="country-drawer"
-          onClick={(e) => e.stopPropagation()} // ✅ stop overlay from catching clicks
+          className="overlay"
+          onClick={() => setShowPopup(false)}
         >
-          <header className="drawer-header">
-            <h2>Change Driver Country</h2>
-            <button className="drawer-close" onClick={() => setShowPopup(false)}>✖</button>
-          </header>
+          <div
+            className="country-drawer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <header className="drawer-header">
+              <h2>Change Driver Country</h2>
+              <button
+                className="drawer-close"
+                onClick={() => setShowPopup(false)}
+              >
+                ✖
+              </button>
+            </header>
 
-          <div className="drawer-body">
-            <label htmlFor="countrySelect">Select Country:</label>
-            <select
-              id="countrySelect"
-              value={newCountry}
-              onChange={(e) => setNewCountry(e.target.value)}
-            >
-              <option value="">— Select a country —</option>
-              {flags.map((flagFile) => {
-                const country = flagFile.replace(".png", "");
-                const flagSrc = `/flags/${flagFile}`;
-                return (
-                  <option key={country} value={country}>
-                    {country}
-                  </option>
-                );
-              })}
-            </select>
+            <div className="drawer-body">
+              <label htmlFor="countrySelect">
+                Select Country:
+              </label>
+              <select
+                id="countrySelect"
+                value={newCountry}
+                onChange={(e) =>
+                  setNewCountry(e.target.value)
+                }
+              >
+                <option value="">
+                  — Select a country —
+                </option>
+                {flags.map((flagFile) => {
+                  const country = flagFile.replace(".png", "");
+                  return (
+                    <option key={country} value={country}>
+                      {country}
+                    </option>
+                  );
+                })}
+              </select>
 
-            <button
-              onClick={() => {
-                console.log("💾 Save clicked");
-                updateDriverCountry();
-              }}
-              className="save-button"
-              disabled={savingCountry || !newCountry}
-            >
-              {savingCountry ? "Saving..." : "💾 Save"}
-            </button>
+              <button
+                onClick={updateDriverCountry}
+                className="save-button"
+                disabled={savingCountry || !newCountry}
+              >
+                {savingCountry ? "Saving..." : "💾 Save"}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
     </div>
   );
 }
 
 export default DriverPage;
 
-// --- shared helpers (copied from TrackPage for consistency) ---
+// --- shared helpers ---
 const isDNF = (res) => res?.dnf === "Yes" || res?.dnf === "DNF";
+
 const toPosSortKey = (res) =>
-  typeof res?.position === "number" ? res.position : Number.POSITIVE_INFINITY;
+  typeof res?.position === "number"
+    ? res.position
+    : Number.POSITIVE_INFINITY;
+
 const posLabel = (res) =>
-  typeof res?.position === "number" ? `P${res.position}` : isDNF(res) ? "DNF" : "—";
+  typeof res?.position === "number"
+    ? `P${res.position}`
+    : isDNF(res)
+    ? "DNF"
+    : "—";
+
 const medalClass = (position) => {
   if (position === 1) return "tp-medal tp-medal-1";
   if (position === 2) return "tp-medal tp-medal-2";
@@ -675,29 +876,39 @@ const medalClass = (position) => {
   if (position === "DNF") return "tp-medal tp-medal-dnf";
   return "";
 };
+
 const asTrackLabel = (t) =>
-  typeof t === "string" ? t : t?.raceName ?? t?.name ?? "—";
+  typeof t === "string"
+    ? t
+    : t?.raceName ?? t?.name ?? "—";
+
 const asRaceLabel = (r) =>
   typeof r === "string" ? r : r?.id ?? r?.id ?? "—";
-const fmtDate = (d) =>
-  d ? new Date(d).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" }) : "—";
 
+const fmtDate = (d) =>
+  d
+    ? new Date(d).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
+      })
+    : "—";
+
+// use canonical name matching + findMyRow for *all* data
 const getPointsPositionsData = (allRaces, driverName) => {
   const races = Array.isArray(allRaces) ? allRaces : [];
-  const counts = Array(10).fill(0); // P1–P10
+  const counts = Array(10).fill(0);
 
   for (const race of races) {
-    const results = (race?.raceResults ?? []).slice().sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
-    if (DEBUG_HEATMAP) {
-      console.log("[Heatmap] driverName param:", driverName);
-    }
-    const me = results.find(
-      (rr) =>
-        rr?.driver?.toLowerCase?.() === (driverName ?? "").toLowerCase() ||
-        rr?.driver === driverName
-    );
+    const results = (race?.raceResults ?? [])
+      .slice()
+      .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
+
+    const me = findMyRow(results, driverName);
     if (!me) continue;
-    const pos = typeof me.position === "number" ? me.position : null;
+
+    const pos =
+      typeof me.position === "number" ? me.position : null;
     if (pos && pos >= 1 && pos <= 10) counts[pos - 1] += 1;
   }
 
@@ -707,29 +918,38 @@ const getPointsPositionsData = (allRaces, driverName) => {
   }));
 };
 
-// ONLY use allRaces; no fallbacks
-const aggregateRaceBucketsFromAll = (driverName, allRaces, driverLabel) => {
+const aggregateRaceBucketsFromAll = (
+  driverName,
+  allRaces,
+  driverLabel
+) => {
   const races = Array.isArray(allRaces) ? allRaces : [];
-  const buckets = { podiums: 0, points: 0, noPoints: 0, dnf: 0 };
+  const buckets = {
+    podiums: 0,
+    points: 0,
+    noPoints: 0,
+    dnf: 0,
+  };
 
   for (const race of races) {
     const results = (race?.raceResults ?? [])
       .slice()
       .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
 
-    const me = results.find(
-      (rr) =>
-        rr?.driver?.toLowerCase?.() === (driverName ?? "").toLowerCase() ||
-        rr?.driver === driverLabel
-    );
+    const me =
+      findMyRow(results, driverName) ||
+      findMyRow(results, driverLabel);
     if (!me) continue;
 
     const dnf = isDNF(me);
-    const pos = typeof me.position === "number" ? me.position : null;
-    const pts = typeof me.points === "number" ? me.points : 0;
+    const pos =
+      typeof me.position === "number" ? me.position : null;
+    const pts =
+      typeof me.points === "number" ? me.points : 0;
 
     if (dnf) buckets.dnf += 1;
-    else if (pos && pos >= 1 && pos <= 3) buckets.podiums += 1;
+    else if (pos && pos >= 1 && pos <= 3)
+      buckets.podiums += 1;
     else if (pts > 0) buckets.points += 1;
     else buckets.noPoints += 1;
   }
@@ -738,7 +958,9 @@ const aggregateRaceBucketsFromAll = (driverName, allRaces, driverLabel) => {
 
 const getStartFinishMatrix = (allRaces, driverNameRaw) => {
   const races = Array.isArray(allRaces) ? allRaces : [];
-  const m = Array.from({ length: 20 }, () => Array(20).fill(0));
+  const m = Array.from({ length: 20 }, () =>
+    Array(20).fill(0)
+  );
 
   if (DEBUG_HEATMAP) {
     console.log("[Heatmap] allRaces length:", races.length);
@@ -747,7 +969,9 @@ const getStartFinishMatrix = (allRaces, driverNameRaw) => {
   let processed = 0;
 
   for (const race of races) {
-    const results = Array.isArray(race?.raceResults) ? race.raceResults : null;
+    const results = Array.isArray(race?.raceResults)
+      ? race.raceResults
+      : null;
     if (!results) continue;
 
     const me = findMyRow(results, driverNameRaw);
@@ -759,85 +983,113 @@ const getStartFinishMatrix = (allRaces, driverNameRaw) => {
       me?.status === "DNF" ||
       me?.classified === false;
 
-    // try multiple fields for start & finish
     const startPos =
       (typeof me.grid === "number" && me.grid) ||
       (typeof me.start === "number" && me.start) ||
-      (typeof me.startingPosition === "number" && me.startingPosition) ||
+      (typeof me.startingPosition === "number" &&
+        me.startingPosition) ||
       (typeof me.qualifying === "number" && me.qualifying) ||
       (typeof me.quali === "number" && me.quali) ||
       null;
 
     let finishPos = null;
-    if (typeof me.position === "number") finishPos = me.position;
-    else if (typeof me.position === "string" && /^P?\d+$/.test(me.position)) {
-      finishPos = parseInt(me.position.replace("P",""), 10);
+    if (typeof me.position === "number")
+      finishPos = me.position;
+    else if (
+      typeof me.position === "string" &&
+      /^P?\d+$/.test(me.position)
+    ) {
+      finishPos = parseInt(
+        me.position.replace("P", ""),
+        10
+      );
     }
 
     if (DEBUG_HEATMAP) {
-      console.log("[Heatmap] race:", { id: race?.id, track: race?.track, date: race?.date },
-        "me:", extractDriverName(me),
-        "start:", startPos, "finish:", finishPos, "dnf:", dnf
+      console.log(
+        "[Heatmap] race:",
+        { id: race?.id, track: race?.track, date: race?.date },
+        "me:",
+        extractDriverName(me),
+        "start:",
+        startPos,
+        "finish:",
+        finishPos,
+        "dnf:",
+        dnf
       );
     }
 
     if (!startPos || !finishPos || dnf) continue;
-    if (startPos < 1 || startPos > 20 || finishPos < 1 || finishPos > 20) continue;
+    if (
+      startPos < 1 ||
+      startPos > 20 ||
+      finishPos < 1 ||
+      finishPos > 20
+    )
+      continue;
 
     m[startPos - 1][finishPos - 1] += 1;
     processed++;
   }
 
   if (DEBUG_HEATMAP) {
-    const total = m.flat().reduce((a,b)=>a+b,0);
-    console.log("[Heatmap] processed rows:", processed, "total counts placed:", total);
+    const total = m.flat().reduce((a, b) => a + b, 0);
+    console.log(
+      "[Heatmap] processed rows:",
+      processed,
+      "total counts placed:",
+      total
+    );
   }
 
   return m;
 };
 
-// Simple color scale: returns an rgba() with intensity based on value/max
 const heatColor = (value, max) => {
-  if (max <= 0) return "rgba(59,130,246,0.08)"; // faint fallback
-  const t = value / max;                 // 0..1
-  const alpha = 0.15 + 0.75 * t;         // keep visible on dark bg
-  // blue -> green blend (feel free to tweak)
+  if (max <= 0) return "rgba(59,130,246,0.08)";
+  const t = value / max;
+  const alpha = 0.15 + 0.75 * t;
   const r = Math.round(59 + (16 - 59) * t);
   const g = Math.round(130 + (185 - 130) * t);
   const b = Math.round(0 + (129 - 246) * t);
   return `rgba(${r},${g},${b},${alpha})`;
 };
 
-// Turn off later
 const DEBUG_HEATMAP = false;
 
-// 1) Normalize any name to a canonical form (case/space/diacritics insensitive)
 const canonicalize = (s) =>
   (s ?? "")
     .toString()
     .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")  // strip accents
-    .replace(/\s+/g, "")              // remove all spaces
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\s+/g, "")
     .toLowerCase()
     .trim();
 
-// 2) Try to extract a driver name from a result row using common field names
 const extractDriverName = (row) => {
   if (!row || typeof row !== "object") return "";
-  // sometimes the driver is an object like { name: "...", username: "..." }
   const candidateObjs = [
-    row.driver, row.driverOBJ, row.user, row.account, row.profile,
+    row.driver,
+    row.driverOBJ,
+    row.user,
+    row.account,
+    row.profile,
   ].filter(Boolean);
 
   for (const obj of candidateObjs) {
     if (typeof obj === "string") return obj;
     if (typeof obj === "object") {
-      const v = obj.name || obj.username || obj.displayName || obj.tag || obj.handle;
+      const v =
+        obj.name ||
+        obj.username ||
+        obj.displayName ||
+        obj.tag ||
+        obj.handle;
       if (v) return v;
     }
   }
 
-  // fall back to flat string fields on the row
   return (
     row.driver ||
     row.name ||
@@ -849,8 +1101,6 @@ const extractDriverName = (row) => {
   );
 };
 
-// 3) Find the driver's row in raceResults using canonical comparison.
-//    Also logs the available names when we can't find a match.
 const findMyRow = (results, targetNameRaw) => {
   const target = canonicalize(targetNameRaw);
 
@@ -859,13 +1109,15 @@ const findMyRow = (results, targetNameRaw) => {
     if (canonicalize(name) === target) return rr;
   }
 
-  // Not found: debug dump of what names exist
   if (DEBUG_HEATMAP) {
     const names = results.map((rr) => extractDriverName(rr));
-    console.log("[Heatmap] could not match driver. target:",
+    console.log(
+      "[Heatmap] could not match driver. target:",
       targetNameRaw,
-      "canonical:", target,
-      "available:", names
+      "canonical:",
+      target,
+      "available:",
+      names
     );
   }
   return null;

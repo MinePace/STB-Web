@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace STB_Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20251112212000_DriverForeignKeyMigration")]
+    partial class DriverForeignKeyMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.1");
@@ -132,6 +135,10 @@ namespace STB_Backend.Migrations
                     b.Property<int>("RaceId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Team")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("TeamId")
                         .HasColumnType("INTEGER");
 
@@ -143,8 +150,6 @@ namespace STB_Backend.Migrations
                     b.HasIndex("DriverId");
 
                     b.HasIndex("RaceId");
-
-                    b.HasIndex("TeamId");
 
                     b.ToTable("RaceResults");
                 });
@@ -357,17 +362,9 @@ namespace STB_Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Team", "Team")
-                        .WithMany()
-                        .HasForeignKey("TeamId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Driver");
 
                     b.Navigation("Race");
-
-                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("SeasonalTeamColor", b =>
