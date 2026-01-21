@@ -1,4 +1,4 @@
-import { useParams, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
@@ -13,6 +13,7 @@ function ChampionshipPage() {
   const { season, division } = useParams();
   const [searchParams] = useSearchParams();
   const prefillDriver = searchParams.get("driver");
+  const navigate = useNavigate();
 
   // NEW: Constructors mode
   const mode = searchParams.get("c") === "constructors" ? "constructors" : "drivers";
@@ -77,6 +78,16 @@ function ChampionshipPage() {
         setLoading(false);
       });
   }, [season, division]);
+
+  const toggleChampionshipMode = () => {
+    if (mode === "constructors") {
+      // go back to drivers (remove query param)
+      navigate(`/STB/Championship/${season}/${division}`);
+    } else {
+      // go to constructors
+      navigate(`/STB/Championship/${season}/${division}?c=constructors`);
+    }
+  };
 
   // 🔹 NORMAL DRIVER CHAMPIONSHIP LOGIC — UNCHANGED
   const transformData = (races) => {
@@ -190,7 +201,7 @@ function ChampionshipPage() {
       .sort((a, b) => b.total - a.total);
   };
 
-  // html2canvas logic — unchanged
+  // now with BACKEND UPLOAD.
   const downloadTableAsImage = async () => {
     const root = tableRef.current;
     if (!root) return;
@@ -199,9 +210,9 @@ function ChampionshipPage() {
     const totalW = root.scrollWidth;
     const totalH = root.scrollHeight;
 
-    const SCALE = 3;
-    const TILE_W = 1400;
-    const TILE_H = 1000;
+    const SCALE   = 2;
+    const TILE_W  = 1400;
+    const TILE_H  = 1000;
     const MAX_DIM = 16000;
 
     const oneShotOK =
@@ -216,20 +227,53 @@ function ChampionshipPage() {
         windowHeight: vh,
         scrollX: 0,
         scrollY: 0,
+        onclone: (doc) => {
+          doc.body.style.background = "transparent";
+
+          const clonedRoot =
+            doc.querySelector(ROOT_SELECTOR) || doc.body.firstElementChild;
+
+          const scroller = clonedRoot?.querySelector(".scrollable-wrapper");
+          if (scroller) {
+            scroller.style.overflow   = "hidden";
+            scroller.style.maxHeight  = "none";
+            scroller.style.maxWidth   = "none";
+            scroller.style.visibility = "visible";
+            scroller.scrollLeft = vx;
+            scroller.scrollTop  = vy;
+
+            // Hide rows after 25
+            const rows = scroller.querySelectorAll("tbody tr");
+            rows.forEach((row, i) => {
+              if (i >= 50) row.style.display = "none";
+            });
+          }
+
+          const css = doc.createElement("style");
+          css.textContent = `
+            .scrollable-wrapper { scrollbar-width: none !important; }
+            .scrollable-wrapper::-webkit-scrollbar { display: none !important; }
+          `;
+          doc.head.appendChild(css);
+        },
       });
 
     let finalCanvas;
 
     if (oneShotOK) {
-      finalCanvas = await makeShot(0, 0, totalW, totalH, SCALE);
+      const safeScale = Math.min(
+        SCALE,
+        MAX_DIM / Math.max(1, totalW),
+        MAX_DIM / Math.max(1, totalH)
+      );
+      finalCanvas = await makeShot(0, 0, totalW, totalH, safeScale);
     } else {
       const cols = Math.ceil(totalW / TILE_W);
       const rows = Math.ceil(totalH / TILE_H);
 
       finalCanvas = document.createElement("canvas");
-      finalCanvas.width = Math.min(totalW * SCALE, MAX_DIM);
+      finalCanvas.width  = Math.min(totalW * SCALE, MAX_DIM);
       finalCanvas.height = Math.min(totalH * SCALE, MAX_DIM);
-
       const ctx = finalCanvas.getContext("2d");
 
       for (let r = 0; r < rows; r++) {
@@ -243,25 +287,71 @@ function ChampionshipPage() {
 
           ctx.drawImage(
             tile,
-            Math.floor(vx * SCALE),
-            Math.floor(vy * SCALE)
+            0, 0, tile.width, tile.height,
+            Math.floor(vx * SCALE), Math.floor(vy * SCALE),
+            Math.floor(vw * SCALE), Math.floor(vh * SCALE)
           );
         }
       }
     }
 
-    finalCanvas.toBlob(
-      (blob) => {
-        if (!blob) return;
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `Championship_Season_${season}_Tier_${division}.png`;
-        a.click();
-        URL.revokeObjectURL(url);
-      },
-      "image/png"
+    // Convert to blob
+    const blob = await new Promise((resolve) =>
+      finalCanvas.toBlob(resolve, "image/png")
     );
+    if (!blob) return;
+
+    // -------------------------------
+    // 1️⃣ LOCAL DOWNLOAD
+    // -------------------------------
+    const localFileName =
+      mode === "constructors"
+        ? "championship-constructors.png"
+        : "championship-drivers.png";
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = localFileName;
+    a.click();
+    URL.revokeObjectURL(url);
+
+    // -------------------------------
+    // 2️⃣ UPLOAD TO BACKEND
+    // -------------------------------
+
+    // Find latest race WITH results
+    const latestRace = [...races]        // copy
+      .filter((r) => Array.isArray(r.raceResults) && r.raceResults.length > 0)
+      .sort((a, b) => b.round - a.round)[0];
+
+    const country = latestRace?.track?.country || "";
+    const circuit = latestRace?.track?.name || "";
+
+    const file = new File([blob], localFileName, { type: "image/png" });
+
+    const formData = new FormData();
+    formData.append("season", season);
+    formData.append("tier", division);
+    formData.append("mode", mode);     // "drivers" or "constructors"
+    formData.append("country", country);
+    formData.append("circuit", circuit);
+    formData.append("file", file);
+
+    try {
+      const response = await fetch(
+        "http://localhost:5110/api/auth/upload-championship",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const json = await response.json();
+      console.log("🏆 Championship upload complete:", json);
+    } catch (err) {
+      console.error("❌ Championship upload failed:", err);
+    }
   };
 
   const raceCount = sortedDrivers.raceNumbers?.length || 0;
@@ -290,9 +380,22 @@ function ChampionshipPage() {
     return (
       <div className="table-container constructors-view">
 
-        <button onClick={downloadTableAsImage} className="download-button">
-          Download Table
-        </button>
+        <div className="championship-buttons">
+          <div className="championship-buttons-inner">
+            <button onClick={downloadTableAsImage} className="download-button">
+              Download Table
+            </button>
+
+            <button
+              onClick={toggleChampionshipMode}
+              className="download-button"
+            >
+              {mode === "constructors"
+                ? "View Drivers Championship"
+                : "View Constructors Championship"}
+            </button>
+          </div>
+        </div>
 
         <div
           ref={tableRef}
@@ -349,9 +452,22 @@ function ChampionshipPage() {
 
   return (
     <div className="table-container">
-      <button onClick={downloadTableAsImage} className="download-button">
-        Download Table
-      </button>
+      <div className="championship-buttons">
+        <div className="championship-buttons-inner">
+          <button onClick={downloadTableAsImage} className="download-button">
+            Download Table
+          </button>
+
+          <button
+            onClick={toggleChampionshipMode}
+            className="download-button"
+          >
+            {mode === "constructors"
+              ? "View Drivers Championship"
+              : "View Constructors Championship"}
+          </button>
+        </div>
+      </div>
 
       <div ref={tableRef} id="championship-table">
         <table className="header-table">
@@ -435,14 +551,15 @@ function ChampionshipPage() {
                       <td>
                         <Link
                           to={`/STB/Driver/${encodeURIComponent(driver)}`}
-                          className={`primary-link ${
-                            (claimedDriver?.name &&
-                              driver.toLowerCase() ===
-                                claimedDriver.name.toLowerCase()) ||
-                            prefillDriver === driver
-                              ? "driver-link-season"
-                              : ""
-                          }`}
+                          className={`primary-link`}
+                            // ${
+                            //   (claimedDriver?.name &&
+                            //     driver.toLowerCase() ===
+                            //       claimedDriver.name.toLowerCase()) ||
+                            //   prefillDriver === driver
+                            //     ? "driver-link-season"
+                            //     : ""
+                            //   }
                         >
                           {driver}
                         </Link>

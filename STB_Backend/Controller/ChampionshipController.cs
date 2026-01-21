@@ -56,7 +56,7 @@ public class ChampionshipController : ControllerBase
     [HttpGet("current")]
     public IActionResult GetCurrentChampionshipTop3()
     {
-        var currentSeason = 29;
+        var currentSeason =30;
 
         // Aggregate totals
         var driverTotals = _context.RaceResults

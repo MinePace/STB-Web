@@ -109,27 +109,19 @@ Content-Type: application/json
 
 ##########
 
-GET  http://localhost:5110/api/discordbot/tier-info/3
+GET  http://localhost:5110/api/championship/current
 
 ##########
 
-GET  http://localhost:5110/api/driver/stats/Joey1854
-
-##########
-
-PUT http://localhost:5110/api/raceresult/update/7219
+POST http://localhost:5110/api/admin/drivers/combine/1130
 Content-Type: application/json
 
 {
-    "Position": 1,
-    "Driver": "Will Gibson",
-    "Team": "Racing Bulls",
-    "Points": 25,
-    "DNF": "No",
-    "Qualifying": 1,
-    "Pos_Change": 0,
-    "Time": "39:08.717",
-    "Penalty": 5
+  "driverIds": [1130, 941] 
 }
+
+##########
+
+PUT http://localhost:5110/api/discordbot/name-change-driver/JedemVevapeGaming?name=JedemCevapeGaming
 
 ##########

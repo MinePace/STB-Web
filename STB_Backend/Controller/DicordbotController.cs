@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Text.Json;
@@ -135,6 +136,15 @@ public class DiscordbotController : ControllerBase
         if (!races.Any())
             return NotFound(new { message = $"No data found for tier {tier} in season {latestSeason}" });
 
+        var drivers = _context.Races
+            .Where(r => r.Season == latestSeason && r.Division == tier)
+            .SelectMany(r => r.RaceResults.Select(rr => new{
+                rr.Driver.Name,
+                rr.Driver.DiscordId
+            }))
+            .Distinct()
+            .ToList();
+
         // 3️⃣ Get latest completed race (one that has RaceResults)
         var latestRace = _context.Races
             .Include(r => r.Track)
@@ -227,6 +237,7 @@ public class DiscordbotController : ControllerBase
             tier,
             season = latestSeason,
             races = races.Count,
+            drivers,
             latestRace = latestRace != null ? new
             {
                 name = latestRace.TrackName,
@@ -449,12 +460,14 @@ public class DiscordbotController : ControllerBase
         // 🏆 Top 10 by Wins
         var topWins = allResults
             .Where(r => r.Position == 1)
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Select(g => new
             {
                 Driver = g.Key,
                 Wins = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderByDescending(x => x.Wins)
             .Take(10)
@@ -463,12 +476,14 @@ public class DiscordbotController : ControllerBase
         // 🥈 Top 10 by Podiums
         var topPodiums = allResults
             .Where(r => r.Position >= 1 && r.Position <= 3)
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Select(g => new
             {
                 Driver = g.Key,
                 Podiums = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderByDescending(x => x.Podiums)
             .Take(10)
@@ -476,12 +491,14 @@ public class DiscordbotController : ControllerBase
 
         // 💯 Top 10 by Total Points
         var topPoints = allResults
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Select(g => new
             {
                 Driver = g.Key,
                 Points = g.Sum(r => r.Points),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderByDescending(x => x.Points)
             .Take(10)
@@ -490,12 +507,14 @@ public class DiscordbotController : ControllerBase
         // 🎯 Top 10 by Poles
         var topPoles = allResults
             .Where(r => r.Qualifying == 1)
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Select(g => new
             {
                 Driver = g.Key,
                 Poles = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderByDescending(x => x.Poles)
             .Take(10)
@@ -503,14 +522,16 @@ public class DiscordbotController : ControllerBase
 
         // 🏁 Average Finish (≥15 races)
         var avgFinish = allResults
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Where(g => g.Count() >= 15)
             .Select(g => new
             {
                 Driver = g.Key,
                 AvgFinish = Math.Round(g.Average(r => r.Position), 2),
                 Races = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderBy(x => x.AvgFinish)
             .ThenByDescending(x => x.Races)
@@ -520,14 +541,16 @@ public class DiscordbotController : ControllerBase
         // 🎯 Average Qualifying (≥15 races)
         var avgQualifying = allResults
             .Where(r => r.Qualifying > 0) // ignore missing data
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Where(g => g.Count() >= 15)
             .Select(g => new
             {
                 Driver = g.Key,
                 AvgQuali = Math.Round(g.Average(r => r.Qualifying), 2),
                 Races = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderBy(x => x.AvgQuali)
             .ThenByDescending(x => x.Races)
@@ -576,12 +599,14 @@ public class DiscordbotController : ControllerBase
         // 🏆 Top 10 by Wins
         var topWins = allResults
             .Where(r => r.Position == 1)
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Select(g => new
             {
                 Driver = g.Key,
                 Wins = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderByDescending(x => x.Wins)
             .Take(10)
@@ -590,12 +615,14 @@ public class DiscordbotController : ControllerBase
         // 🥈 Top 10 by Podiums
         var topPodiums = allResults
             .Where(r => r.Position >= 1 && r.Position <= 3)
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Select(g => new
             {
                 Driver = g.Key,
                 Podiums = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderByDescending(x => x.Podiums)
             .Take(10)
@@ -603,12 +630,14 @@ public class DiscordbotController : ControllerBase
 
         // 💯 Top 10 by Points
         var topPoints = allResults
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Select(g => new
             {
                 Driver = g.Key,
                 Points = g.Sum(r => r.Points),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderByDescending(x => x.Points)
             .Take(10)
@@ -617,12 +646,14 @@ public class DiscordbotController : ControllerBase
         // 🎯 Top 10 by Poles
         var topPoles = allResults
             .Where(r => r.Qualifying == 1)
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Select(g => new
             {
                 Driver = g.Key,
                 Poles = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderByDescending(x => x.Poles)
             .Take(10)
@@ -630,14 +661,16 @@ public class DiscordbotController : ControllerBase
 
         // 🏁 Average Finish (≥15 races)
         var avgFinish = allResults
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Where(g => g.Count() >= 15)
             .Select(g => new
             {
                 Driver = g.Key,
                 AvgFinish = Math.Round(g.Average(r => r.Position), 2),
                 Races = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderBy(x => x.AvgFinish)
             .ThenByDescending(x => x.Races)
@@ -647,14 +680,16 @@ public class DiscordbotController : ControllerBase
         // 🎯 Average Qualifying (≥15 races)
         var avgQualifying = allResults
             .Where(r => r.Qualifying > 0)
-            .GroupBy(r => r.Driver)
+            .GroupBy(r => new { r.DriverId, r.Driver.Name })
             .Where(g => g.Count() >= 15)
             .Select(g => new
             {
                 Driver = g.Key,
                 AvgQuali = Math.Round(g.Average(r => r.Qualifying), 2),
                 Races = g.Count(),
-                DiscordId = getDiscordId(g.Key)
+                DiscordId = drivers
+                    .FirstOrDefault(d => d.Name.ToLower() == g.Key.Name.ToLower())
+                    ?.DiscordId
             })
             .OrderBy(x => x.AvgQuali)
             .ThenByDescending(x => x.Races)
@@ -683,6 +718,21 @@ public class DiscordbotController : ControllerBase
     public async Task<IActionResult> ChangeDriverName(string discordId, string name)
     {
         var driver = await _context.Drivers.FirstOrDefaultAsync(d => d.DiscordId == discordId);
+        if (driver == null)
+            return NotFound(new { message = "Driver not found for the provided Discord ID." });
+
+        var oldName = driver.Name;
+
+        driver.Name = name;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Driver name updated successfully.", driver, oldName });
+    }
+
+    [HttpPut("name-change-driver/{drivername}")]
+    public async Task<IActionResult> ChangeDriverNameByName(string drivername, string name)
+    {
+        var driver = await _context.Drivers.FirstOrDefaultAsync(d => d.Name == drivername);
         if (driver == null)
             return NotFound(new { message = "Driver not found for the provided Discord ID." });
 

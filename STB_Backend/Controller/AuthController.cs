@@ -72,7 +72,7 @@ public class AuthController : ControllerBase
         if (file == null || file.Length == 0)
             return BadRequest("No file uploaded.");
 
-        var savePath = Path.Combine("..", "STB_Frontend", "public", "results", $"season{season}", $"tier{tier}");
+        var savePath = Path.Combine("..", "STB_Frontend", "public", "results", $"season{season}", $"tier{tier}", "race-results");
         if (!Directory.Exists(savePath))
             Directory.CreateDirectory(savePath);
 
@@ -94,7 +94,7 @@ public class AuthController : ControllerBase
                 season,
                 tier,
                 round,
-                imagePath = $"/results/season{season}/tier{tier}/round{round}.png",
+                imagePath = $"/results/season{season}/tier{tier}/race-results/round{round}.png",
                 isFinal = false,
                 country,
                 circuit
@@ -116,6 +116,69 @@ public class AuthController : ControllerBase
         }
 
         return Ok(new { message = "Upload successful", path = filePath });
+    }
+
+    [HttpPost("upload-championship")]
+    public async Task<IActionResult> UploadChampionshipImage(
+        [FromForm] int season,
+        [FromForm] int tier,
+        [FromForm] string mode,   // "drivers" or "constructors"
+        [FromForm] string country,
+        [FromForm] string circuit,
+        [FromForm] IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("No file uploaded.");
+
+        // Folder path
+        var savePath = Path.Combine("..", "STB_Frontend", "public", "results", $"season{season}", $"tier{tier}");
+        if (!Directory.Exists(savePath))
+            Directory.CreateDirectory(savePath);
+
+        string fileName = mode switch
+        {
+            "drivers" => "championship-drivers.png",
+            "constructors" => "championship-constructors.png",
+            _ => "championship.png"
+        };
+
+        var filePath = Path.Combine(savePath, fileName);
+
+        using (var stream = new FileStream(filePath, FileMode.Create))
+            await file.CopyToAsync(stream);
+
+        Console.WriteLine($"🏆 Uploaded championship image ({mode}) → {filePath}");
+
+        // 🔵 Optional: Notify your Discord bot
+        try
+        {
+            using var client = new HttpClient();
+            var botUrl = "http://localhost:3000/api/notify-championship";
+
+            var payload = new
+            {
+                season,
+                tier,
+                mode,
+                country,
+                circuit,
+                imagePath = $"/results/season{season}/tier{tier}/{fileName}"
+            };
+
+            var json = JsonSerializer.Serialize(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync(botUrl, content);
+            var responseText = await response.Content.ReadAsStringAsync();
+
+            Console.WriteLine($"[BOT_NOTIFY_CHAMP] Response: {response.StatusCode} → {responseText}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[WARN] Could not notify bot (championship): {ex.Message}");
+        }
+
+        return Ok(new { message = "Championship upload successful", path = filePath });
     }
 
     // 🔹 Wachtwoord hash functie
