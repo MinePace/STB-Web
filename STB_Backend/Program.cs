@@ -25,6 +25,25 @@ Directory.CreateDirectory(Path.GetDirectoryName(csb.DataSource)!);
 // Log the final resolved path
 Console.WriteLine($"[DB] SQLite DataSource resolved to: {csb.DataSource}");
 
+Console.WriteLine("---- FILE CHECK ----");
+Console.WriteLine("ContentRootPath: " + builder.Environment.ContentRootPath);
+
+var dataDir = Path.Combine(builder.Environment.ContentRootPath, "Data");
+
+if (Directory.Exists(dataDir))
+{
+    Console.WriteLine("Data folder exists. Files:");
+    foreach (var file in Directory.GetFiles(dataDir))
+    {
+        var info = new FileInfo(file);
+        Console.WriteLine($" - {file} ({info.Length} bytes)");
+    }
+}
+else
+{
+    Console.WriteLine("Data folder NOT found at: " + dataDir);
+}
+
 // Use this final connection string
 var finalConnString = csb.ToString();
 
