@@ -50,7 +50,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<DataContext>();
-        dbContext.Database.EnsureCreated(); // 👈 faster, no migrations
+        // dbContext.Database.EnsureCreated(); // 👈 faster, no migrations
 }
 
 if (app.Environment.IsDevelopment())
