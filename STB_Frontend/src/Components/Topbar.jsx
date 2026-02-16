@@ -98,7 +98,7 @@ function Topbar() {
 
   useEffect(() => {
     if (isLoggedIn && username) {
-      fetch(`http://localhost:5110/api/driver/user/${username}`)
+      fetch(`https://stbleague.onrender.com/api/driver/user/${username}`)
         .then((res) => res.json())
         .then((data) => data && setClaimedDriver(data))
         .catch((err) => console.error("Error fetching claimed driver:", err));
