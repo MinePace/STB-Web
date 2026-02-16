@@ -109,15 +109,15 @@ Content-Type: application/json
 
 ##########
 
-GET  http://localhost:5110/api/championship/current
+GET  http://localhost:5110/api/race/races/30
 
 ##########
 
-POST http://localhost:5110/api/admin/drivers/combine/1130
+POST http://localhost:5110/api/admin/drivers/combine/290
 Content-Type: application/json
 
 {
-  "driverIds": [1130, 941] 
+  "driverIds": [290, 272] 
 }
 
 ##########

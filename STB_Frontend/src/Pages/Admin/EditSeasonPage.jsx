@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useMemo, useState } from "react";
-import "./EditRacePage.css";
+import "./EditSeasonPage.css";
 import "@/Components/Links.css";
 
 /**
@@ -10,7 +10,7 @@ import "@/Components/Links.css";
  * - Simplified update payload (no need to fetch full Track for PUT).
  * - Minor cleanups for change detection & disabled states.
  */
-function EditRacePage() {
+function EditSeasonPage() {
   const navigate = useNavigate();
 
   // Filters
@@ -630,33 +630,36 @@ function EditRacePage() {
                   for (const td of teamDrivers) {
                     if (!td.teamId) continue;
 
-                    for (const driverName of td.drivers || []) {
-                      if (!driverName) continue;
+                    const validDrivers = (td.drivers || [])
+                      .map(d => d?.trim())
+                      .filter(Boolean)
+                      .slice(0, 2); // max 2 drivers
 
-                      try {
-                        const payload = {
-                          season: Number(selectedSeason),
-                          division: Number(selectedDivision),
-                          teamId: Number(td.teamId),
-                          driver: driverName.trim(),
-                        };
+                    if (validDrivers.length === 0) continue;
 
-                        const res = await fetch(
-                          "http://localhost:5110/api/team/teamdriver",
-                          {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(payload),
-                          }
-                        );
+                    try {
+                      const payload = {
+                        season: Number(selectedSeason),
+                        division: Number(selectedDivision),
+                        teamId: Number(td.teamId),
+                        drivers: validDrivers, // <-- ARRAY i.p.v. single driver
+                      };
 
-                        if (!res.ok) {
-                          const txt = await res.text().catch(() => "");
-                          throw new Error(txt || `HTTP ${res.status}`);
+                      const res = await fetch(
+                        "http://localhost:5110/api/team/teamdrivers", // <-- nieuwe endpoint
+                        {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify(payload),
                         }
-                      } catch (e) {
-                        errors.push(e.message);
+                      );
+
+                      if (!res.ok) {
+                        const txt = await res.text().catch(() => "");
+                        throw new Error(txt || `HTTP ${res.status}`);
                       }
+                    } catch (e) {
+                      errors.push(`Team ${td.teamId}: ${e.message}`);
                     }
                   }
 
@@ -677,4 +680,4 @@ function EditRacePage() {
   );
 }
 
-export default EditRacePage;
+export default EditSeasonPage;

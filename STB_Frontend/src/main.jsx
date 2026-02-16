@@ -17,8 +17,8 @@ import AdminPage from "./Pages/Admin/AdminPage";
 import AddRaceResultPage from "./Pages/Admin/AddRaceResultPage";
 import EditRaceResultPage from "./Pages/Admin/EditRaceResultPage";
 import AddTrackPage from "./Pages/Admin/AddTrackPage";
-import AddRacePage from "./Pages/Admin/AddRacePage";
-import EditRacePage from "./Pages/Admin/EditRacePage";
+import AddSeasonPage from "./Pages/Admin/AddSeasonPage";
+import EditSeasonPage from "./Pages/Admin/EditSeasonPage";
 import EditTrackPage from "./Pages/Admin/EditTrackPage";
 
 import Layout from "./Components/Layout";
@@ -39,9 +39,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       
       <Route path="/STB/Add/RaceResults" element={<Layout showSidebar={true}><AddRaceResultPage /></Layout>} />
       <Route path="/STB/Add/Track" element={<AddTrackPage />} />
-      <Route path="/STB/Add/Race" element={<Layout showSidebar={true}><AddRacePage /></Layout>} />
+      <Route path="/STB/Add/Season" element={<Layout showSidebar={true}><AddSeasonPage /></Layout>} />
 
-      <Route path="/STB/Edit/Race" element={<Layout showSidebar={true}><EditRacePage /></Layout>} />
+      <Route path="/STB/Edit/Season" element={<Layout showSidebar={true}><EditSeasonPage /></Layout>} />
       <Route path="/STB/Edit/RaceResults" element={<Layout showSidebar={true}><EditRaceResultPage /></Layout>} />
       <Route path="/STB/Edit/Tracks" element={<Layout showSidebar={true}><EditTrackPage /></Layout>} />
     </Routes>

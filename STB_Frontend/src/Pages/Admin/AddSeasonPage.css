@@ -1,6 +1,6 @@
 /*----Buttons----*/
 .button-date {
-    background-color: rgb(0, 76, 169);
+    background-color: rgb(76, 144, 228);
     border: none;
     padding: 8px 16px;
     margin: 5px;
@@ -11,12 +11,12 @@
 }
 
 .button-date:hover {
-    background-color: rgb(0, 60, 134);
+    background-color: rgb(35, 103, 185);
 }
 
 .button-ghost {
     background-color: transparent;
-    border: 2px solid rgb(0, 76, 169);
+    border: 2px solid rgb(0, 0, 0);
     padding: 10px 20px;
     margin: 5px;
     cursor: pointer;

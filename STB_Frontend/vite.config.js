@@ -10,4 +10,11 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+
+  server: {
+    host: true,
+    allowedHosts: [
+      'unvainly-untripped-onie.ngrok-free.dev'
+    ]
+  }
 })

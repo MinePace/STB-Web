@@ -69,6 +69,7 @@ public class AdminController : ControllerBase
                 {
                     leadDriver.UserId = driver.UserId;
                     leadDriver.User = driver.User;
+                    leadDriver.DiscordId = driver.DiscordId;
                 }
             }
 

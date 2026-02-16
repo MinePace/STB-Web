@@ -1,52 +1,31 @@
 .layout-container {
-  padding-top: 60px; /* Push content below the fixed Topbar */
+  height: 100vh;
   display: flex;
+  flex-direction: column;
+}
+
+/* Topbar neemt 60px */
+.content-wrapper {
+  display: flex;
+  flex: 1;
+  margin-top: 60px; /* hoogte van topbar */
+  padding: 0;
 }
 
 /* Sidebar */
 .sidebar {
+  width: 100px;
+  min-width: 100px;
+  height: calc(100vh - 60px);
   position: fixed;
   left: 0;
-  top: 60px; /* Below the Topbar */
-  padding-top: 20px;
-  width: 6%;          /* same as margin-left below */
-  height: calc(100vh - 60px);
-  background-color: #0040805f;
-  color: white;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-  z-index: 1000;
+  top: 60px;
 }
 
-/* Main content area */
+/* Content */
 .content-container {
-  margin-left: 100px;    /* Reserve space for sidebar */
-  overflow-x: auto;
-  flex: 1;               /* Let content fill remaining width */
-  transition: margin-left 0.3s ease;
-}
-
-/* Scrollbar styling */
-.content-container::-webkit-scrollbar {
-  width: 6px;
-  background-color: transparent;
-}
-.content-container::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
-  border-radius: 10px;
-}
-.content-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgb(212, 225, 255);
-}
-.content-container::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
-/* ✅ Responsive behavior — hide sidebar and remove margin on small screens */
-@media (max-width: 768px) {
-  .sidebar {
-    display: none;          /* Hide sidebar */
-  }
-  .content-container {
-    margin-left: 0;         /* Remove the offset */
-  }
+  flex: 1;
+  margin-left: 100px; /* exact gelijk aan sidebar width */
+  height: calc(100vh - 60px);
+  overflow: auto;
 }

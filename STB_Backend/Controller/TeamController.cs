@@ -80,102 +80,90 @@ public class TeamController : ControllerBase
         return CreatedAtAction(nameof(GetTeam), new { id = newTeamColor.Id }, newTeamColor);
     }
 
-    [HttpPost("teamdriver")]
-    public async Task<IActionResult> AddTeamDriver([FromBody] TeamDriverRequest newTeamDriver)
+    [HttpPost("teamdrivers")]
+    public async Task<IActionResult> AddTeamDrivers([FromBody] TeamDriverRequest request)
     {
-        if (newTeamDriver == null)
-            return BadRequest(new { message = "Invalid teamDriver data." });
+        if (request == null)
+            return BadRequest(new { message = "Invalid data." });
 
-        if (newTeamDriver.TeamId <= 0)
+        if (request.TeamId <= 0)
             return BadRequest(new { message = "TeamId is required." });
 
-        if (newTeamDriver.Season <= 0 || newTeamDriver.Division <= 0)
+        if (request.Season <= 0 || request.Division <= 0)
             return BadRequest(new { message = "Season and Division are required." });
 
-        if (newTeamDriver.Driver == null || string.IsNullOrWhiteSpace(newTeamDriver.Driver))
-            return BadRequest(new { message = "Driver name is required." });
+        if (request.Drivers == null || !request.Drivers.Any())
+            return BadRequest(new { message = "At least one driver is required." });
 
-        // 1️⃣ Check if driver already exists by name
-        var driverName = newTeamDriver.Driver.Trim().ToLower();
-        var existingDriver = await _context.Drivers
-            .FirstOrDefaultAsync(d => d.Name.ToLower() == driverName);
+        if (request.Drivers.Count > 2)
+            return BadRequest(new { message = "Maximum 2 drivers allowed per team." });
 
-        // 2️⃣ If not found, create the driver
-        if (existingDriver == null)
+        // 1️⃣ Haal bestaande team-driver links op (voor wissel scenario)
+        var existingLinks = await _context.SeasonalTeamDrivers
+            .Where(td =>
+                td.Season == request.Season &&
+                td.Division == request.Division &&
+                td.TeamId == request.TeamId)
+            .ToListAsync();
+
+        // 2️⃣ Verwijder oude links (team wisselt van rijder)
+        if (existingLinks.Any())
         {
-            existingDriver = new Driver
+            _context.SeasonalTeamDrivers.RemoveRange(existingLinks);
+        }
+
+        var createdLinks = new List<SeasonalTeamDriver>();
+
+        // 3️⃣ Loop door drivers
+        foreach (var driverNameRaw in request.Drivers)
+        {
+            if (string.IsNullOrWhiteSpace(driverNameRaw))
+                continue;
+
+            var driverName = driverNameRaw.Trim();
+            var normalized = driverName.ToLower();
+
+            // Zoek bestaande driver
+            var existingDriver = await _context.Drivers
+                .FirstOrDefaultAsync(d => d.Name.ToLower() == normalized);
+
+            // Maak driver als hij niet bestaat
+            if (existingDriver == null)
             {
-                Name = newTeamDriver.Driver.Trim(),
-                Country = null,
-                UserId = null
+                existingDriver = new Driver
+                {
+                    Name = driverName,
+                    Country = null,
+                    UserId = null
+                };
+
+                _context.Drivers.Add(existingDriver);
+                await _context.SaveChangesAsync();
+            }
+
+            // Maak nieuwe team-driver link
+            var teamDriver = new SeasonalTeamDriver
+            {
+                Season = request.Season,
+                Division = request.Division,
+                TeamId = request.TeamId,
+                DriverId = existingDriver.Id
             };
 
-            _context.Drivers.Add(existingDriver);
-            await _context.SaveChangesAsync();
+            _context.SeasonalTeamDrivers.Add(teamDriver);
+            createdLinks.Add(teamDriver);
         }
 
-        // 3️⃣ Check if this team-driver-season-division combo already exists
-        bool alreadyLinked = await _context.SeasonalTeamDrivers.AnyAsync(td =>
-            td.Season == newTeamDriver.Season &&
-            td.Division == newTeamDriver.Division &&
-            td.TeamId == newTeamDriver.TeamId &&
-            td.DriverId == existingDriver.Id);
+        await _context.SaveChangesAsync();
 
-        if (alreadyLinked)
+        // Load navigation props
+        foreach (var link in createdLinks)
         {
-            Console.WriteLine($"Skipped duplicate: Team {newTeamDriver.TeamId}, Driver {existingDriver.Id}, Season {newTeamDriver.Season}, Division {newTeamDriver.Division}");
-            return Ok(new { message = "Skipped existing TeamDriver link." });
+            await _context.Entry(link).Reference(t => t.Team).LoadAsync();
+            await _context.Entry(link).Reference(t => t.Driver).LoadAsync();
         }
 
-
-        // 4️⃣ Add the link
-        var teamDriver = new SeasonalTeamDriver
-        {
-            Season = newTeamDriver.Season,
-            Division = newTeamDriver.Division,
-            TeamId = newTeamDriver.TeamId,
-            DriverId = existingDriver.Id
-        };
-
-        _context.SeasonalTeamDrivers.Add(teamDriver);
-        await _context.SaveChangesAsync();
-
-        // Include team and driver objects in response
-        await _context.Entry(teamDriver).Reference(t => t.Team).LoadAsync();
-        await _context.Entry(teamDriver).Reference(t => t.Driver).LoadAsync();
-
-        return CreatedAtAction(nameof(GetTeamDriver), new { season = teamDriver.Season, division = teamDriver.Division }, teamDriver);
-    }
-
-    [HttpDelete("teamdriver")]
-    public async Task<IActionResult> DeleteTeamDriver([FromBody] TeamDriverRequest td)
-    {
-        if (string.IsNullOrWhiteSpace(td.Driver))
-            return BadRequest(new { message = "Driver name is required." });
-
-        // 1️⃣ Find the driver by name
-        var driver = await _context.Drivers
-            .FirstOrDefaultAsync(d => d.Name.ToLower() == td.Driver.Trim().ToLower());
-
-        if (driver == null)
-            return NotFound(new { message = "Driver not found." });
-
-        // 2️⃣ Find the SeasonalTeamDriver entry
-        var teamDriver = await _context.SeasonalTeamDrivers
-            .FirstOrDefaultAsync(td =>
-                td.Season == td.Season &&
-                td.Division == td.Division &&
-                td.TeamId == td.TeamId &&
-                td.DriverId == driver.Id);
-
-        if (teamDriver == null)
-            return NotFound(new { message = "TeamDriver link not found." });
-
-        // 3️⃣ Delete the entry
-        _context.SeasonalTeamDrivers.Remove(teamDriver);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "TeamDriver link deleted successfully." });
+        return Ok(createdLinks);
     }
 
     [HttpGet("teamdriver/{season}/{division}")]
@@ -234,6 +222,6 @@ public class TeamController : ControllerBase
         public int Season { get; set; }
         public int Division { get; set; }
         public int TeamId { get; set; }
-        public string Driver { get; set; }
+        public List<string> Drivers { get; set; } = new();
     }
 }

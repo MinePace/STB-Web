@@ -1,0 +1,58 @@
+.admin-container {
+  padding: 40px;
+  color: white;
+}
+
+.admin-title {
+  font-size: 42px;
+  margin-bottom: 6px;
+}
+
+.admin-subtitle {
+  opacity: 0.8;
+  margin-bottom: 25px;
+}
+
+/* Compact panel */
+.admin-panel {
+  max-width: 420px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Per categorie rij */
+.admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  padding: 12px 16px;
+}
+
+/* Section label (RESULTS / TRACKS / SEASONS) */
+.admin-section {
+  font-weight: 600;
+  letter-spacing: 1px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Knoppen rechts */
+.admin-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-action:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-1px);
+}
+
+/* Icoon grootte */
+.icon {
+  font-size: 14px;
+}

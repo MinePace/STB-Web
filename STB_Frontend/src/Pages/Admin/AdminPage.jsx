@@ -1,46 +1,67 @@
 import React, { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import "./AdminPage.css";
+import "@/Components/Links.css"
 
-function AdminHub() {
+function AdminPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
     const role = localStorage.getItem("role");
     if (role !== "Admin") {
-      navigate("/"); // Stuur terug naar homepage als geen admin
+      navigate("/");
     }
   }, [navigate]);
 
   return (
     <div className="admin-container">
-      <h1>Admin Hub</h1>
-      <p>Welcome to the Admin Hub. Please select an action below:</p>
+      <h1 className="admin-title">Admin Hub</h1>
+      <p className="admin-subtitle">
+        Manage seasons, tracks and race results
+      </p>
 
-      {/* Links naar specifieke pagina's */}
-      <div className="admin-links">
-        <ul>
-          <li>
-            <Link to="/STB/Add/Race">Add a New Season</Link>
-          </li>
-          <li>
-            <Link to="/STB/Add/Track">Add a New Track</Link>
-          </li>
-          <li>
-            <Link to="/STB/Add/RaceResults">Add a Race Results</Link>
-          </li>
-          <li>
-            <Link to="/STB/Edit/Race">Edit Existing Seasons</Link>
-          </li>
-          <li>
-            <Link to="/STB/Edit/RaceResults">Edit Race Results</Link>
-          </li>
-          <li>
-            <Link to="/STB/Edit/Tracks">Edit Existing Tracks</Link>
-          </li>
-        </ul>
+      <div className="admin-panel">
+        {/* RESULTS */}
+        <div className="admin-row">
+          <span className="admin-section">RESULTS</span>
+          <div className="admin-actions">
+            <Link to="/STB/Add/RaceResults" className="primary-link">
+              <span className="icon">🏁</span> Add
+            </Link>
+            <Link to="/STB/Edit/RaceResults" className="primary-link">
+              <span className="icon">✏</span> Edit
+            </Link>
+          </div>
+        </div>
+
+        {/* TRACKS */}
+        <div className="admin-row">
+          <span className="admin-section">TRACKS</span>
+          <div className="admin-actions">
+            <Link to="/STB/Add/Track" className="primary-link">
+              <span className="icon">📍</span> Add
+            </Link>
+            <Link to="/STB/Edit/Tracks" className="primary-link">
+              <span className="icon">✏</span> Edit
+            </Link>
+          </div>
+        </div>
+
+        {/* SEASONS */}
+        <div className="admin-row">
+          <span className="admin-section">SEASONS</span>
+          <div className="admin-actions">
+            <Link to="/STB/Add/Season" className="primary-link">
+              <span className="icon">📅</span> Add
+            </Link>
+            <Link to="/STB/Edit/Season" className="primary-link">
+              <span className="icon">✏</span> Edit
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-export default AdminHub;
+export default AdminPage;
