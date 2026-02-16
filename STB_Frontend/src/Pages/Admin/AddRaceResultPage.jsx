@@ -440,7 +440,7 @@ export default function AddRaceResults() {
           then paste — it fills down from the focused row.
         </p>
 
-        <table>
+        <table className="results-table">
           <thead>
             <tr>
               <th>Position</th>

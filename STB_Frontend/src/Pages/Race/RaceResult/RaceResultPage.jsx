@@ -318,7 +318,7 @@ function RaceResultPage() {
             <div className="admin-actions">
               <Link
                 to={`/STB/Add/RaceResults?race=${race.id}`}
-                className="primary-link"
+                className="primary-link add-results-link"
               >
                 ➕ Add Race Results
               </Link>

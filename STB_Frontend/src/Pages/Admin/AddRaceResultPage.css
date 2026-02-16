@@ -1,3 +1,9 @@
+.results-table {
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin: 0 auto;
+  }
+
 .ar-driver-input {
   width: 200px;
   padding: 8px;

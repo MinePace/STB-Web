@@ -15,7 +15,6 @@
   width: 90%;
   max-width: min(92vw, 1400px); /* controls how wide it can get */
   margin: 0 auto;               /* centers inside main content */
-  padding: 0 12px;
 }
 
 /* === Header table (separate table only for thead) === */
