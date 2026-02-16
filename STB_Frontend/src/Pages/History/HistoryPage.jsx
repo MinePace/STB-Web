@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./HistoryPage.css";
-import "@/Components/links.css";
+import "@/Components/Links.css";
 
 export default function HistoryPage() {
   const [seasons, setSeasons] = useState([]);
