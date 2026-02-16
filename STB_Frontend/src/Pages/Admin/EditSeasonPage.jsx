@@ -46,7 +46,7 @@ function EditSeasonPage() {
 
   // ----- Load seasons -----
   useEffect(() => {
-    fetch("http://localhost:5110/api/race/seasons")
+    fetch("https://stbleague.onrender.com/api/race/seasons")
       .then((r) => r.json())
       .then(setSeasons)
       .catch((e) => console.error("seasons error:", e));
@@ -59,7 +59,7 @@ function EditSeasonPage() {
     setOriginalRows([]);
 
     if (!selectedSeason) return;
-    fetch(`http://localhost:5110/api/race/races/${selectedSeason}`)
+    fetch(`https://stbleague.onrender.com/api/race/races/${selectedSeason}`)
       .then((r) => r.json())
       .then((list) => {
         // normalize + sort by round
@@ -79,9 +79,9 @@ function EditSeasonPage() {
     setLoadingTeamDrivers(true);
 
     Promise.all([
-      fetch(`http://localhost:5110/api/team/teamdriver/${selectedSeason}/${selectedDivision}`).then((r) => r.json()),
-      fetch(`http://localhost:5110/api/team`).then((r) => r.json()),
-      fetch(`http://localhost:5110/api/driver/all`).then((r) => r.json()),
+      fetch(`https://stbleague.onrender.com/api/team/teamdriver/${selectedSeason}/${selectedDivision}`).then((r) => r.json()),
+      fetch(`https://stbleague.onrender.com/api/team`).then((r) => r.json()),
+      fetch(`https://stbleague.onrender.com/api/driver/all`).then((r) => r.json()),
     ])
       .then(([teamDriverData, teamList, driverList]) => {
         setTeamDrivers(teamDriverData || []);
@@ -125,7 +125,7 @@ function EditSeasonPage() {
 
     (async () => {
       try {
-        const res = await fetch("http://localhost:5110/api/track");
+        const res = await fetch("https://stbleague.onrender.com/api/track");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 
@@ -256,7 +256,7 @@ function EditSeasonPage() {
           Date: row.date || null,
         };
 
-        const res = await fetch("http://localhost:5110/api/race", {
+        const res = await fetch("https://stbleague.onrender.com/api/race", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -278,7 +278,7 @@ function EditSeasonPage() {
 
         const payload = toUpdatePayload(row);
 
-        const res = await fetch(`http://localhost:5110/api/race/update/${row.id}`, {
+        const res = await fetch(`https://stbleague.onrender.com/api/race/update/${row.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -646,7 +646,7 @@ function EditSeasonPage() {
                       };
 
                       const res = await fetch(
-                        "http://localhost:5110/api/team/teamdrivers", // <-- nieuwe endpoint
+                        "https://stbleague.onrender.com/api/team/teamdrivers", // <-- nieuwe endpoint
                         {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },

@@ -29,7 +29,7 @@ function LoginPage() {
 
   // 🔹 Register
   const handleRegister = async () => {
-    const response = await fetch("http://localhost:5110/api/auth/register", {
+    const response = await fetch("https://stbleague.onrender.com/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password, email }),
@@ -41,7 +41,7 @@ function LoginPage() {
 
   // 🔹 Login
   const handleLogin = async () => {
-    const response = await fetch("http://localhost:5110/api/auth/login", {
+    const response = await fetch("https://stbleague.onrender.com/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),

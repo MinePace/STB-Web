@@ -43,7 +43,7 @@ function AddSeasonPage() {
   }, [navigate]);
 
   useEffect(() => {
-    fetch("http://localhost:5110/api/race/tracks")
+    fetch("https://stbleague.onrender.com/api/race/tracks")
       .then((r) => r.json())
       .then(setTracks)
       .catch((e) => console.error("Error fetching tracks:", e));
@@ -130,7 +130,7 @@ function AddSeasonPage() {
 
     try {
       const res = await fetch(
-        `http://localhost:5110/api/race/races/${importSeason}`
+        `https://stbleague.onrender.com/api/race/races/${importSeason}`
       );
       const races = await res.json();
 
@@ -237,7 +237,7 @@ function AddSeasonPage() {
     }
 
     for (const p of payloads) {
-      await fetch("http://localhost:5110/api/race", {
+      await fetch("https://stbleague.onrender.com/api/race", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(p),

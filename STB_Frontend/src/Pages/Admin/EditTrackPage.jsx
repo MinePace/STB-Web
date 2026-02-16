@@ -22,7 +22,7 @@ function EditTrackPage() {
     }
 
     // Fetch all tracks
-    fetch("http://localhost:5110/api/race/tracks")
+    fetch("https://stbleague.onrender.com/api/race/tracks")
       .then((res) => res.json())
       .then((data) => {
         setTracks(data);
@@ -64,7 +64,7 @@ function EditTrackPage() {
     console.log("Saving track:", updatedTrack);
 
     const response = await fetch(
-      `http://localhost:5110/api/track/update/${selectedTrack.id}`,
+      `https://stbleague.onrender.com/api/track/update/${selectedTrack.id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

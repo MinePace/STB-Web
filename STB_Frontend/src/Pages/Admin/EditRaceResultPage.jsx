@@ -38,7 +38,7 @@ function EditRaceResults() {
 
   // Load seasons
   useEffect(() => {
-    fetch(`http://localhost:5110/api/race/seasons`)
+    fetch(`https://stbleague.onrender.com/api/race/seasons`)
       .then((res) => res.json())
       .then((data) => (Array.isArray(data) ? setSeasons(data) : setSeasons([])))
       .catch((err) => console.error("Error fetching seasons:", err));
@@ -47,7 +47,7 @@ function EditRaceResults() {
   // Load races for a season
   useEffect(() => {
     if (selectedSeason) {
-      fetch(`http://localhost:5110/api/race/races/${selectedSeason}`)
+      fetch(`https://stbleague.onrender.com/api/race/races/${selectedSeason}`)
         .then((res) => res.json())
         .then((data) => setRaces(Array.isArray(data) ? data : []))
         .catch((err) => console.error("Error fetching races:", err));
@@ -90,7 +90,7 @@ function EditRaceResults() {
       return;
     }
 
-    fetch(`http://localhost:5110/api/race/race/${selectedRace}`)
+    fetch(`https://stbleague.onrender.com/api/race/race/${selectedRace}`)
       .then((res) => res.json())
       .then((data) => {
         const raceObj = data?.race ?? data;
@@ -117,7 +117,7 @@ function EditRaceResults() {
   useEffect(() => {
     if (!selectedSeason || !selectedRace) return;
 
-    fetch(`http://localhost:5110/api/fastestlap/${selectedRace}`)
+    fetch(`https://stbleague.onrender.com/api/fastestlap/${selectedRace}`)
       .then(async (res) => {
         const text = await res.text();
         try {
@@ -191,7 +191,7 @@ function EditRaceResults() {
 
     console.log("Saving DTO:", dto);
     const resp = await fetch(
-      `http://localhost:5110/api/raceresult/update/${id}`,
+      `https://stbleague.onrender.com/api/raceresult/update/${id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -243,7 +243,7 @@ function EditRaceResults() {
           Penalty: updated.penalty ?? base.penalty,
         };
 
-        return fetch(`http://localhost:5110/api/raceresult/update/${id}`, {
+        return fetch(`https://stbleague.onrender.com/api/raceresult/update/${id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dto),
@@ -265,7 +265,7 @@ function EditRaceResults() {
 
     // Clear edits & refetch fresh data (and refresh original points map)
     setEditedResults({});
-    fetch(`http://localhost:5110/api/race/race/${selectedRace}`)
+    fetch(`https://stbleague.onrender.com/api/race/race/${selectedRace}`)
       .then((res) => res.json())
       .then((data) => {
         const raceObj = data?.race ?? data;
@@ -278,7 +278,7 @@ function EditRaceResults() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this result?")) return;
     const resp = await fetch(
-      `http://localhost:5110/api/raceresult/delete/${id}`,
+      `https://stbleague.onrender.com/api/raceresult/delete/${id}`,
       { method: "DELETE" }
     );
     if (resp.ok) {

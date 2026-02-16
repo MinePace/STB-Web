@@ -30,7 +30,7 @@ function RaceResultPage() {
     const name = localStorage.getItem("name");
     if (!token || !name) return;
 
-    fetch(`http://localhost:5110/api/user/${name}`)
+    fetch(`https://stbleague.onrender.com/api/user/${name}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => data && setUser(data))
       .catch((err) => console.error("Error fetching user data:", err));
@@ -62,7 +62,7 @@ function RaceResultPage() {
     setLoading(true);
     setError(null);
 
-    fetch(`http://localhost:5110/api/race/race/${raceId}`)
+    fetch(`https://stbleague.onrender.com/api/race/race/${raceId}`)
       .then((res) => {
         if (!res.ok) throw new Error("This Race doesn't exist.");
         return res.json();
@@ -147,7 +147,7 @@ function RaceResultPage() {
 
         try {
           const response = await fetch(
-            `http://localhost:5110/api/auth/upload-result`,
+            `https://stbleague.onrender.com/api/auth/upload-result`,
             { method: "POST", body: formData }
           );
         } catch (err) {

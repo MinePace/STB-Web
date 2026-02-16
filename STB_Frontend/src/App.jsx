@@ -6,7 +6,7 @@ function App() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5110/api/test")
+    fetch("https://stbleague.onrender.com/api/test")
       .then((res) => res.json())
       .then((data) => setMessage(data.message))
       .catch((err) => console.error("Error fetching API:", err));

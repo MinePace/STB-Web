@@ -24,7 +24,7 @@ function AddTrackPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:5110/api/race/track", {
+      const response = await fetch("https://stbleague.onrender.com/api/race/track", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(track), // includes raceName now

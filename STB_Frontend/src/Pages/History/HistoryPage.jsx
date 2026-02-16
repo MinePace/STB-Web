@@ -14,7 +14,7 @@ export default function HistoryPage() {
       setLoading(true);
       setErr("");
       try {
-        const res = await fetch("http://localhost:5110/api/history/champions");
+        const res = await fetch("https://stbleague.onrender.com/api/history/champions");
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         const json = await res.json();
         if (alive) setSeasons(Array.isArray(json) ? json : []);

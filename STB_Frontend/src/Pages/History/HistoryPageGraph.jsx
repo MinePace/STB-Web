@@ -11,7 +11,7 @@ import {
 } from "recharts";
 import "./HistoryPage.css";
 
-const API_BASE = "http://localhost:5110/api/raceresult";
+const API_BASE = "https://stbleague.onrender.com/api/raceresult";
 const TOP_N = 15;          // how many drivers to plot
 const STEP_W = 70;         // px reserved per round label (controls spacing)
 
