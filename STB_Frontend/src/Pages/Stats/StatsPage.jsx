@@ -1,5 +1,5 @@
 import "./StatsPage.css";
-import "@/Components/links.css";
+import "@/Components/Links.css";
 
 export default function StatsPage() {
 
