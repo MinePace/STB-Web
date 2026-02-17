@@ -47,19 +47,42 @@ function ChampionshipPage() {
     fetch(`https://stbleaguedata.vercel.app/api/championship/${season}/${division}`)
       .then((res) => res.json())
       .then((raceData) => {
-        if (!Array.isArray(raceData) || raceData.length === 0) {
-          setNotFound(true);
-          setLoading(false);
-          return;
-        }
+      if (!Array.isArray(raceData) || raceData.length === 0) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
 
-        setRaces(raceData);
+      // 🔥 NORMALIZE SUPABASE RESPONSE → MATCH OLD .NET SHAPE
+      const normalized = raceData.map(race => ({
+        id: race.Id,
+        round: race.Round,
+        sprint: race.Sprint,
+        track: race.Tracks
+          ? {
+              id: race.Tracks.Id,
+              country: race.Tracks.Country,
+              countryCode: race.Tracks.CountryCode,
+              name: race.Tracks.Name
+            }
+          : null,
 
-        // normal driver championship processing
-        transformData(raceData);
+        raceResults: (race.RaceResults || []).map(res => ({
+          position: res.Position,
+          points: Number(res.Points) || 0,
+          dnf: res.DNF,
+          driver: res.Drivers
+            ? { name: res.Drivers.Name }
+            : res.Driver,
+          team: res.Teams
+            ? { name: res.Teams.Name }
+            : res.Team
+        }))
+      }));
 
-        // NEW: constructors standings
-        setConstructors(computeConstructors(raceData));
+      setRaces(normalized);
+      transformData(normalized);
+      setConstructors(computeConstructors(normalized));
 
         // fastest laps fetch
         fetch(`https://stbleague.fly.dev/api/fastestlap/${season}/${division}`)
