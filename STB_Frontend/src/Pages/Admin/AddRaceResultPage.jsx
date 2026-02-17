@@ -38,11 +38,11 @@ export default function AddRaceResults() {
 
   // ---------- Load all races, then know which already have results ----------
   useEffect(() => {
-    fetch("https://stbleague.onrender.com/api/race/races")
+    fetch("https://stbleague.fly.dev/api/race/races")
       .then((res) => res.json())
       .then((allRaces) => {
         setRaces(allRaces || []);
-        return fetch("https://stbleague.onrender.com/api/race/raceresults")
+        return fetch("https://stbleague.fly.dev/api/race/raceresults")
           .then((res) => res.json())
           .then((allResults) => {
             const withResults = new Set((allResults || []).map((r) => r.raceId));
@@ -63,7 +63,7 @@ export default function AddRaceResults() {
                   const loadLinks = async () => {
                     console.log(`📡 Auto-fetching team-driver links for S${target.season} T${target.division}`);
                     const res = await fetch(
-                      `https://stbleague.onrender.com/api/team/teamdriver/${target.season}/${target.division}`
+                      `https://stbleague.fly.dev/api/team/teamdriver/${target.season}/${target.division}`
                     );
                     if (!res.ok) throw new Error("Failed to fetch team-driver links");
                     const data = await res.json();
@@ -84,7 +84,7 @@ export default function AddRaceResults() {
 
   // ---------- Load drivers ----------
   useEffect(() => {
-    fetch("https://stbleague.onrender.com/api/driver/all")
+    fetch("https://stbleague.fly.dev/api/driver/all")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setDriversList(data);
@@ -98,7 +98,7 @@ export default function AddRaceResults() {
     setTeamsLoading(true);
     setTeamsError(null);
 
-    fetch("https://stbleague.onrender.com/api/team")
+    fetch("https://stbleague.fly.dev/api/team")
       .then((r) => r.json())
       .then((json) => {
         if (abort) return;
@@ -182,7 +182,7 @@ export default function AddRaceResults() {
 
     try {
       const res = await fetch(
-        `https://stbleague.onrender.com/api/team/teamdriver/${race.season}/${race.division}`
+        `https://stbleague.fly.dev/api/team/teamdriver/${race.season}/${race.division}`
       );
       if (!res.ok) throw new Error("Failed to fetch team-driver links");
       const data = await res.json();
@@ -352,7 +352,7 @@ export default function AddRaceResults() {
       Time: r.raceTime.trim(),              // NOTE: capital T — confirm your API expects this
     }));
 
-    const url = "https://stbleague.onrender.com/api/race/raceresults";
+    const url = "https://stbleague.fly.dev/api/race/raceresults";
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 15000);
 

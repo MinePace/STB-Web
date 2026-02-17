@@ -33,7 +33,7 @@ function ChampionshipPage() {
   // fetch claimed driver
   useEffect(() => {
     if (!isLoggedIn || !username) return;
-    fetch(`https://stbleague.onrender.com/api/driver/user/${username}`)
+    fetch(`https://stbleague.fly.dev/api/driver/user/${username}`)
       .then((r) => r.json())
       .then((d) => setClaimedDriver(d))
       .catch((err) => console.error("Error fetching claimed driver:", err));
@@ -44,7 +44,7 @@ function ChampionshipPage() {
     setLoading(true);
     setNotFound(false);
 
-    fetch(`https://stbleague.onrender.com/api/championship/races/${season}/${division}`)
+    fetch(`https://stbleague.fly.dev/api/championship/races/${season}/${division}`)
       .then((res) => res.json())
       .then((raceData) => {
         if (!Array.isArray(raceData) || raceData.length === 0) {
@@ -62,7 +62,7 @@ function ChampionshipPage() {
         setConstructors(computeConstructors(raceData));
 
         // fastest laps fetch
-        fetch(`https://stbleague.onrender.com/api/fastestlap/${season}/${division}`)
+        fetch(`https://stbleague.fly.dev/api/fastestlap/${season}/${division}`)
           .then((res) => res.json())
           .then((data) => {
             setFastestLapData(Array.isArray(data) ? data : []);
@@ -340,7 +340,7 @@ function ChampionshipPage() {
 
     try {
       const response = await fetch(
-        "https://stbleague.onrender.com/api/auth/upload-championship",
+        "https://stbleague.fly.dev/api/auth/upload-championship",
         {
           method: "POST",
           body: formData,

@@ -22,7 +22,7 @@ function EditTrackPage() {
     }
 
     // Fetch all tracks
-    fetch("https://stbleague.onrender.com/api/race/tracks")
+    fetch("https://stbleague.fly.dev/api/race/tracks")
       .then((res) => res.json())
       .then((data) => {
         setTracks(data);
@@ -64,7 +64,7 @@ function EditTrackPage() {
     console.log("Saving track:", updatedTrack);
 
     const response = await fetch(
-      `https://stbleague.onrender.com/api/track/update/${selectedTrack.id}`,
+      `https://stbleague.fly.dev/api/track/update/${selectedTrack.id}`,
       {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

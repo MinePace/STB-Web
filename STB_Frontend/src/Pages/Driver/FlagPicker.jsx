@@ -12,7 +12,7 @@ export default function FlagPicker({ driver, onClose }) {
     const name = localStorage.getItem("name");
     if (!token || !name) return;
 
-    fetch(`https://stbleague.onrender.com/api/user/${name}`)
+    fetch(`https://stbleague.fly.dev/api/user/${name}`)
       .then((res) => res.json())
       .then((data) => setUser(data))
       .catch((err) => console.error("Failed to load user", err));
@@ -37,7 +37,7 @@ export default function FlagPicker({ driver, onClose }) {
   const handleSelectCountry = async (countryName) => {
     try {
       const res = await fetch(
-        `https://stbleague.onrender.com/api/driver/update/${driver.id}`,
+        `https://stbleague.fly.dev/api/driver/update/${driver.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

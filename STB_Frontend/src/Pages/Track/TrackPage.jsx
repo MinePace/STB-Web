@@ -87,7 +87,7 @@ function TrackPage() {
     (async () => {
       try {
         const res = await fetch(
-          `https://stbleague.onrender.com/api/track/${encodeURIComponent(trackId || "")}`
+          `https://stbleague.fly.dev/api/track/${encodeURIComponent(trackId || "")}`
         );
         if (!res.ok) throw new Error("Failed to fetch track info");
         const data = await res.json();
@@ -102,7 +102,7 @@ function TrackPage() {
     (async () => {
       try {
         const res = await fetch(
-          `https://stbleague.onrender.com/api/track/races/${encodeURIComponent(trackId || "")}`
+          `https://stbleague.fly.dev/api/track/races/${encodeURIComponent(trackId || "")}`
         );
         if (!res.ok) throw new Error("Failed to fetch track races");
         const races = await res.json();

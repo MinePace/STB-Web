@@ -23,7 +23,7 @@ function DriverPage() {
       if (!token || !name) return;
 
       try {
-        const res = await fetch(`https://stbleague.onrender.com/api/user/${name}`, {
+        const res = await fetch(`https://stbleague.fly.dev/api/user/${name}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -49,7 +49,7 @@ function DriverPage() {
 
   const fetchDriverStats = async () => {
     try {
-      const res = await fetch(`https://stbleague.onrender.com/api/driver/stats/${driverName}`);
+      const res = await fetch(`https://stbleague.fly.dev/api/driver/stats/${driverName}`);
       if (!res.ok) throw new Error("Failed to fetch driver stats");
       const data = await res.json();
       setDriverStats(data);
@@ -67,7 +67,7 @@ function DriverPage() {
     if (!token) return;
 
     try {
-      const response = await fetch(`https://stbleague.onrender.com/api/driver/claim/${driverStats.driver}`, {
+      const response = await fetch(`https://stbleague.fly.dev/api/driver/claim/${driverStats.driver}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: user.username }),
@@ -103,7 +103,7 @@ function DriverPage() {
       setSavingCountry(true);
       const driverId = driverStats.driverOBJ.id;
       console.log("Selected driver ID:", driverId, "New country:", newCountry);
-      const res = await fetch(`https://stbleague.onrender.com/api/driver/updateCountry/${driverId}`, {
+      const res = await fetch(`https://stbleague.fly.dev/api/driver/updateCountry/${driverId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ country: newCountry }),

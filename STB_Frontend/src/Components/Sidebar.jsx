@@ -40,7 +40,7 @@ function Sidebar() {
     const fetchSeasonRaced = async () => {
       try {
         const res = await fetch(
-          `https://stbleague.onrender.com/api/driver/claimeddriver/races/${username}`
+          `https://stbleague.fly.dev/api/driver/claimeddriver/races/${username}`
         );
         if (!res.ok) throw new Error("Failed to fetch driver stats");
         const data = await res.json();

@@ -32,7 +32,7 @@ function HomePage() {
   useEffect(() => {
     const fetchLatestRace = async () => {
       try {
-        const response = await fetch("https://stbleague.onrender.com/api/race/latest");
+        const response = await fetch("https://stbleague.fly.dev/api/race/latest");
         if (!response.ok) throw new Error("Failed to fetch latest race.");
         const data = await response.json();
 
@@ -65,7 +65,7 @@ function HomePage() {
   useEffect(() => {
     const fetchLeagueStats = async () => {
       try {
-        const response = await fetch("https://stbleague.onrender.com/api/race/stats/league");
+        const response = await fetch("https://stbleague.fly.dev/api/race/stats/league");
         if (!response.ok) throw new Error("Failed to fetch league stats.");
         const data = await response.json();
         setLeagueStats({
@@ -82,7 +82,7 @@ function HomePage() {
           },
         });
 
-        const currentSeasonResponse = await fetch("https://stbleague.onrender.com/api/race/stats/season/30");
+        const currentSeasonResponse = await fetch("https://stbleague.fly.dev/api/race/stats/season/30");
         if (!currentSeasonResponse.ok) throw new Error("Failed to fetch current season stats.");
         const currentSeasonData = await currentSeasonResponse.json();
         setSeasonStats({
@@ -110,7 +110,7 @@ function HomePage() {
   useEffect(() => {
     const fetchStandings = async () => {
       try {
-        const res = await fetch("https://stbleague.onrender.com/api/championship/current");
+        const res = await fetch("https://stbleague.fly.dev/api/championship/current");
         if (!res.ok) throw new Error("Failed to fetch current championships.");
         const data = await res.json();
         setStandings(normalizeStandings(data));
@@ -127,7 +127,7 @@ function HomePage() {
   useEffect(() => {
     const fetchNextRace = async () => {
       try {
-        const response = await fetch("https://stbleague.onrender.com/api/race/nextrace");
+        const response = await fetch("https://stbleague.fly.dev/api/race/nextrace");
         if (!response.ok) throw new Error("Failed to fetch next race.");
         const data = await response.json();
         const raceDate = new Date(data.date);
