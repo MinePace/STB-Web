@@ -62,7 +62,7 @@ function RaceResultPage() {
     setLoading(true);
     setError(null);
 
-    fetch(`https://stbleague.fly.dev/api/race/race/${raceId}`)
+    fetch(`https://stbleaguedata.vercel.app/api/race/${raceId}`)
       .then((res) => {
         if (!res.ok) throw new Error("This Race doesn't exist.");
         return res.json();
