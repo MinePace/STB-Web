@@ -157,7 +157,6 @@ C:\Users\joeyz\Desktop\STB Project\STB_Backend\bin\Debug\net8.0\runtimes\win-arm
 C:\Users\joeyz\Desktop\STB Project\STB_Backend\bin\Debug\net8.0\runtimes\win-x64\native\e_sqlite3.dll
 C:\Users\joeyz\Desktop\STB Project\STB_Backend\bin\Debug\net8.0\runtimes\win-x86\native\e_sqlite3.dll
 C:\Users\joeyz\Desktop\STB Project\STB_Backend\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
-C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\STB_Backend.exe
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\STB_Backend.deps.json
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\STB_Backend.runtimeconfig.json
@@ -324,3 +323,5 @@ C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\MailKit.dll
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\MimeKit.dll
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\System.Security.Cryptography.Pkcs.dll
 C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
+C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\appsettings.json
+C:\Users\joeyz\Documents\GitHub\STB-Web\STB_Backend\bin\Debug\net8.0\Data\Data.db
