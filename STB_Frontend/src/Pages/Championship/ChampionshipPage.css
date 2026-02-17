@@ -38,6 +38,10 @@
   gap: 12px;
 }
 
+.constructors-table-wrapper {
+  margin: 0 auto;
+}
+
 /* Use the same model for the scrollable body table */
 .scrollable-table table {
   width: 100%;
@@ -265,7 +269,7 @@
    ======================================================== */
 :root {
   /* Table width */
-  --constructors-width: 650px;
+  --constructors-width: 400px;
 
   /* Column widths */
   --col-pos-width: 40px;
