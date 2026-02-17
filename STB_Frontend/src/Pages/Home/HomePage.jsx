@@ -200,8 +200,10 @@ function HomePage() {
       const list = item.top3 ?? item.Top3 ?? item.standings ?? [];
       return {
         tier: typeof division === "number" ? `Tier ${division}` : String(division),
-        top3: list.map((d) => ({
-          name: safeName(d.driver ?? d.Driver ?? d.name),
+        top3: list.map((d) => (
+          console.log("driver object:", d),
+          {
+          name: safeName(d.driver ?? d.Driver ?? d.Name),
           team: safeName(d.team ?? d.Team),
           points: d.totalPoints ?? d.TotalPoints ?? d.points ?? 0,
         })),
