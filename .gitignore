@@ -1,7 +1,23 @@
-/STB_Backend/obj
-/STB_Backend/obj/Debug
-/STB_Backend/obj/Debug/net8.0
+# .NET build output
+bin/
+obj/
+
+# User-specific
+*.user
+*.suo
+
+# Compiled files
 *.dll
+*.exe
 *.pdb
-/STB_Backend/obj/Debug/net8.0
-/STB_Frontend/build
+
+# Logs
+*.log
+
+# SQLite local dev DB (optional — ONLY if you don't want it in git)
+Data.db
+
+# Frontend build output
+STB_Frontend/dist/
+STB_Frontend/build/
+node_modules/
