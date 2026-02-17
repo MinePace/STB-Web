@@ -41,7 +41,7 @@ function LoginPage() {
 
   // 🔹 Login
   const handleLogin = async () => {
-    const response = await fetch("https://stbleague.fly.dev/api/auth/login", {
+    const response = await fetch("https://stbleaguedata.vercel.app/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -54,7 +54,7 @@ function LoginPage() {
       alert("Login successful");
       localStorage.setItem("token", data.token);
       localStorage.setItem("role", data.role);
-      localStorage.setItem("name", data.name);
+      localStorage.setItem("name", data.username);
       setIsLoggedIn(true);
       setRole(data.role);
       navigate("/"); // Redirect to homepage
@@ -78,7 +78,7 @@ function LoginPage() {
       <div className="login-form">
         {isLoggedIn ? (
           <>
-            <h1>Welcome {role === "admin" ? "Admin" : "User"}</h1>
+            <h1>Welcome {role === "Admin" ? "Admin" : "User"}</h1>
             <button onClick={handleLogout}>Logout</button>
           </>
         ) : (
