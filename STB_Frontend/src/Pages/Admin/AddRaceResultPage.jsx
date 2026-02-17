@@ -382,7 +382,7 @@ export default function AddRaceResults() {
       console.log("Server OK:", body);
       alert(body?.message ?? "Results submitted.");
 
-      navigate(`/STB/Race/${raceId}`);
+      navigate(`/STB/Race/${selectedRace.id}`);
       // … your “advance to next race” logic here …
     } catch (err) {
       // Network/CORS/abort/JSON errors land here
