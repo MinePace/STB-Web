@@ -110,7 +110,7 @@ function HomePage() {
   useEffect(() => {
     const fetchStandings = async () => {
       try {
-        const res = await fetch("https://stbleague.fly.dev/api/championship/current");
+        const res = await fetch("https://stbleaguedata.vercel.app/api/championship/current");
         if (!res.ok) throw new Error("Failed to fetch current championships.");
         const data = await res.json();
         setStandings(normalizeStandings(data));
