@@ -74,15 +74,15 @@ function RaceResultPage() {
         // 🔥 convert incoming results into safe-name format
         const fixedResults = (raceObj?.raceResults ?? []).map((r) => ({
           ...r,
-          driverName: safeName(r.driver),
-          teamName: safeName(r.team)
+          driverName: safeName(r.Drivers),
+          teamName: safeName(r.Teams)
         }));
 
         setRaceData(raceObj);
         setRaceResults(fixedResults);
         setFastestLap(flObj);
 
-        if (raceObj?.youtubeLink) extractYouTubeEmbed(raceObj.youtubeLink);
+        if (raceObj?.YoutubeLink) extractYouTubeEmbed(raceObj.YoutubeLink);
       })
       .catch((err) => {
         console.error("Error fetching race results:", err);
@@ -157,9 +157,9 @@ function RaceResultPage() {
   }
 
   const hasAnyTime = raceResults.some((r) => r.time && r.time.trim() !== "");
-  const season = race ? race.season : "unknown";
-  const tier = race ? race.division : "unknown";
-  const round = race ? race.round : "unknown";
+  const season = race ? race.Season : "unknown";
+  const tier = race ? race.Division : "unknown";
+  const round = race ? race.Round : "unknown";
 
   return (
     <div className="race-page-container">
