@@ -1,24 +1,23 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# .NET build output
+bin/
+obj/
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
+# User-specific
+*.user
 *.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+
+# Compiled files
+*.dll
+*.exe
+*.pdb
+
+# Logs
+*.log
+
+# SQLite local dev DB (optional — ONLY if you don't want it in git)
+Data.db
+
+# Frontend build output
+STB_Frontend/dist/
+STB_Frontend/build/
+node_modules/
