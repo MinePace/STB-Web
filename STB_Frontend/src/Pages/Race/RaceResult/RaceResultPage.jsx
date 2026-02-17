@@ -147,7 +147,7 @@ function RaceResultPage() {
 
         try {
           const response = await fetch(
-            `https://stbleague.fly.dev/api/auth/upload-result`,
+            `https://stbleaguedata.vercel.app/api/auth/upload-result`,
             { method: "POST", body: formData }
           );
         } catch (err) {
