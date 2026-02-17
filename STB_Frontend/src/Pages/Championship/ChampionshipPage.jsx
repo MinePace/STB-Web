@@ -44,7 +44,7 @@ function ChampionshipPage() {
     setLoading(true);
     setNotFound(false);
 
-    fetch(`https://stbleaguedata.vercel.app/api/championship/races/${season}/${division}`)
+    fetch(`https://stbleaguedata.vercel.app/api/Championship/${season}/${division}`)
       .then((res) => res.json())
       .then((raceData) => {
         if (!Array.isArray(raceData) || raceData.length === 0) {
