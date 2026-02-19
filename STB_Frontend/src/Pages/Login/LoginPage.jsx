@@ -8,7 +8,6 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("token") !== null);
-  const [role, setRole] = useState(localStorage.getItem("role") || "user");
 
   const navigate = useNavigate();
 
@@ -53,10 +52,7 @@ function LoginPage() {
     if (response.ok) {
       alert("Login successful");
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role);
-      localStorage.setItem("name", data.username);
       setIsLoggedIn(true);
-      setRole(data.role);
       navigate("/"); // Redirect to homepage
     } else {
       alert(data.message);
@@ -66,7 +62,6 @@ function LoginPage() {
   // 🔹 Logout
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("role");
     setIsLoggedIn(false);
     setRole("user");
     alert("Logged out");
@@ -78,7 +73,6 @@ function LoginPage() {
       <div className="login-form">
         {isLoggedIn ? (
           <>
-            <h1>Welcome {role === "Admin" ? "Admin" : "User"}</h1>
             <button onClick={handleLogout}>Logout</button>
           </>
         ) : (

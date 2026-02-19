@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "@/Components/Links.css";
 
 function AddTrackPage() {
@@ -9,8 +10,19 @@ function AddTrackPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const role = localStorage.getItem("role");
-    if (role !== "Admin") navigate("/");
+    const token = localStorage.getItem("token");
+    let role = "user";
+  
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+  
+        role = decoded.role;
+        if (role !== "Admin") navigate("/");
+      } catch (e) {
+        console.log("JWT decode failed:", e);
+      }
+    }
   }, [navigate]);
 
   const handleInputChange = (e) => {

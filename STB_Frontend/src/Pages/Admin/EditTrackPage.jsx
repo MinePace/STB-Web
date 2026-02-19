@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "@/Components/Links.css";
 
 function EditTrackPage() {
@@ -16,9 +17,18 @@ function EditTrackPage() {
 
   useEffect(() => {
     // Check if user is an admin
-    const role = localStorage.getItem("role");
-    if (role !== "Admin") {
-      navigate("/"); // Redirect non-admins
+    const token = localStorage.getItem("token");
+    let role = "user";
+  
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+  
+        role = decoded.role;
+        if (role !== "Admin") navigate("/");
+      } catch (e) {
+        console.log("JWT decode failed:", e);
+      }
     }
 
     // Fetch all tracks

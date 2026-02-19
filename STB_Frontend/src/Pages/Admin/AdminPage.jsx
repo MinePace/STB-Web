@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "./AdminPage.css";
 import "@/Components/Links.css"
 
@@ -7,9 +8,18 @@ function AdminPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const role = localStorage.getItem("role");
-    if (role !== "Admin") {
-      navigate("/");
+    const token = localStorage.getItem("token");
+    let role = "user";
+  
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+  
+        role = decoded.role;
+        if (role !== "Admin") navigate("/");
+      } catch (e) {
+        console.log("JWT decode failed:", e);
+      }
     }
   }, [navigate]);
 

@@ -109,7 +109,7 @@ Content-Type: application/json
 
 ##########
 
-GET  http://localhost:5110/api/race/races/30
+GET  https://stbleaguedata.vercel.app/api/race/472
 
 ##########
 

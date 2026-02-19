@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "./AddSeasonPage.css";
 import "@/Components/Links.css";
 
@@ -38,8 +39,20 @@ function AddSeasonPage() {
   });
 
   useEffect(() => {
-    const role = localStorage.getItem("role");
-    if (role !== "Admin") navigate("/");
+    const token = localStorage.getItem("token");
+    
+    let role = "user";
+  
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+  
+        role = decoded.role;
+        if (role !== "Admin") navigate("/");
+      } catch (e) {
+        console.log("JWT decode failed:", e);
+      }
+    }
   }, [navigate]);
 
   useEffect(() => {

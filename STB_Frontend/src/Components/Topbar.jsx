@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "./Topbar.css";
 import { useShortcut } from "@/Components/ShortCut";
 
@@ -85,8 +86,8 @@ function Topbar() {
   const [menuOpen, setMenuOpen] = useState(false); // ← added
   const [claimedDriver, setClaimedDriver] = useState(null);
   const isLoggedIn = localStorage.getItem("token") !== null;
-  const username = localStorage.getItem("name") || "";
-  const role = localStorage.getItem("role") || "user";
+  const [username, setUsername] = useState("");
+  const [roleState, setRoleState] = useState("user");
   const navigate = useNavigate();
 
   const SOCIAL_LINKS = [
@@ -105,10 +106,27 @@ function Topbar() {
     }
   }, [isLoggedIn, username]);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    let role = "user";
+  
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+  
+        role = decoded.role;
+        setRoleState(role);
+
+        username = decoded.username
+        setUsername(username);
+      } catch (e) {
+        console.log("JWT decode failed:", e);
+      }
+    }
+  }, [navigate]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    localStorage.removeItem("name");
     alert("Logged out");
     navigate("/login");
   };
@@ -136,7 +154,7 @@ function Topbar() {
 
           <li><SocialDropdown label="Socials" links={SOCIAL_LINKS} /></li>
 
-          {role === "Admin" && (
+          {roleState === "Admin" && (
             <li><Link to="/admin" className="topbar-link" onClick={() => setMenuOpen(false)}>Admin Hub</Link></li>
           )}
 

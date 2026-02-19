@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "./AddRaceResultPage.css";
 import "@/Components/Links.css";
 
@@ -31,60 +32,67 @@ export default function AddRaceResults() {
   const [teamsError, setTeamsError] = useState(null);
 
   // ---------- Access control ----------
-  useEffect(() => {
-    const role = localStorage.getItem("role");
-    if (role !== "Admin") navigate("/");
-  }, [navigate]);
+  const token = localStorage.getItem("token");
+  
+  let role = "user";
+
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+
+      role = decoded.role;
+    } catch (e) {
+      console.log("JWT decode failed:", e);
+    }
+  }
 
   // ---------- Load all races, then know which already have results ----------
   useEffect(() => {
-    fetch("https://stbleague.fly.dev/api/race/races")
+    fetch("https://stbleaguedata.vercel.app/api/race/races")
       .then((res) => res.json())
       .then((allRaces) => {
-        setRaces(allRaces || []);
-        return fetch("https://stbleague.fly.dev/api/race/raceresults")
+        setRaces(allRaces || [])
+
+        return fetch("https://stbleaguedata.vercel.app/api/race/raceresults")
           .then((res) => res.json())
           .then((allResults) => {
-            const withResults = new Set((allResults || []).map((r) => r.raceId));
-            setExistingResults(withResults);
+            const withResults = new Set(
+              (allResults || []).map((r) => r.RaceId)
+            )
 
-            const available = (allRaces || []).filter((r) => !withResults.has(r.id));
-            setFilteredRaces(available);
+            const available = (allRaces || []).filter(
+              (r) => !withResults.has(r.Id)
+            )
+
+            setFilteredRaces(available)
 
             if (prefillRaceId) {
-              const targetId = Number(prefillRaceId);
-              const target = available.find((r) => Number(r.id) === targetId);
-              if (target) {
-                setSelectedRace(target);
-                initResultsForRace(target, setRaceResults);
+              const targetId = Number(prefillRaceId)
+              const target = available.find(
+                (r) => Number(r.Id) === targetId
+              )
 
-                // 👇 Automatically load seasonal team-driver links (same as handleRaceSelect)
-                try {
-                  const loadLinks = async () => {
-                    console.log(`📡 Auto-fetching team-driver links for S${target.season} T${target.division}`);
-                    const res = await fetch(
-                      `https://stbleague.fly.dev/api/team/teamdriver/${target.season}/${target.division}`
-                    );
-                    if (!res.ok) throw new Error("Failed to fetch team-driver links");
-                    const data = await res.json();
-                    console.log("🟩 [Auto-load team-driver links]", data);
-                    setTeamDriverLinks(data || []);
-                  };
-                  loadLinks();
-                } catch (err) {
-                  console.error("TeamDriver auto-fetch error:", err);
-                  setTeamDriverLinks([]);
-                }
+              if (target) {
+                setSelectedRace(target)
+                initResultsForRace(target, setRaceResults)
+
+                fetch(
+                  `https://stbleaguedata.vercel.app/api/team/teamdriver/${target.Season}/${target.Division}`
+                )
+                  .then((res) => res.json())
+                  .then((data) => setTeamDriverLinks(data || []))
               }
             }
-          });
+          })
       })
-      .catch((err) => console.error("Error fetching races/results:", err));
-  }, [prefillRaceId]);
+      .catch((err) =>
+        console.error("Error fetching races/results:", err)
+      )
+  }, [prefillRaceId])
 
   // ---------- Load drivers ----------
   useEffect(() => {
-    fetch("https://stbleague.fly.dev/api/driver/all")
+    fetch("https://stbleaguedata.vercel.app/api/driver")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setDriversList(data);
@@ -98,7 +106,7 @@ export default function AddRaceResults() {
     setTeamsLoading(true);
     setTeamsError(null);
 
-    fetch("https://stbleague.fly.dev/api/team")
+    fetch("https://stbleaguedata.vercel.app/api/team")
       .then((r) => r.json())
       .then((json) => {
         if (abort) return;
@@ -125,7 +133,7 @@ export default function AddRaceResults() {
 
   const teamByName = useMemo(() => {
     const m = new Map();
-    for (const t of teams) m.set(String(t.name), t);
+    for (const t of teams) m.set(String(t.Name), t);
     return m;
   }, [teams]);
 
@@ -182,7 +190,7 @@ export default function AddRaceResults() {
 
     try {
       const res = await fetch(
-        `https://stbleague.fly.dev/api/team/teamdriver/${race.season}/${race.division}`
+        `https://stbleaguedata.vercel.app/api/team/teamdriver/${race.season}/${race.division}`
       );
       if (!res.ok) throw new Error("Failed to fetch team-driver links");
       const data = await res.json();
@@ -339,29 +347,33 @@ export default function AddRaceResults() {
     if (!selectedRace) return;
 
     const payload = raceResults.map((r) => ({
-      raceId: selectedRace.id,
-      position: r.position,
-      driver: r.driver.trim(),
-      team: r.team.trim(),
-      teamId: r.teamId ?? 0,
-      points: r.points,
-      dnf: r.dnf,
-      qualifying: r.qualifying ? parseInt(r.qualifying, 10) : 0,
-      pos_Change: r.pos_Change,
-      fastestLap: r.fastestLap,
-      Time: r.raceTime.trim(),              // NOTE: capital T — confirm your API expects this
-    }));
+      RaceId: selectedRace.Id,
+      Position: r.position,
+      Driver: r.driver.trim(),
+      Team: r.team.trim(),
+      TeamId: r.teamId ?? 0,
+      Points: r.points,
+      DNF: r.dnf,
+      Qualifying: r.qualifying ? parseInt(r.qualifying, 10) : 0,
+      Pos_Change: r.pos_Change,
+      FastestLap: r.fastestLap,
+      Time: r.raceTime.trim(),
+    }))
 
-    const url = "https://stbleague.fly.dev/api/race/raceresults";
+    const url = "https://stbleaguedata.vercel.app/api/race/raceresults";
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 15000);
 
     try {
       console.log("Submitting results →", { url, payload, selectedRace });
+      const token = localStorage.getItem("token")
 
       const res = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(payload),
         signal: ctrl.signal,
       });
@@ -423,9 +435,9 @@ export default function AddRaceResults() {
           <option value="">Select a Race</option>
           {filteredRaces.length > 0 ? (
             filteredRaces.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.name} - Season {r.season}, Round {r.round}, Div {r.division}{" "}
-                {r.sprint === "Yes" ? "(Sprint)" : ""}
+              <option key={r.Id} value={r.Id}>
+                Season {r.Season}, Round {r.Round}, Div {r.Division} - {r.Tracks?.RaceName ?? r.Name}
+                {r.Sprint === "Yes" ? " (Sprint)" : ""}
               </option>
             ))
           ) : (
@@ -436,7 +448,7 @@ export default function AddRaceResults() {
 
       {/* Results Form */}
       <div className="ar-form">
-        <h2>Add Results for {selectedRace?.track?.raceName ?? "—"}</h2>
+        <h2>Add Results for {selectedRace?.Tracks?.RaceName ?? "—"}</h2>
         <p style={{ fontSize: 12, color: "#8a909aff" }}>
           Tip: you can paste multiple rows from Excel/Sheets. Focus a cell in Driver, Team, Qualifying or Race Time,
           then paste — it fills down from the focused row.
@@ -473,7 +485,7 @@ export default function AddRaceResults() {
                   />
                   <datalist id="drivers-list">
                     {driversList.map((d, idx) => (
-                      <option key={idx} value={d.name} />
+                      <option key={idx} value={d.Name} />
                     ))}
                   </datalist>
                 </td>
@@ -497,10 +509,10 @@ export default function AddRaceResults() {
                       <option value="">Select team…</option>
                       {teams
                         .slice()
-                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .sort((a, b) => a.Name.localeCompare(b.Name))
                         .map((t) => (
-                          <option key={t.id} value={t.name}>
-                            {t.name}
+                          <option key={t.Id} value={t.Name}>
+                            {t.Name}
                           </option>
                         ))}
                     </select>

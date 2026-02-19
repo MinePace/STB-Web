@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { jwtDecode } from "jwt-decode";
 import "./EditRaceResultPage.css";
 import "@/Components/Links.css";
 
@@ -25,8 +26,19 @@ function EditRaceResults() {
 
   // Only admins allowed
   useEffect(() => {
-    const role = localStorage.getItem("role");
-    if (role !== "Admin") navigate("/");
+    const token = localStorage.getItem("token");
+    let role = "user";
+  
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+  
+        role = decoded.role;
+        if (role !== "Admin") navigate("/");
+      } catch (e) {
+        console.log("JWT decode failed:", e);
+      }
+    }
   }, [navigate]);
 
   // Sync URL params → state

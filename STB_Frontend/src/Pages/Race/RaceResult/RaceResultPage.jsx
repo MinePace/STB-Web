@@ -1,6 +1,7 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import html2canvas from "html2canvas";
 import "./RaceResultPage.css";
 import "@/Components/Links.css";
@@ -18,7 +19,23 @@ function RaceResultPage() {
   const [fastestLap, setFastestLap] = useState(null);
   const [embedUrl, setEmbedUrl] = useState("");
 
-  const role = localStorage.getItem("role") || "user";
+  const token = localStorage.getItem("token");
+
+  let role = "user";
+
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+
+      console.log("🔐 Decoded JWT:", decoded);
+      console.log("👤 Role from token:", decoded.role);
+      console.log("👤 Username from token:", decoded.username);
+
+      role = decoded.role;
+    } catch (e) {
+      console.log("JWT decode failed:", e);
+    }
+  }
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
