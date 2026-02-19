@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { jwtDecode } from "jwt-decode";
 import "./EditRaceResultPage.css";
 import "@/Components/Links.css";
 
