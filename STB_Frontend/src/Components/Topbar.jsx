@@ -117,7 +117,7 @@ function Topbar() {
         role = decoded.role;
         setRoleState(role);
 
-        username = decoded.username
+        const username = decoded.username
         setUsername(username);
       } catch (e) {
         console.log("JWT decode failed:", e);

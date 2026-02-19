@@ -23,10 +23,12 @@ function EditRaceResults() {
   const [raceResults, setRaceResults] = useState([]);
   const [editedResults, setEditedResults] = useState({});
   const [originalPointsByPosition, setOriginalPointsByPosition] = useState({});
+  const [token, setToken] = useState("");
 
   // Only admins allowed
   useEffect(() => {
     const token = localStorage.getItem("token");
+    setToken(token || ""); // Store token for API calls
     let role = "user";
   
     if (token) {
@@ -59,7 +61,7 @@ function EditRaceResults() {
   // Load races for a season
   useEffect(() => {
     if (selectedSeason) {
-      fetch(`https://stbleaguedata.vercel.app/api/race/${selectedSeason}`)
+      fetch(`https://stbleaguedata.vercel.app/api/race/season/${selectedSeason}`)
         .then((res) => res.json())
         .then((data) => setRaces(Array.isArray(data) ? data : []))
         .catch((err) => console.error("Error fetching races:", err));
@@ -203,7 +205,7 @@ function EditRaceResults() {
 
     console.log("Saving DTO:", dto);
     const resp = await fetch(
-      `https://stbleaguedata.vercel.app/api/raceresult/update/${id}`,
+      `https://stbleaguedata.vercel.app/api/race/raceresult/update/${id}`,
       {
         method: "PUT",
         headers: { 
@@ -258,7 +260,7 @@ function EditRaceResults() {
           Penalty: updated.penalty ?? base.penalty,
         };
 
-        return fetch(`https://stbleaguedata.vercel.app/api/raceresult/update/${id}`, {
+        return fetch(`https://stbleaguedata.vercel.app/api/race/raceresult/update/${id}`, {
           method: "PUT",
           headers: { 
             "Content-Type": "application/json",
@@ -296,7 +298,8 @@ function EditRaceResults() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this result?")) return;
     const resp = await fetch(
-      `https://stbleaguedata.vercel.app/api/raceresult/delete/${id}`, { 
+      `https://stbleaguedata.vercel.app/api/race/raceresult/delete/${id}`,
+      { 
         method: "DELETE",
         headers: { 
           "Authorization": `Bearer ${token}`
@@ -367,9 +370,9 @@ function EditRaceResults() {
     const set = new Set(
       races
         .filter(
-          (r) => !selectedSeason || String(r.season) === String(selectedSeason)
+          (r) => !selectedSeason || String(r.Season) === String(selectedSeason)
         )
-        .map((r) => r.division)
+        .map((r) => r.Division)
         .filter((v) => v !== undefined && v !== null)
     );
     return Array.from(set).sort(
@@ -380,11 +383,11 @@ function EditRaceResults() {
   const filteredRaces = useMemo(() => {
     return races
       .filter(
-        (r) => !selectedSeason || String(r.season) === String(selectedSeason)
+        (r) => !selectedSeason || String(r.Season) === String(selectedSeason)
       )
       .filter(
         (r) =>
-          !selectedDivision || String(r.division) === String(selectedDivision)
+          !selectedDivision || String(r.Division) === String(selectedDivision)
       );
   }, [races, selectedSeason, selectedDivision]);
 
@@ -444,8 +447,8 @@ function EditRaceResults() {
           >
             <option value="">-- Select Race --</option>
             {filteredRaces.map((r) => (
-              <option key={r.id} value={r.id}>
-                Round: {r.round} - T{r.division}
+              <option key={r.Id} value={r.Id}>
+                Round: {r.Round} - T{r.Division}
               </option>
             ))}
             {filteredRaces.length === 0 && (

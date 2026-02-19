@@ -27,10 +27,6 @@ function RaceResultPage() {
     try {
       const decoded = jwtDecode(token);
 
-      console.log("🔐 Decoded JWT:", decoded);
-      console.log("👤 Role from token:", decoded.role);
-      console.log("👤 Username from token:", decoded.username);
-
       role = decoded.role;
     } catch (e) {
       console.log("JWT decode failed:", e);

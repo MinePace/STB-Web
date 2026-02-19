@@ -53,7 +53,7 @@ export default function AddRaceResults() {
       .then((allRaces) => {
         setRaces(allRaces || [])
 
-        return fetch("https://stbleaguedata.vercel.app/api/race/raceresults")
+        return fetch("https://stbleaguedata.vercel.app/api/race/raceresult")
           .then((res) => res.json())
           .then((allResults) => {
             const withResults = new Set(
