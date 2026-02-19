@@ -1,7 +1,6 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import html2canvas from "html2canvas";
 import "./RaceResultPage.css";
 import "@/Components/Links.css";
