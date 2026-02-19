@@ -85,7 +85,7 @@ function ChampionshipPage() {
       setConstructors(computeConstructors(normalized));
 
         // fastest laps fetch
-        fetch(`https://stbleague.fly.dev/api/fastestlap/${season}/${division}`)
+        fetch(`https://stbleaguedata.vercel.app/api/fastestlap/${season}/${division}`)
           .then((res) => res.json())
           .then((data) => {
             setFastestLapData(Array.isArray(data) ? data : []);
