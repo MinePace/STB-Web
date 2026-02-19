@@ -17,7 +17,7 @@ function EditRaceResults() {
   const [seasons, setSeasons] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState(paramSeason || "");
   const [races, setRaces] = useState([]);
-  const [selectedRace, setSelectedRace] = useState(paramRound || "");
+  const [selectedRaceId, setSelectedRace] = useState(paramRound || "");
   const [selectedDivision, setSelectedDivision] = useState(paramDivision || "");
   const [FastestLap, setFastestLap] = useState(""); // driver name (display only)
   const [raceResults, setRaceResults] = useState([]);
@@ -50,7 +50,7 @@ function EditRaceResults() {
 
   // Load seasons
   useEffect(() => {
-    fetch(`https://stbleague.fly.dev/api/race/seasons`)
+    fetch(`https://stbleaguedata.vercel.app/api/race/seasons`)
       .then((res) => res.json())
       .then((data) => (Array.isArray(data) ? setSeasons(data) : setSeasons([])))
       .catch((err) => console.error("Error fetching seasons:", err));
@@ -59,7 +59,7 @@ function EditRaceResults() {
   // Load races for a season
   useEffect(() => {
     if (selectedSeason) {
-      fetch(`https://stbleague.fly.dev/api/race/races/${selectedSeason}`)
+      fetch(`https://stbleaguedata.vercel.app/api/race/${selectedSeason}`)
         .then((res) => res.json())
         .then((data) => setRaces(Array.isArray(data) ? data : []))
         .catch((err) => console.error("Error fetching races:", err));
@@ -96,13 +96,13 @@ function EditRaceResults() {
 
   // Load race + results (with driver/team objects)
   useEffect(() => {
-    if (!selectedRace) {
+    if (!selectedRaceId) {
       setRaceResults([]);
       setOriginalPointsByPosition({});
       return;
     }
 
-    fetch(`https://stbleague.fly.dev/api/race/race/${selectedRace}`)
+    fetch(`https://stbleaguedata.vercel.app/api/race/${selectedRaceId}`)
       .then((res) => res.json())
       .then((data) => {
         const raceObj = data?.race ?? data;
@@ -123,13 +123,13 @@ function EditRaceResults() {
         }
       })
       .catch((err) => console.error("Error fetching race results:", err));
-  }, [selectedRace]);
+  }, [selectedRaceId]);
 
   // Optional: dedicated fastest-lap endpoint (again, only to display name)
   useEffect(() => {
-    if (!selectedSeason || !selectedRace) return;
+    if (!selectedSeason || !selectedRaceId) return;
 
-    fetch(`https://stbleague.fly.dev/api/fastestlap/${selectedRace}`)
+    fetch(`https://stbleaguedata.vercel.app/api/fastestlap/${selectedRaceId}`)
       .then(async (res) => {
         const text = await res.text();
         try {
@@ -145,7 +145,7 @@ function EditRaceResults() {
         }
       })
       .catch((err) => console.error("Error fetching fastest lap:", err));
-  }, [selectedSeason, selectedRace]);
+  }, [selectedSeason, selectedRaceId]);
 
   /** Generic field change */
   const handleInputChange = (id, field, value) => {
@@ -203,10 +203,13 @@ function EditRaceResults() {
 
     console.log("Saving DTO:", dto);
     const resp = await fetch(
-      `https://stbleague.fly.dev/api/raceresult/update/${id}`,
+      `https://stbleaguedata.vercel.app/api/raceresult/update/${id}`,
       {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+         },
         body: JSON.stringify(dto),
       }
     );
@@ -255,9 +258,12 @@ function EditRaceResults() {
           Penalty: updated.penalty ?? base.penalty,
         };
 
-        return fetch(`https://stbleague.fly.dev/api/raceresult/update/${id}`, {
+        return fetch(`https://stbleaguedata.vercel.app/api/raceresult/update/${id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
           body: JSON.stringify(dto),
         }).then((res) => ({
           id,
@@ -277,7 +283,7 @@ function EditRaceResults() {
 
     // Clear edits & refetch fresh data (and refresh original points map)
     setEditedResults({});
-    fetch(`https://stbleague.fly.dev/api/race/race/${selectedRace}`)
+    fetch(`https://stbleaguedata.vercel.app/api/race/${selectedRaceId}`)
       .then((res) => res.json())
       .then((data) => {
         const raceObj = data?.race ?? data;
@@ -290,8 +296,12 @@ function EditRaceResults() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this result?")) return;
     const resp = await fetch(
-      `https://stbleague.fly.dev/api/raceresult/delete/${id}`,
-      { method: "DELETE" }
+      `https://stbleaguedata.vercel.app/api/raceresult/delete/${id}`, { 
+        method: "DELETE",
+        headers: { 
+          "Authorization": `Bearer ${token}`
+         }, 
+      }
     );
     if (resp.ok) {
       alert("Race result deleted successfully!");
@@ -429,7 +439,7 @@ function EditRaceResults() {
         <div>
           <label>Select Race: </label>
           <select
-            value={selectedRace}
+            value={selectedRaceId}
             onChange={(e) => setSelectedRace(e.target.value)}
           >
             <option value="">-- Select Race --</option>
@@ -446,10 +456,10 @@ function EditRaceResults() {
       )}
 
       {/* Results Table */}
-      {selectedSeason && selectedRace && (
+      {selectedSeason && selectedRaceId && (
         <>
           <h2>
-            Race Results{type ? ` - ${type}` : ""} • Id {selectedRace} • Season{" "}
+            Race Results{type ? ` - ${type}` : ""} • Id {selectedRaceId} • Season{" "}
             {selectedSeason}
           </h2>
 
