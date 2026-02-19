@@ -360,7 +360,7 @@ export default function AddRaceResults() {
       Time: r.raceTime.trim(),
     }))
 
-    const url = "https://stbleaguedata.vercel.app/api/race/raceresults";
+    const url = "https://stbleaguedata.vercel.app/api/race/raceresult";
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 15000);
 
