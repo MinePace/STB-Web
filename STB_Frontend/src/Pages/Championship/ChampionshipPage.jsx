@@ -29,6 +29,7 @@ function ChampionshipPage() {
   const username = localStorage.getItem("name") || "";
   const isLoggedIn = localStorage.getItem("token") !== null;
   const [claimedDriver, setClaimedDriver] = useState(null);
+  const [token, setToken] = useState("");
 
   // fetch claimed driver
   useEffect(() => {
@@ -38,6 +39,10 @@ function ChampionshipPage() {
       .then((d) => setClaimedDriver(d))
       .catch((err) => console.error("Error fetching claimed driver:", err));
   }, [isLoggedIn, username]);
+
+  useEffect(() => {
+    setToken(localStorage.getItem("token"));
+  }, []);
 
   // MAIN fetch
   useEffect(() => {
@@ -363,10 +368,13 @@ function ChampionshipPage() {
 
     try {
       const response = await fetch(
-        "https://stbleague.fly.dev/api/auth/upload-championship",
+        "https://stbleaguedata.vercel.app/api/auth/upload-championship",
         {
           method: "POST",
           body: formData,
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
       );
 

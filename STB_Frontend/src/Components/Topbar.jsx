@@ -98,15 +98,6 @@ function Topbar() {
   ];
 
   useEffect(() => {
-    if (isLoggedIn && username) {
-      fetch(`https://stbleague.fly.dev/api/driver/user/${username}`)
-        .then((res) => res.json())
-        .then((data) => data && setClaimedDriver(data))
-        .catch((err) => console.error("Error fetching claimed driver:", err));
-    }
-  }, [isLoggedIn, username]);
-
-  useEffect(() => {
     const token = localStorage.getItem("token");
     let role = "user";
   
@@ -124,6 +115,15 @@ function Topbar() {
       }
     }
   }, [navigate]);
+
+  useEffect(() => {
+    if (isLoggedIn && username) {
+      fetch(`https://stbleaguedata.vercel.app/api/driver/user/${username}`)
+        .then((res) => res.json())
+        .then((data) => data && setClaimedDriver(data))
+        .catch((err) => console.error("Error fetching claimed driver:", err));
+    }
+  }, [isLoggedIn, username]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

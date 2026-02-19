@@ -161,7 +161,13 @@ function RaceResultPage() {
         try {
           const response = await fetch(
             `https://stbleaguedata.vercel.app/api/auth/upload-result`,
-            { method: "POST", body: formData }
+            { 
+              method: "POST", 
+              body: formData,
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            }
           );
         } catch (err) {
           console.error("Upload error:", err);
