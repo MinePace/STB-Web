@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "./AddRaceResultPage.css";
 import "@/Components/Links.css";
 
