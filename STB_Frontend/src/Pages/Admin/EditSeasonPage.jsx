@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import React, { useEffect, useMemo, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import "./EditSeasonPage.css";
 import "@/Components/Links.css";
 
