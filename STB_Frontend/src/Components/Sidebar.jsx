@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "./Sidebar.css";
 import "@/Components/Links.css";
 
@@ -34,15 +35,37 @@ function Sidebar() {
   const [seasonRaced, setSeasonRaced] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const username = localStorage.getItem("name") || "";
+  const [username, setUsername] = useState("");
+  const [roleState, setRoleState] = useState("user");
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode(token);
+
+      setRoleState(decoded.role);
+      setUsername(decoded.username);
+    } catch (e) {
+      console.log("JWT decode failed:", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!username) return; // wait until username exists
+
     const fetchSeasonRaced = async () => {
       try {
+        console.log("Fetching season raced for user:", username);
+
         const res = await fetch(
-          `https://stbleague.fly.dev/api/driver/claimeddriver/races/${username}`
+          `https://stbleaguedata.vercel.app/api/driver/claimeddriver/races/${username}`
         );
+
         if (!res.ok) throw new Error("Failed to fetch driver stats");
+
         const data = await res.json();
         setSeasonRaced(data);
       } catch (err) {

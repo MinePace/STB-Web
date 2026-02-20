@@ -114,7 +114,7 @@ function Topbar() {
         console.log("JWT decode failed:", e);
       }
     }
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     if (isLoggedIn && username) {

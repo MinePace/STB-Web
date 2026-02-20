@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import "./ChampionshipPage.css";
 import "@/Components/Links.css";
+import RaceLoader from "@/components/Loaders/RaceLoader";
 
 // 🔹 helper to safely extract driver/team name
 const safeName = (entity) =>
@@ -399,7 +400,7 @@ function ChampionshipPage() {
   );
 
   if (loading)
-    return <div className="loading-bar">Loading Championship Data...</div>;
+    return <RaceLoader season={season} division={division} />;
 
   if (notFound)
     return <div className="not-found">No races found for this championship.</div>;
