@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import html2canvas from "html2canvas";
 import "./ChampionshipPage.css";
 import "@/Components/Links.css";
-import RaceLoader from "@/components/Loaders/RaceLoader";
+import RaceLoader from "@/Components/Loaders/RaceLoader";
 
 // 🔹 helper to safely extract driver/team name
 const safeName = (entity) =>
