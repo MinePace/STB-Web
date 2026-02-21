@@ -1,7 +1,9 @@
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { jwtDecode } from "jwt-decode";
 import React from "react";
 import "./DriverPage.css";
+import DriverLoader from "@/Components/Loaders/DriverLoader";
 import "@/Components/Links.css";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
@@ -15,15 +17,36 @@ function DriverPage() {
   const [newCountry, setNewCountry] = useState("");
   const [savingCountry, setSavingCountry] = useState(false);
   const [flags, setFlags] = useState([]);
+  const [roleState, setRoleState] = useState("user");
+  const [name, setUsername] = useState("");
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+      setToken(localStorage.getItem("token"));
+      let role = "user";
+    
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+    
+          role = decoded.role;
+          setRoleState(role);
+  
+          const username = decoded.username
+          setUsername(username);
+        } catch (e) {
+          console.log("JWT decode failed:", e);
+        }
+      }
+    }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const token = localStorage.getItem("token");
-      const name = localStorage.getItem("name");
+
       if (!token || !name) return;
 
       try {
-        const res = await fetch(`https://stbleague.fly.dev/api/user/${name}`, {
+        const res = await fetch(`https://stbleaguedata.vercel.app/api/user/${name}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -49,7 +72,10 @@ function DriverPage() {
 
   const fetchDriverStats = async () => {
     try {
-      const res = await fetch(`https://stbleague.fly.dev/api/driver/stats/${driverName}`);
+      setLoading(true);
+      setDriverStats(null);
+      setError(null);
+      const res = await fetch(`https://stbleaguedata.vercel.app/api/driver/stats/${driverName}`);
       if (!res.ok) throw new Error("Failed to fetch driver stats");
       const data = await res.json();
       setDriverStats(data);
@@ -67,7 +93,7 @@ function DriverPage() {
     if (!token) return;
 
     try {
-      const response = await fetch(`https://stbleague.fly.dev/api/driver/claim/${driverStats.driver}`, {
+      const response = await fetch(`https://stbleaguedata.vercel.app/api/driver/claim/${driverStats.Driver}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: user.username }),
@@ -87,13 +113,13 @@ function DriverPage() {
   const updateDriverCountry = async () => {
     console.log("Inside updateDriverCountry ✅", {
       driverStats,
-      driverId: driverStats?.driverOBJ?.id,
+      driverId: driverStats?.driverOBJ?.Id,
       newCountry,
     });
 
-    if (!driverStats?.driverOBJ?.id || !newCountry) {
+    if (!driverStats?.driverOBJ?.Id || !newCountry) {
       console.warn("⛔ Exiting early — missing data", {
-        driverId: driverStats?.driverOBJ?.id,
+        driverId: driverStats?.driverOBJ?.Id,
         newCountry,
       });
       return;
@@ -101,9 +127,9 @@ function DriverPage() {
 
     try {
       setSavingCountry(true);
-      const driverId = driverStats.driverOBJ.id;
+      const driverId = driverStats.driverOBJ.Id;
       console.log("Selected driver ID:", driverId, "New country:", newCountry);
-      const res = await fetch(`https://stbleague.fly.dev/api/driver/updateCountry/${driverId}`, {
+      const res = await fetch(`https://stbleaguedata.vercel.app/api/driver/updateCountry/${driverId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ country: newCountry }),
@@ -122,23 +148,46 @@ function DriverPage() {
     }
   };
 
-  if (loading) return <div className="spinner">🏁 Loading driver stats...</div>;
+  if (loading) return <DriverLoader />;
   if (error) return <div className="error">❌ {error}</div>;
   if (!driverStats) return <div>No data available.</div>;
 
-  const nat = driverStats?.driverOBJ?.country ?? "NAT";
-  const flagPath = driverStats?.driverOBJ?.country
-    ? `/flags/${driverStats.driverOBJ.country}.png`
+  const nat = driverStats?.driverOBJ?.Country ?? "NAT";
+  const flagPath = driverStats?.driverOBJ?.Country
+    ? `/flags/${driverStats.driverOBJ.Country}.png`
     : null;
+  console.log("country:", driverStats?.driverOBJ?.Country);
 
   function StartFinishHeatmap({ allRaces, driverName }) {
-    console.log("[Heatmap] driverName prop:", driverName);
-    const matrix = getStartFinishMatrix(allRaces, driverName);
-    const max = Math.max(0, ...matrix.flat());
+    const [selectedCell, setSelectedCell] = useState(null);
+
+    const flyoutRef = useRef(null);
+    useEffect(() => {
+      if (!selectedCell) return;
+
+      const handleClickOutside = (e) => {
+        if (flyoutRef.current?.contains(e.target)) return;
+        if (e.target.closest(".sf-cell")) return;
+        setSelectedCell(null);
+      };
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [selectedCell]);
+
+    const matrix = React.useMemo(
+      () => getStartFinishMatrixDetailed(allRaces, driverName),
+      [allRaces, driverName]
+    );
+
+    const max = Math.max(
+      0,
+      ...matrix.flat().map((cell) => cell.length)
+    );
 
     return (
       <div className="sf-heatmap-wrap" style={{ display: "grid", gap: 12 }}>
-        {/* Color legend */}
+        {/* legend */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{ opacity: 0.85 }}>Less</span>
           <div
@@ -153,7 +202,7 @@ function DriverPage() {
           <span style={{ opacity: 0.85 }}>More</span>
         </div>
 
-        {/* Grid */}
+        {/* grid */}
         <div
           style={{
             display: "grid",
@@ -165,11 +214,7 @@ function DriverPage() {
           {Array.from({ length: 20 }, (_, i) => (
             <div
               key={`col-${i}`}
-              style={{
-                textAlign: "center",
-                fontSize: 12,
-                opacity: 0.7,
-              }}
+              style={{ textAlign: "center", fontSize: 12, opacity: 0.7 }}
             >
               P{i + 1}
             </div>
@@ -177,32 +222,51 @@ function DriverPage() {
 
           {matrix.map((row, r) => (
             <React.Fragment key={r}>
-              <div
-                style={{
-                  fontSize: 12,
-                  opacity: 0.7,
-                  whiteSpace: "nowrap",
-                }}
-              >
-                Start P{r + 1}
+              <div style={{ fontSize: 12, opacity: 0.7 }}>
+                P{r + 1}
               </div>
-              {row.map((val, c) => (
-                <div
-                  key={`${r}-${c}`}
-                  title={`Start P${r + 1} → Finish P${c + 1}: ${val}`}
-                  style={{
-                    aspectRatio: "1 / 1",
-                    borderRadius: 3,
-                    background: heatColor(val, max),
-                    display: "grid",
-                    placeItems: "center",
-                    fontSize: 11,
-                    color: "rgba(255,255,255,0.9)",
-                  }}
-                >
-                  {val > 0 ? val : ""}
-                </div>
-              ))}
+
+              {row.map((cellRaces, c) => {
+                const count = cellRaces.length;
+
+                return (
+                  <div
+                    key={`${r}-${c}`}
+                    title={`Start P${r + 1} → Finish P${c + 1}: ${count}`}
+                    onClick={(e) => {
+                      if (!count) return;
+
+                      const cellRect = e.currentTarget.getBoundingClientRect();
+                      const containerRect =
+                        e.currentTarget
+                          .closest(".sf-heatmap-wrap")
+                          .getBoundingClientRect();
+
+                      setSelectedCell({
+                        start: r + 1,
+                        finish: c + 1,
+                        races: cellRaces,
+                        x: cellRect.right - containerRect.left,
+                        y: cellRect.top - containerRect.top,
+                      });
+                    }}
+                    style={{
+                      aspectRatio: "1 / 1",
+                      borderRadius: 3,
+                      background: heatColor(count, max),
+                      display: "grid",
+                      placeItems: "center",
+                      fontSize: 11,
+                      color: "rgba(255,255,255,0.9)",
+                      cursor: count > 0 ? "pointer" : "default",
+                      transition: "transform 0.12s ease",
+                    }}
+                    className={`sf-cell ${selectedCell?.start === r + 1 && selectedCell?.finish === c + 1 ? "sf-cell--active" : ""}`}
+                  >
+                    {count > 0 ? count : ""}
+                  </div>
+                );
+              })}
             </React.Fragment>
           ))}
         </div>
@@ -210,6 +274,42 @@ function DriverPage() {
         <div style={{ fontSize: 12, opacity: 0.7 }}>
           *DNFs excluded — only races with valid start & finish positions shown.
         </div>
+
+        {/* popup */}
+        {selectedCell && (
+          <div
+            ref={flyoutRef} 
+            className="heatmap-flyout"
+            style={{
+              left: selectedCell.x,
+              top: selectedCell.y,
+            }}
+          >
+            <div className="heatmap-flyout-title">
+              Start P{selectedCell.start} → Finish P{selectedCell.finish}
+            </div>
+
+            <div className="heatmap-flyout-list">
+              {selectedCell.races.map((race) => (
+                <Link
+                  key={race.Id}
+                  to={`/STB/Race/${race.Id}`}
+                  className="heatmap-flyout-link"
+                  onClick={() => setSelectedCell(null)}
+                >
+                  {asTrackLabel(race.Track)} — S{race.Season} T{race.Division}
+                </Link>
+              ))}
+            </div>
+
+            <button
+              className="heatmap-flyout-close"
+              onClick={() => setSelectedCell(null)}
+            >
+              Close
+            </button>
+          </div>
+        )}
       </div>
     );
   }
@@ -338,46 +438,46 @@ function DriverPage() {
             ) : (() => {
               const race = driverStats.lastRace;
 
-              const trackLabel = asTrackLabel(race.track);
+              const trackLabel = asTrackLabel(race.Track);
               const raceLabel = asRaceLabel(race);
-              const dateLabel = fmtDate(race.date);
+              const dateLabel = fmtDate(race.Date);
 
-              const results = (race.raceResults ?? [])
+              const results = (race.RaceResults ?? [])
                 .slice()
                 .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
 
               const top10 = results
                 .filter(
                   (r) =>
-                    typeof r.position === "number" &&
-                    r.position >= 1 &&
-                    r.position <= 5
+                    typeof r.Position === "number" &&
+                    r.Position >= 1 &&
+                    r.Position <= 5
                 )
                 .slice(0, 5);
 
               // use helper to find this driver's row (handles driver objects)
-              const myResult = findMyRow(results, driverStats.driver);
+              const myResult = findMyRow(results, driverStats.Driver);
               const showMyExtra =
                 myResult &&
-                (typeof myResult.position !== "number" ||
-                  myResult.position > 5);
+                (typeof myResult.Position !== "number" ||
+                  myResult.Position > 5);
 
               return (
                 <div className="last-race">
                   <div className="lr-meta">
-                    <a
-                      href={`/STB/Championship/${race.season}/${race.division}?driver=${driverStats.driver}`}
+                    <Link
+                      to={`/STB/Championship/${race.Season}/${race.Division}?driver=${driverStats.driver}`}
                       className="primary-link"
                     >
-                      Season {race.season} Tier {race.division}
-                    </a>
+                      Season {race.Season} Tier {race.Division}
+                    </Link>
                     <h>•</h>
-                    <a
-                      href={`/STB/Race/${raceLabel}?driver=${driverStats.driver}`}
+                    <Link
+                      to={`/STB/Race/${raceLabel}?driver=${driverStats.driver}`}
                       className="primary-link"
                     >
                       {trackLabel}
-                    </a>
+                    </Link>
                     <div>
                       <strong>Date:</strong> {dateLabel}
                     </div>
@@ -396,21 +496,21 @@ function DriverPage() {
                         return (
                           <div
                             className="tp-result-row"
-                            key={res.id ?? `${name}-${res.position}`}
+                            key={res.Id ?? `${name}-${res.Position}`}
                           >
                             <div
                               className={`tp-pos ${medalClass(
-                                res.position
+                                res.Position
                               )}`}
                             >
                               {posLabel(res)}
                             </div>
-                            <a
-                              href={`/STB/Driver/${encodeURIComponent(name)}`}
+                            <Link
+                              to={`/STB/Driver/${encodeURIComponent(name)}`}
                               className="primary-link"
                             >
                               {name}
-                            </a>
+                            </Link>
                             <div className="tp-right">
                               {isDNF(res) ? (
                                 <span className="tp-tag tp-tag-dnf">
@@ -418,7 +518,7 @@ function DriverPage() {
                                 </span>
                               ) : (
                                 <span className="tp-tag">
-                                  {res.points ?? 0}
+                                  {res.Points ?? 0}
                                 </span>
                               )}
                             </div>
@@ -434,23 +534,23 @@ function DriverPage() {
                             return (
                               <div
                                 className="tp-result-row tp-result-row--me"
-                                key={myResult.id ?? "me"}
+                                key={myResult.Id ?? "me"}
                               >
                                 <div
                                   className={`tp-pos ${medalClass(
-                                    myResult.position
+                                    myResult.Position
                                   )}`}
                                 >
                                   {posLabel(myResult)}
                                 </div>
-                                <a
-                                  href={`/STB/Driver/${encodeURIComponent(
+                                <Link
+                                  to={`/STB/Driver/${encodeURIComponent(
                                     myName
                                   )}`}
                                   className="primary-link"
                                 >
                                   {myName}
-                                </a>
+                                </Link>
                                 <div className="tp-right">
                                   {isDNF(myResult) ? (
                                     <span className="tp-tag tp-tag-dnf">
@@ -458,7 +558,7 @@ function DriverPage() {
                                     </span>
                                   ) : (
                                     <span className="tp-tag">
-                                      {myResult.points ?? 0}
+                                      {myResult.Points ?? 0}
                                     </span>
                                   )}
                                 </div>
@@ -485,19 +585,18 @@ function DriverPage() {
               return lastFive.length ? (
                 <div className="race-chips">
                   {lastFive.map((race, idx) => {
-                    const trackLabel = asTrackLabel(race.track);
+                    const trackLabel = asTrackLabel(race.Track);
                     const raceLabel = asRaceLabel(race);
-                    const results = (race.raceResults ?? [])
+                    const results = (race.RaceResults ?? [])
                       .slice()
                       .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
-
                     const myResult = findMyRow(
                       results,
-                      driverStats.driver
+                      driverName
                     );
                     const isSprint =
                       race?.isSprint === true ||
-                      race?.sprint === true ||
+                      race?.Sprint === true ||
                       race?.format === "Sprint" ||
                       race?.type === "Sprint";
 
@@ -507,13 +606,11 @@ function DriverPage() {
                     if (myResult) {
                       if (isDNF(myResult)) {
                         labelPos = "DNF";
-                      } else if (
-                        typeof myResult.position === "number"
-                      ) {
-                        labelPos = `P${myResult.position}`;
+                      } else {
+                        labelPos = `P${myResult.Position}`;
                       }
                       if (!isDNF(myResult)) {
-                        pts = myResult.points ?? 0;
+                        pts = myResult.Points ?? 0;
                       }
                     }
 
@@ -523,18 +620,18 @@ function DriverPage() {
 
                     return (
                       <div
-                        key={race.id ?? `${raceLabel}-${idx}`}
+                        key={race.Id ?? `${raceLabel}-${dx}`}
                         className="race-chip race-chip--stacked"
-                        href={`/STB/Race/${raceLabel}`}
+                        to={`/STB/Race/${raceLabel}`}
                         title={title}
                         aria-label={title}
                       >
-                        <a
-                          href={`/STB/Race/${raceLabel}?driver=${driverStats.driver}`}
+                        <Link
+                          to={`/STB/Race/${raceLabel}?driver=${driverStats.driver}`}
                           className="primary-link"
                         >
                           {trackLabel}
-                        </a>
+                        </Link>
                         <span
                           className="race-chip-divider"
                           aria-hidden="true"
@@ -544,7 +641,7 @@ function DriverPage() {
                             className={`race-chip-badge ${
                               isDNF(myResult)
                                 ? "tp-medal tp-medal-dnf"
-                                : medalClass(myResult?.position)
+                                : medalClass(myResult?.Position)
                             }`}
                           >
                             {labelPos}
@@ -635,12 +732,12 @@ function DriverPage() {
             </div>
 
             <p className="claimed-by">
-              {driverStats.driverOBJ?.user?.username
-                ? `Claimed by: ${driverStats.driverOBJ.user.username}`
+              {driverStats.driverOBJ?.Username
+                ? `Claimed by: ${driverStats.driverOBJ.Username}`
                 : "🚨 Unclaimed"}
             </p>
 
-            {!driverStats.driverOBJ?.user?.username &&
+            {!driverStats.driverOBJ?.Username &&
               user &&
               !user.driverClaimed && (
                 <button onClick={claimDriver} className="claim-button">
@@ -855,16 +952,16 @@ function DriverPage() {
 export default DriverPage;
 
 // --- shared helpers ---
-const isDNF = (res) => res?.dnf === "Yes" || res?.dnf === "DNF";
+const isDNF = (res) => res?.DNF === "Yes" || res?.DNF === "DNF";
 
 const toPosSortKey = (res) =>
-  typeof res?.position === "number"
-    ? res.position
+  typeof res?.Position === "number"
+    ? res.Position
     : Number.POSITIVE_INFINITY;
 
 const posLabel = (res) =>
-  typeof res?.position === "number"
-    ? `P${res.position}`
+  typeof res?.Position === "number"
+    ? `P${res.Position}`
     : isDNF(res)
     ? "DNF"
     : "—";
@@ -880,10 +977,10 @@ const medalClass = (position) => {
 const asTrackLabel = (t) =>
   typeof t === "string"
     ? t
-    : t?.raceName ?? t?.name ?? "—";
+    : t?.RaceName ?? t?.Name ?? "—";
 
 const asRaceLabel = (r) =>
-  typeof r === "string" ? r : r?.id ?? r?.id ?? "—";
+  typeof r === "string" ? r : r?.Id ?? r?.Id ?? "—";
 
 const fmtDate = (d) =>
   d
@@ -900,7 +997,7 @@ const getPointsPositionsData = (allRaces, driverName) => {
   const counts = Array(10).fill(0);
 
   for (const race of races) {
-    const results = (race?.raceResults ?? [])
+    const results = (race?.RaceResults ?? [])
       .slice()
       .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
 
@@ -908,7 +1005,7 @@ const getPointsPositionsData = (allRaces, driverName) => {
     if (!me) continue;
 
     const pos =
-      typeof me.position === "number" ? me.position : null;
+      typeof me.Position === "number" ? me.Position : null;
     if (pos && pos >= 1 && pos <= 10) counts[pos - 1] += 1;
   }
 
@@ -932,7 +1029,7 @@ const aggregateRaceBucketsFromAll = (
   };
 
   for (const race of races) {
-    const results = (race?.raceResults ?? [])
+    const results = (race?.RaceResults ?? [])
       .slice()
       .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
 
@@ -943,9 +1040,9 @@ const aggregateRaceBucketsFromAll = (
 
     const dnf = isDNF(me);
     const pos =
-      typeof me.position === "number" ? me.position : null;
+      typeof me.Position === "number" ? me.Position : null;
     const pts =
-      typeof me.points === "number" ? me.points : 0;
+      typeof me.Points === "number" ? me.Points : 0;
 
     if (dnf) buckets.dnf += 1;
     else if (pos && pos >= 1 && pos <= 3)
@@ -969,8 +1066,8 @@ const getStartFinishMatrix = (allRaces, driverNameRaw) => {
   let processed = 0;
 
   for (const race of races) {
-    const results = Array.isArray(race?.raceResults)
-      ? race.raceResults
+    const results = Array.isArray(race?.RaceResults)
+      ? race.RaceResults
       : null;
     if (!results) continue;
 
@@ -978,8 +1075,8 @@ const getStartFinishMatrix = (allRaces, driverNameRaw) => {
     if (!me) continue;
 
     const dnf =
-      me?.dnf === "Yes" ||
-      me?.dnf === "DNF" ||
+      me?.DNF === "Yes" ||
+      me?.DNF === "DNF" ||
       me?.status === "DNF" ||
       me?.classified === false;
 
@@ -989,18 +1086,19 @@ const getStartFinishMatrix = (allRaces, driverNameRaw) => {
       (typeof me.startingPosition === "number" &&
         me.startingPosition) ||
       (typeof me.qualifying === "number" && me.qualifying) ||
+      (typeof me.Qualifying === "number" && me.Qualifying) ||
       (typeof me.quali === "number" && me.quali) ||
       null;
 
     let finishPos = null;
-    if (typeof me.position === "number")
-      finishPos = me.position;
+    if (typeof me.Position === "number")
+      finishPos = me.Position;
     else if (
-      typeof me.position === "string" &&
-      /^P?\d+$/.test(me.position)
+      typeof me.Position === "string" &&
+      /^P?\d+$/.test(me.Position)
     ) {
       finishPos = parseInt(
-        me.position.replace("P", ""),
+        me.Position.replace("P", ""),
         10
       );
     }
@@ -1008,7 +1106,7 @@ const getStartFinishMatrix = (allRaces, driverNameRaw) => {
     if (DEBUG_HEATMAP) {
       console.log(
         "[Heatmap] race:",
-        { id: race?.id, track: race?.track, date: race?.date },
+        { id: race?.Id, track: race?.Track, date: race?.Date },
         "me:",
         extractDriverName(me),
         "start:",
@@ -1070,18 +1168,19 @@ const canonicalize = (s) =>
 const extractDriverName = (row) => {
   if (!row || typeof row !== "object") return "";
   const candidateObjs = [
-    row.driver,
+    row.Driver,
     row.driverOBJ,
     row.user,
     row.account,
     row.profile,
+    row.DriverName
   ].filter(Boolean);
 
   for (const obj of candidateObjs) {
     if (typeof obj === "string") return obj;
     if (typeof obj === "object") {
       const v =
-        obj.name ||
+        obj.Name ||
         obj.username ||
         obj.displayName ||
         obj.tag ||
@@ -1092,13 +1191,55 @@ const extractDriverName = (row) => {
 
   return (
     row.driver ||
-    row.name ||
+    row.Name ||
     row.username ||
     row.displayName ||
     row.tag ||
     row.handle ||
     ""
   );
+};
+
+const getStartFinishMatrixDetailed = (allRaces, driverNameRaw) => {
+  const races = Array.isArray(allRaces) ? allRaces : [];
+
+  const m = Array.from({ length: 20 }, () =>
+    Array.from({ length: 20 }, () => [])
+  );
+
+  for (const race of races) {
+    const results = Array.isArray(race?.RaceResults)
+      ? race.RaceResults
+      : null;
+    if (!results) continue;
+
+    const me = findMyRow(results, driverNameRaw);
+    if (!me) continue;
+
+    const dnf =
+      me?.DNF === "Yes" ||
+      me?.DNF === "DNF" ||
+      me?.classified === false;
+
+    const startPos =
+      me?.Qualifying ??
+      me?.qualifying ??
+      me?.grid ??
+      null;
+
+    const finishPos =
+      typeof me.Position === "number"
+        ? me.Position
+        : null;
+
+    if (!startPos || !finishPos || dnf) continue;
+    if (startPos < 1 || startPos > 20) continue;
+    if (finishPos < 1 || finishPos > 20) continue;
+
+    m[startPos - 1][finishPos - 1].push(race);
+  }
+
+  return m;
 };
 
 const findMyRow = (results, targetNameRaw) => {

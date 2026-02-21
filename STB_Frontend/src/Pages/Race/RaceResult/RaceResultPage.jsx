@@ -161,14 +161,48 @@ function RaceResultPage() {
         try {
           const response = await fetch(
             `https://stbleaguedata.vercel.app/api/auth/upload-result`,
-            { 
-              method: "POST", 
+            {
+              method: "POST",
               body: formData,
               headers: {
                 Authorization: `Bearer ${token}`
               }
             }
           );
+
+          const json = await response.json();
+          console.log("📤 Result upload complete:", json);
+
+          // 🔥 IMPORTANT: get Supabase public URL from backend
+          const imageUrl = json?.publicUrl || json?.url || json?.imageUrl;
+
+          if (!imageUrl) {
+            console.warn("⚠️ No image URL returned from backend");
+            return;
+          }
+
+          // 🤖 Notify Discord bot
+          try {
+            await fetch("http://localhost:3000/api/notify-new-result", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                season,
+                tier,
+                round,
+                country: race.track?.country,
+                circuit: race.track?.name,
+                imagePath: imageUrl // ✅ FULL URL — NOT local path
+              })
+            });
+
+            console.log("🤖 Race bot notified successfully");
+          } catch (err) {
+            console.error("❌ Failed to notify race bot:", err);
+          }
+
         } catch (err) {
           console.error("Upload error:", err);
         }

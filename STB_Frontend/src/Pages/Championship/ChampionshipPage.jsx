@@ -381,6 +381,31 @@ function ChampionshipPage() {
 
       const json = await response.json();
       console.log("🏆 Championship upload complete:", json);
+
+      // -------------------------------
+      // 🤖 NOTIFY DISCORD BOT
+      // -------------------------------
+
+      try {
+        await fetch("http://localhost:3000/api/notify-championship", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            season,
+            tier: division,
+            mode,
+            country,
+            circuit,
+            imagePath: `${json.publicUrl}` // ⚠️ adjust if needed
+          }),
+        });
+
+        console.log("🤖 Bot notified successfully");
+      } catch (err) {
+        console.error("❌ Failed to notify Discord bot:", err);
+      }
     } catch (err) {
       console.error("❌ Championship upload failed:", err);
     }
