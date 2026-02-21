@@ -32,6 +32,18 @@ function ChampionshipPage() {
   const [claimedDriver, setClaimedDriver] = useState(null);
   const [token, setToken] = useState("");
 
+  let role = "user";
+  
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+  
+        role = decoded.role;
+      } catch (e) {
+        console.log("JWT decode failed:", e);
+      }
+    }
+
   // fetch claimed driver
   useEffect(() => {
     if (!isLoggedIn || !username) return;
@@ -385,26 +397,27 @@ function ChampionshipPage() {
       // -------------------------------
       // 🤖 NOTIFY DISCORD BOT
       // -------------------------------
+      if (role === "admin") {
+        try {
+          await fetch("http://localhost:3000/api/notify-championship", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              season,
+              tier: division,
+              mode,
+              country,
+              circuit,
+              imagePath: `${json.publicUrl}` // ⚠️ adjust if needed
+            }),
+          });
 
-      try {
-        await fetch("http://localhost:3000/api/notify-championship", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            season,
-            tier: division,
-            mode,
-            country,
-            circuit,
-            imagePath: `${json.publicUrl}` // ⚠️ adjust if needed
-          }),
-        });
-
-        console.log("🤖 Bot notified successfully");
-      } catch (err) {
-        console.error("❌ Failed to notify Discord bot:", err);
+          console.log("🤖 Bot notified successfully");
+        } catch (err) {
+          console.error("❌ Failed to notify Discord bot:", err);
+        }
       }
     } catch (err) {
       console.error("❌ Championship upload failed:", err);

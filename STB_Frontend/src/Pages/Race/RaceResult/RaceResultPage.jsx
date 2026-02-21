@@ -180,29 +180,29 @@ function RaceResultPage() {
             console.warn("⚠️ No image URL returned from backend");
             return;
           }
+          if(role === "Admin") {
+            // 🤖 Notify Discord bot
+            try {
+              await fetch("http://localhost:3000/api/notify-new-result", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  season,
+                  tier,
+                  round,
+                  country: race.track?.country,
+                  circuit: race.track?.name,
+                  imagePath: imageUrl // ✅ FULL URL — NOT local path
+                })
+              });
 
-          // 🤖 Notify Discord bot
-          try {
-            await fetch("http://localhost:3000/api/notify-new-result", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                season,
-                tier,
-                round,
-                country: race.track?.country,
-                circuit: race.track?.name,
-                imagePath: imageUrl // ✅ FULL URL — NOT local path
-              })
-            });
-
-            console.log("🤖 Race bot notified successfully");
-          } catch (err) {
-            console.error("❌ Failed to notify race bot:", err);
+              console.log("🤖 Race bot notified successfully");
+            } catch (err) {
+              console.error("❌ Failed to notify race bot:", err);
+            }
           }
-
         } catch (err) {
           console.error("Upload error:", err);
         }
