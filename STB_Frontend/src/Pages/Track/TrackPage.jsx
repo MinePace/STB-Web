@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import "./TrackPage.css";
 import "@/Components/Links.css";
+import DriverLoader from "@/Components/Loaders/DriverLoader";
 
 /* ---------- maps & helpers at module scope ---------- */
 
@@ -124,7 +125,7 @@ function TrackPage() {
 
   const loading = loadingInfo || loadingRaces;
 
-  if (loading) return <div className="tp-spinner">🏁 Loading track…</div>;
+  if (loading) return <DriverLoader />;
   if (!trackInfo) return <div className="tp-error">❌ {errorInfo || "Track not found."}</div>;
 
   const { Name, RaceName, Country, Length, Turns } = trackInfo;

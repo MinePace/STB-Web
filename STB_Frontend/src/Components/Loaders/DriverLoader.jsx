@@ -17,7 +17,7 @@ function DriverLoader() {
         </div>
 
         <div className="driver-loader-subtext">
-          Loading driver data
+          Gathering data
           <span className="dots">
             <span>.</span><span>.</span><span>.</span>
           </span>
