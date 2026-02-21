@@ -32,28 +32,28 @@ const eqCI = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
 const incCI = (hay, needle) =>
   String(hay).toLowerCase().includes(String(needle).toLowerCase());
 
-function getMapCandidates({ country, name }) {
+function getMapCandidates({ Country, Name }) {
   const out = [];
 
-  if (country && MAP_EXCEPTIONS[country]) {
-    const byCountry = MAP_EXCEPTIONS[country];
+  if (Country && MAP_EXCEPTIONS[Country]) {
+    const byCountry = MAP_EXCEPTIONS[Country];
 
-    if (byCountry[name]) out.push(byCountry[name]);
+    if (byCountry[Name]) out.push(byCountry[Name]);
     else {
       const keys = Object.keys(byCountry);
       const k = keys.find(
-        (key) => eqCI(key, name) || incCI(name, key) || incCI(key, name)
+        (key) => eqCI(key, Name) || incCI(Name, key) || incCI(key, Name)
       );
       if (k) out.push(byCountry[k]);
     }
   }
 
-  if (country && name) {
-    out.push(`/track_map/${slugCountry(country)}_${slugTrack(name)}.avif`);
+  if (Country && Name) {
+    out.push(`/track_map/${slugCountry(Country)}_${slugTrack(Name)}.avif`);
   }
 
-  if (country) {
-    out.push(`/track_map/${slugCountry(country)}.avif`);
+  if (Country) {
+    out.push(`/track_map/${slugCountry(Country)}.avif`);
   }
 
   return out;
@@ -87,7 +87,7 @@ function TrackPage() {
     (async () => {
       try {
         const res = await fetch(
-          `https://stbleague.fly.dev/api/track/${encodeURIComponent(trackId || "")}`
+          `https://stbleaguedata.vercel.app/api/track/${encodeURIComponent(trackId || "")}`
         );
         if (!res.ok) throw new Error("Failed to fetch track info");
         const data = await res.json();
@@ -102,7 +102,7 @@ function TrackPage() {
     (async () => {
       try {
         const res = await fetch(
-          `https://stbleague.fly.dev/api/track/races/${encodeURIComponent(trackId || "")}`
+          `https://stbleaguedata.vercel.app/api/track/races/${encodeURIComponent(trackId || "")}`
         );
         if (!res.ok) throw new Error("Failed to fetch track races");
         const races = await res.json();
@@ -127,9 +127,9 @@ function TrackPage() {
   if (loading) return <div className="tp-spinner">🏁 Loading track…</div>;
   if (!trackInfo) return <div className="tp-error">❌ {errorInfo || "Track not found."}</div>;
 
-  const { name, raceName, country, length, turns } = trackInfo;
+  const { Name, RaceName, Country, Length, Turns } = trackInfo;
 
-  const mapCandidates = getMapCandidates({ country, name });
+  const mapCandidates = getMapCandidates({ Country, Name });
   const mapSrc = mapOk && mapCandidates.length ? mapCandidates[mapIdx] : null;
 
   return (
@@ -138,27 +138,27 @@ function TrackPage() {
       <div className="tp-hero">
         <div className="tp-hero-main">
           <header className="tp-header">
-            {country && (
+            {Country && (
               <img
-                src={`/flags/${country}.png`}
-                alt={`${country} flag`}
+                src={`/flags/${Country}.png`}
+                alt={`${Country} flag`}
                 className="tp-flag"
               />
             )}
-            <h1 className="tp-title">{name}</h1>
+            <h1 className="tp-title">{Name}</h1>
             <p className="tp-subtitle">
-              {[raceName, country].filter(Boolean).join(" · ") || "—"}
+              {[RaceName, Country].filter(Boolean).join(" · ") || "—"}
             </p>
           </header>
 
           <section className="tp-stats">
             <div className="tp-stat">
-              <div className="tp-stat-value">{formatLength(length)}</div>
+              <div className="tp-stat-value">{formatLength(Length)}</div>
               <div className="tp-stat-label">Track Length</div>
             </div>
 
             <div className="tp-stat">
-              <div className="tp-stat-value">{turns ?? "—"}</div>
+              <div className="tp-stat-value">{Turns ?? "—"}</div>
               <div className="tp-stat-label">Turns</div>
             </div>
 
@@ -168,15 +168,15 @@ function TrackPage() {
             </div>
 
             <div className="tp-stat">
-              <div className="tp-stat-value">{mostWins?.count ?? "—"}</div>
+              <div className="tp-stat-value">{mostWins?.Count ?? "—"}</div>
               <div className="tp-stat-sub">
                 <span className="tp-stat-label">Most wins:</span>
-                {mostWins?.name && (
+                {mostWins?.Name && (
                   <Link
-                    to={`/STB/Driver/${encodeURIComponent(mostWins.name)}`}
+                    to={`/STB/Driver/${encodeURIComponent(mostWins.Name)}`}
                     className="primary-link tp-stat-winner"
                   >
-                    {mostWins.name}
+                    {mostWins.Name}
                   </Link>
                 )}
               </div>
@@ -189,7 +189,7 @@ function TrackPage() {
             {mapSrc && mapOk ? (
               <img
                 src={mapSrc}
-                alt={`${country} track map`}
+                alt={`${Country} track map`}
                 className="tp-map"
                 loading="lazy"
                 onError={() => {
@@ -220,20 +220,20 @@ function TrackPage() {
               .slice()
               .sort(compareBySeasonRound)
               .map((r) => {
-                const results = (r.raceResults ?? [])
+                const results = (r.RaceResults ?? [])
                   .slice()
                   .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
 
                 const visible = results.slice(0, 3);
 
                 return (
-                  <article className="tp-round-card" key={r.id}>
+                  <article className="tp-round-card" key={r.Id}>
                     <div className="tp-round-meta">
-                      <div className="tp-round-title">{r.name}</div>
+                      <div className="tp-round-title">{r.Name}</div>
                       <div className="tp-round-sub">
-                        Season {r.season} · Tier {r.division} · Round {r.round}
-                        {r.date ? ` - ${formatDate(r.date)}` : ""}
-                        {r.sprint === "Yes" && (
+                        Season {r.Season} · Tier {r.Division} · Round {r.Round}
+                        {r.Date ? ` - ${formatDate(r.Date)}` : ""}
+                        {r.Sprint === "Yes" && (
                           <span className="tp-badge tp-badge-sprint">Sprint</span>
                         )}
                       </div>
@@ -249,22 +249,22 @@ function TrackPage() {
                       <div className="tp-results-body">
                         {visible.map((res, i) => (
                           <div className="tp-result-row" key={i}>
-                            <div className={`tp-pos ${medalClass(res.position)}`}>
+                            <div className={`tp-pos ${medalClass(res.Position)}`}>
                               {posLabel(res)}
                             </div>
 
                             <Link
-                              to={`/STB/Driver/${encodeURIComponent(res.driver?.name ?? "")}`}
+                              to={`/STB/Driver/${encodeURIComponent(res.Drivers?.Name ?? "")}`}
                               className="primary-link"
                             >
-                              {res.driver?.name ?? "Unknown"}
+                              {res.Drivers?.Name ?? "Unknown"}
                             </Link>
 
                             <div className="tp-right">
                               {isDNF(res) ? (
                                 <span className="tp-tag tp-tag-dnf">DNF</span>
                               ) : (
-                                <span className="tp-tag">{res.points ?? 0}</span>
+                                <span className="tp-tag">{res.Points ?? 0}</span>
                               )}
                             </div>
                           </div>
@@ -273,7 +273,7 @@ function TrackPage() {
                     </div>
 
                     {results.length > 3 && (
-                      <Link to={`/STB/Race/${r.id}`} className="tp-showmore">
+                      <Link to={`/STB/Race/${r.Id}`} className="tp-showmore">
                         View Race Result
                       </Link>
                     )}
@@ -307,17 +307,17 @@ function formatDate(d) {
 }
 
 function isDNF(res) {
-  return res?.dnf === "Yes" || res?.dnf === "DNF";
+  return res?.DNF === "Yes" || res?.DNF === "DNF";
 }
 
 function posLabel(res) {
-  if (typeof res?.position === "number") return `P${res.position}`;
+  if (typeof res?.Position === "number") return `P${res.Position}`;
   return isDNF(res) ? "DNF" : "—";
 }
 
 function toPosSortKey(res) {
-  return typeof res?.position === "number"
-    ? res.position
+  return typeof res?.Position === "number"
+    ? res.Position
     : Number.POSITIVE_INFINITY;
 }
 
@@ -329,11 +329,11 @@ function medalClass(position) {
 }
 
 function compareBySeasonRound(a, b) {
-  const sa = Number(a.season ?? -Infinity);
-  const sb = Number(b.season ?? -Infinity);
+  const sa = Number(a.Season ?? -Infinity);
+  const sb = Number(b.Season ?? -Infinity);
   if (sb !== sa) return sb - sa;
-  const ra = Number(a.round ?? -Infinity);
-  const rb = Number(b.round ?? -Infinity);
+  const ra = Number(a.Round ?? -Infinity);
+  const rb = Number(b.Round ?? -Infinity);
   return rb - ra;
 }
 
@@ -341,12 +341,12 @@ function topWinnerFirstAchievedBySeason(races, { includeSprint = true } = {}) {
   if (!Array.isArray(races) || races.length === 0) return null;
 
   const asc = [...races].sort((a, b) => {
-    const sa = Number(a?.season);
-    const sb = Number(b?.season);
+    const sa = Number(a?.Season);
+    const sb = Number(b?.Season);
     if (sa !== sb) return (isNaN(sa) ? Infinity : sa) - (isNaN(sb) ? Infinity : sb);
 
-    const ra = Number(a?.round);
-    const rb = Number(b?.round);
+    const ra = Number(a?.Round);
+    const rb = Number(b?.Round);
     return (isNaN(ra) ? Infinity : ra) - (isNaN(rb) ? Infinity : rb);
   });
 
@@ -355,12 +355,12 @@ function topWinnerFirstAchievedBySeason(races, { includeSprint = true } = {}) {
   let leaderCount = 0;
 
   for (const r of asc) {
-    if (!includeSprint && r?.sprint === "Yes") continue;
+    if (!includeSprint && r?.Sprint === "Yes") continue;
 
-    const winner = (r?.raceResults || []).find(rr => rr?.position === 1);
-    if (!winner?.driver?.name) continue;
+    const winner = (r?.RaceResults || []).find(rr => rr?.Position === 1);
+    if (!winner?.Drivers?.Name) continue;
 
-    const driverName = winner.driver.name;
+    const driverName = winner.Drivers.Name;
 
     const next = (counts.get(driverName) || 0) + 1;
     counts.set(driverName, next);
@@ -372,7 +372,7 @@ function topWinnerFirstAchievedBySeason(races, { includeSprint = true } = {}) {
   }
 
   if (!leaderName) return null;
-  return { count: leaderCount, name: leaderName };
+  return { Count: leaderCount, Name: leaderName };
 }
 
 export default TrackPage;
