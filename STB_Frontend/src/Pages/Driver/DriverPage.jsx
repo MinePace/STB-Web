@@ -75,13 +75,27 @@ function DriverPage() {
       setLoading(true);
       setDriverStats(null);
       setError(null);
-      const res = await fetch(`https://stbleaguedata.vercel.app/api/driver/stats/${driverName}`);
-      if (!res.ok) throw new Error("Failed to fetch driver stats");
+
+      const res = await fetch(
+        `https://stbleaguedata.vercel.app/api/driver/stats/${driverName}`
+      );
+
+      if (!res.ok) {
+        throw new Error("Driver not found");
+      }
+
       const data = await res.json();
+
+      // 🚨 CRITICAL: validate actual data
+      if (!data || !data.driverOBJ || !data.driver) {
+        throw new Error("Driver not found");
+      }
+
       setDriverStats(data);
     } catch (err) {
       console.error(err);
-      setError("No Driver has been claimed. Please claim a driver by going to Drivers profile and click the claim button.");
+      setError("Driver not found.");
+      setDriverStats(null);
     } finally {
       setLoading(false);
     }
@@ -156,7 +170,6 @@ function DriverPage() {
   const flagPath = driverStats?.driverOBJ?.Country
     ? `/flags/${driverStats.driverOBJ.Country}.png`
     : null;
-  console.log("country:", driverStats?.driverOBJ?.Country);
 
   function StartFinishHeatmap({ allRaces, driverName }) {
     const [selectedCell, setSelectedCell] = useState(null);
