@@ -456,7 +456,7 @@ function DriverPage() {
                 .slice(0, 5);
 
               // use helper to find this driver's row (handles driver objects)
-              const myResult = findMyRow(results, driverStats.Driver);
+              const myResult = findMyRow(results, driverName);
               const showMyExtra =
                 myResult &&
                 (typeof myResult.Position !== "number" ||
