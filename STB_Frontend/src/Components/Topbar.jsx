@@ -92,7 +92,7 @@ function Topbar() {
 
   const SOCIAL_LINKS = [
     { id: "youtube", name: "YouTube", href: "https://www.youtube.com/@stbracingleague", icon: "/youtube.png" },
-    { id: "discord", name: "Discord", href: "https://discord.gg/Qe2wQNrg", icon: "/discord.webp" },
+    { id: "discord", name: "Discord", href: "https://discord.gg/jQXYKBbEws", icon: "/discord.webp" },
     { id: "tiktok", name: "TikTok", href: "https://www.tiktok.com/@stbracingleague", icon: "/tiktok.png" },
     { id: "twitch", name: "Twitch", href: "https://www.twitch.tv/stbleague", icon: "/twitch.png" }
   ];
