@@ -18,7 +18,6 @@ function HomePage() {
   const [loadingStats, setLoadingStats] = useState(true);
   const [statsError, setStatsError] = useState(null);
 
-  const [nextRace, setNextRace] = useState(null);
   const [timeLeft, setTimeLeft] = useState("");
 
   const [standings, setStandings] = useState([]);
@@ -26,28 +25,28 @@ function HomePage() {
 
   // 🔸 helper to safely extract names
   const safeName = (entity) =>
-    typeof entity === "object" ? entity?.name ?? "Unknown" : entity ?? "Unknown";
+    typeof entity === "object" ? entity?.Name ?? "Unknown" : entity ?? "Unknown";
 
   // Latest Race
   useEffect(() => {
     const fetchLatestRace = async () => {
       try {
-        const response = await fetch("https://stbleague.fly.dev/api/race/latest");
+        const response = await fetch("https://stbleaguedata.vercel.app/api/race/latest");
         if (!response.ok) throw new Error("Failed to fetch latest race.");
         const data = await response.json();
 
         setLatestRace({
-          id: data.race.id,
-          name: `${data.race.track.name}`,
-          country: data.race.track.country,
-          season: data.race.season,
-          division: data.race.division,
-          date: new Date().toLocaleDateString(),
-          top3: data.results.slice(0, 3).map((r) => ({
-            position: r.position,
-            name: safeName(r.driver),
-            team: safeName(r.team),
-            points: r.points,
+          Id: data.Race.Id,
+          Name: `${data.Race.Track.Name}`,
+          Country: data.Race.Track.Country,
+          Season: data.Race.Season,
+          Division: data.Race.Division,
+          Date: new Date().toLocaleDateString(),
+          Top3: data.Results.slice(0, 3).map((r) => ({
+            Position: r.Position,
+            Name: safeName(r.Driver),
+            Team: safeName(r.Team),
+            Points: r.Points,
           })),
         });
       } catch (err) {
@@ -65,33 +64,33 @@ function HomePage() {
   useEffect(() => {
     const fetchLeagueStats = async () => {
       try {
-        const response = await fetch("https://stbleague.fly.dev/api/race/stats/league");
+        const response = await fetch("https://stbleaguedata.vercel.app/api/stats/league");
         if (!response.ok) throw new Error("Failed to fetch league stats.");
         const data = await response.json();
         setLeagueStats({
-          totalSeasons: data.totalSeasons,
-          totalRaces: data.totalRaces,
-          totalDrivers: data.totalDrivers,
+          totalSeasons: data.TotalSeasons,
+          totalRaces: data.TotalRaces,
+          totalDrivers: data.TotalDrivers,
           mostWins: {
-            name: safeName(data.mostWins?.driver),
-            count: data.mostWins?.wins ?? 0,
+            name: safeName(data.MostWins?.Driver.Name),
+            count: data.MostWins?.Wins ?? 0,
           },
           mostRaces: {
-            name: safeName(data.mostRaces?.driver),
-            count: data.mostRaces?.races ?? 0,
+            name: safeName(data.MostRaces?.Driver.Name),
+            count: data.MostRaces?.Races ?? 0,
           },
         });
 
-        const currentSeasonResponse = await fetch("https://stbleague.fly.dev/api/race/stats/season/30");
+        const currentSeasonResponse = await fetch("https://stbleaguedata.vercel.app/api/stats/season/30");
         if (!currentSeasonResponse.ok) throw new Error("Failed to fetch current season stats.");
         const currentSeasonData = await currentSeasonResponse.json();
         setSeasonStats({
-          seasonTotalRaces: currentSeasonData.totalRaces,
-          racesCompleted: currentSeasonData.racesCompleted,
-          seasonMostPodium: currentSeasonData.mostPodium
+          seasonTotalRaces: currentSeasonData.TotalRaces,
+          racesCompleted: currentSeasonData.RacesCompleted,
+          seasonMostPodium: currentSeasonData.MostPodium
             ? {
-                name: safeName(currentSeasonData.mostPodium.driver),
-                count: currentSeasonData.mostPodium.podium,
+                name: safeName(currentSeasonData.MostPodium.Driver),
+                count: currentSeasonData.MostPodium.Podium ?? 0,
               }
             : { name: "N/A", count: 0 },
         });
@@ -123,58 +122,6 @@ function HomePage() {
     fetchStandings();
   }, []);
 
-  // Next Race
-  useEffect(() => {
-    const fetchNextRace = async () => {
-      try {
-        const response = await fetch("https://stbleague.fly.dev/api/race/nextrace");
-        if (!response.ok) throw new Error("Failed to fetch next race.");
-        const data = await response.json();
-        const raceDate = new Date(data.date);
-
-        setNextRace({
-          name: data.track.raceName,
-          country: data.track.country,
-          division: data.division,
-          track: data.track.name,
-          date: raceDate,
-        });
-
-        const timer = setInterval(() => {
-          const now = new Date();
-          const distance = raceDate - now;
-          if (distance <= 0) {
-            setTimeLeft("🏁 Race is live!");
-            clearInterval(timer);
-          } else {
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-            const minutes = Math.floor((distance / (1000 * 60)) % 60);
-            const seconds = Math.floor((distance / 1000) % 60);
-            setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-          }
-        }, 1000);
-
-        return () => clearInterval(timer);
-      } catch (err) {
-        console.error(err);
-        setTimeLeft("❌ Could not load race timer");
-      }
-    };
-
-    fetchNextRace();
-  }, []);
-
-  // Logout
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("role");
-    setIsLoggedIn(false);
-    setRole("user");
-    alert("Logged out");
-    navigate("/login");
-  };
-
   // Auto slide stats
   useEffect(() => {
     const interval = setInterval(() => {
@@ -201,7 +148,6 @@ function HomePage() {
       return {
         tier: typeof division === "number" ? `Tier ${division}` : String(division),
         top3: list.map((d) => (
-          console.log("driver object:", d),
           {
           name: safeName(d.driver ?? d.Driver ?? d.Name),
           team: safeName(d.team ?? d.Team),
@@ -222,28 +168,6 @@ function HomePage() {
         <p>Hover or Click over a season to select a division.</p>
 
         <div className="info-blocks">
-          {/* Next Race Block */}
-          <div className="info-block">
-            {nextRace ? (
-              <>
-                <h2 style={{ marginBottom: "0.2em" }}>🏁 Next Race</h2>
-                <h3 style={{ marginTop: 0, color: "#FFD700" }}>
-                  {nextRace.name} - Tier {nextRace.division}
-                </h3>
-                <ul>
-                  <li>
-                    <strong>Track:</strong> {nextRace.track} ({nextRace.country})
-                  </li>
-                  <li>
-                    <strong>Starts In:</strong> {timeLeft}
-                  </li>
-                </ul>
-              </>
-            ) : (
-              <p>Loading next race...</p>
-            )}
-          </div>
-
           {/* Latest Race Block */}
           <div className="info-block">
             {loadingLatest ? (
@@ -254,28 +178,93 @@ function HomePage() {
               <>
                 <h2 style={{ marginBottom: "0.2em" }}>🏁 Latest Race</h2>
                 <h3 style={{ marginTop: 0, color: "#FFD700" }}>
-                  {latestRace.name} - {latestRace.country} - Tier {latestRace.division}
+                  {latestRace.Name} - {latestRace.Country} - Tier {latestRace.Division}
                 </h3>
                 <ul>
-                  {latestRace.top3.map((driver) => {
+                  {latestRace.Top3.map((Driver) => {
                     let medal =
-                      driver.position === 1
+                      Driver.Position === 1
                         ? "🥇"
-                        : driver.position === 2
+                        : Driver.Position === 2
                         ? "🥈"
                         : "🥉";
                     return (
-                      <li key={driver.position}>
-                        {medal} {driver.name} - {driver.team} ({driver.points} pts)
+                      <li key={Driver.Position}>
+                        {medal} {Driver.Name} - {Driver.Team} ({Driver.Points} pts)
                       </li>
                     );
                   })}
                 </ul>
-                <Link to={`/STB/race/${latestRace.id}`}>View Full Results</Link>
+                <Link to={`/STB/race/${latestRace.Id}`}>View Full Results</Link>
               </>
             ) : (
               <p>No latest race data available.</p>
             )}
+          </div>
+
+          {/* Standings Block */}
+          <div
+            className="info-block"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            <h2>
+              🏆 Championship Standings:{" "}
+              <span className="tier-slider-wrapper">
+                <span
+                  className="tier-slider"
+                  style={{ transform: `translateX(-${currentTier * 100}%)` }}
+                >
+                  {standings.map((tier, idx) => (
+                    <span className="tier-slide" key={idx}>
+                      {tier.tier}
+                    </span>
+                  ))}
+                </span>
+              </span>
+            </h2>
+
+            <div className="standings-slider-wrapper">
+              <div
+                className="standings-slider"
+                style={{ transform: `translateX(-${currentTier * 100}%)` }}
+              >
+                {standings.map((tier, idx) => (
+                  <div className="standings-slide" key={idx}>
+                    <ul>
+                      {tier.top3.map((driver, index) => {
+                        const medals = ["🥇", "🥈", "🥉"];
+                        return (
+                          <li key={index}>
+                            {medals[index]} {driver.name} - {driver.team} ({driver.points} pts)
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="carousel-controls">
+              <button
+                onClick={() =>
+                  setCurrentTier((currentTier - 1 + standings.length) % standings.length)
+                }
+              >
+                ❮
+              </button>
+              <span>
+                {currentTier + 1} / {standings.length}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentTier((currentTier + 1) % standings.length)
+                }
+              >
+                ❯
+              </button>
+            </div>
           </div>
 
           {/* League Stats Block */}
@@ -344,71 +333,6 @@ function HomePage() {
               </button>
               <span>{currentStatsView + 1} / 2</span>
               <button onClick={() => setCurrentStatsView((currentStatsView + 1) % 2)}>
-                ❯
-              </button>
-            </div>
-          </div>
-
-          {/* Standings Block */}
-          <div
-            className="info-block"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-          >
-            <h2>
-              🏆 Championship Standings:{" "}
-              <span className="tier-slider-wrapper">
-                <span
-                  className="tier-slider"
-                  style={{ transform: `translateX(-${currentTier * 100}%)` }}
-                >
-                  {standings.map((tier, idx) => (
-                    <span className="tier-slide" key={idx}>
-                      {tier.tier}
-                    </span>
-                  ))}
-                </span>
-              </span>
-            </h2>
-
-            <div className="standings-slider-wrapper">
-              <div
-                className="standings-slider"
-                style={{ transform: `translateX(-${currentTier * 100}%)` }}
-              >
-                {standings.map((tier, idx) => (
-                  <div className="standings-slide" key={idx}>
-                    <ul>
-                      {tier.top3.map((driver, index) => {
-                        const medals = ["🥇", "🥈", "🥉"];
-                        return (
-                          <li key={index}>
-                            {medals[index]} {driver.name} - {driver.team} ({driver.points} pts)
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="carousel-controls">
-              <button
-                onClick={() =>
-                  setCurrentTier((currentTier - 1 + standings.length) % standings.length)
-                }
-              >
-                ❮
-              </button>
-              <span>
-                {currentTier + 1} / {standings.length}
-              </span>
-              <button
-                onClick={() =>
-                  setCurrentTier((currentTier + 1) % standings.length)
-                }
-              >
                 ❯
               </button>
             </div>
