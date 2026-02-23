@@ -102,6 +102,9 @@ function Sidebar() {
       <ul>
         {seasons.map((season) => {
           const seasonRaced = didRaceSeason(season.year);
+          if (season.divisions.length === 0) {
+            return null;
+          }
 
           return (
             <li
