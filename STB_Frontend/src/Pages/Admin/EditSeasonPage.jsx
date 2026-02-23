@@ -58,7 +58,7 @@ function EditSeasonPage() {
 
   // ----- Load seasons -----
   useEffect(() => {
-    fetch("https://stbleague.fly.dev/api/race/seasons")
+    fetch("https://stbleaguedata.vercel.app/api/race/seasons")
       .then((r) => r.json())
       .then(setSeasons)
       .catch((e) => console.error("seasons error:", e));
@@ -71,11 +71,11 @@ function EditSeasonPage() {
     setOriginalRows([]);
 
     if (!selectedSeason) return;
-    fetch(`https://stbleague.fly.dev/api/race/races/${selectedSeason}`)
+    fetch(`https://stbleaguedata.vercel.app/api/race/season/${selectedSeason}`)
       .then((r) => r.json())
       .then((list) => {
         // normalize + sort by round
-        const sorted = (list || []).slice().sort((a, b) => a.round - b.round);
+        const sorted = (list || []).slice().sort((a, b) => a.Round - b.Round);
         setAllRacesForSeason(sorted);
       })
       .catch((e) => console.error("races error:", e));
@@ -91,9 +91,9 @@ function EditSeasonPage() {
     setLoadingTeamDrivers(true);
 
     Promise.all([
-      fetch(`https://stbleague.fly.dev/api/team/teamdriver/${selectedSeason}/${selectedDivision}`).then((r) => r.json()),
-      fetch(`https://stbleague.fly.dev/api/team`).then((r) => r.json()),
-      fetch(`https://stbleague.fly.dev/api/driver/all`).then((r) => r.json()),
+      fetch(`https://stbleaguedata.vercel.app/api/team/teamdriver/${selectedSeason}/${selectedDivision}`).then((r) => r.json()),
+      fetch(`https://stbleaguedata.vercel.app/api/team`).then((r) => r.json()),
+      fetch(`https://stbleaguedata.vercel.app/api/driver`).then((r) => r.json()),
     ])
       .then(([teamDriverData, teamList, driverList]) => {
         setTeamDrivers(teamDriverData || []);
@@ -112,18 +112,20 @@ function EditSeasonPage() {
       return;
     }
     const filtered = allRacesForSeason
-      .filter((r) => String(r.division) === String(selectedDivision))
+      .filter((r) => String(r.Division) === String(selectedDivision))
       .map((r) => ({
-        id: r.id,
-        f1_Game: r.f1_Game,
-        season: Number(r.season),
-        division: Number(r.division),
-        round: Number(r.round),
-        sprint: r.sprint || "No",
-        youtubeLink: r.youtubeLink || "",
-        date: r.date ? r.date.split("T")[0] : "",
+        Id: r.Id,
+        F1_Game: r.F1_Game,
+        Season: Number(r.Season),
+        Division: Number(r.Division),
+        Round: Number(r.Round),
+        Sprint: r.Sprint || "No",
+        YoutubeLink: r.YoutubeLink || "",
+        Date: r.Date
+          ? new Date(r.Date).toISOString().slice(0, 10)
+          : "",
         // ensure trackId is a number for consistent payloads
-        trackId: r.track?.id ?? r.trackId ?? "",
+        TrackId: r.Track?.Id ?? r.TrackId ?? "",
       }));
     setRows(filtered);
     setOriginalRows(filtered);
@@ -137,7 +139,7 @@ function EditSeasonPage() {
 
     (async () => {
       try {
-        const res = await fetch("https://stbleague.fly.dev/api/track");
+        const res = await fetch("https://stbleaguedata.vercel.app/api/track");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 
@@ -166,26 +168,26 @@ function EditSeasonPage() {
 
   // Create a blank row (new race)
   const makeBlankRow = (afterRound, defaults = {}) => ({
-    id: undefined, // new
-    f1_Game: rows[0]?.f1_Game ?? allRacesForSeason[0]?.f1_Game ?? 24,
-    season: Number(selectedSeason),
-    division: Number(selectedDivision),
-    round: afterRound + 1,
-    sprint: "No",
-    youtubeLink: "",
-    date: "",
-    trackId: "", // must choose
+    Id: undefined, // new
+    F1_Game: rows[0]?.F1_Game ?? allRacesForSeason[0]?.F1_Game ?? 24,
+    Season: Number(selectedSeason),
+    Division: Number(selectedDivision),
+    Round: afterRound + 1,
+    Sprint: "No",
+    YoutubeLink: "",
+    Date: "",
+    TrackId: "", // must choose
     ...defaults,
   });
 
   // Re-number rounds from top to bottom (1..n)
-  const renumberRounds = (list) => list.map((r, i) => ({ ...r, round: i + 1 }));
+  const renumberRounds = (list) => list.map((r, i) => ({ ...r, Round: i + 1 }));
 
   // Insert a blank row after index i
   const addRowAfter = (i) => {
     setRows((prev) => {
       const copy = [...prev];
-      const afterRound = copy[i]?.round ?? copy.length;
+      const afterRound = copy[i]?.Round ?? copy.length;
       copy.splice(i + 1, 0, makeBlankRow(afterRound));
       return renumberRounds(copy);
     });
@@ -194,7 +196,7 @@ function EditSeasonPage() {
   // Append at the end
   const addRowAtEnd = () => {
     setRows((prev) => {
-      const afterRound = prev[prev.length - 1]?.round ?? 0;
+      const afterRound = prev[prev.length - 1]?.Round ?? 0;
       const copy = [...prev, makeBlankRow(afterRound)];
       return renumberRounds(copy);
     });
@@ -224,14 +226,14 @@ function EditSeasonPage() {
   // Build PUT payload for updates (send TrackId explicitly!)
   const toUpdatePayload = (row) => ({
     // Match the new Update endpoint (DTO expects PascalCase and TrackId only)
-    F1_Game: row.f1_Game,
-    Season: row.season,
-    Division: row.division,
-    Round: row.round,
-    Sprint: row.sprint || "No",
-    YoutubeLink: row.youtubeLink || "",
-    Date: row.date || null,
-    TrackId: Number(row.trackId) || 0,
+    F1_Game: row.F1_Game,
+    Season: row.Season,
+    Division: row.Division,
+    Round: row.Round,
+    Sprint: row.Sprint || "No",
+    YoutubeLink: row.YoutubeLink || "",
+    Date: row.Date || null,
+    TrackId: Number(row.TrackId) || 0,
   });
 
   const saveAll = async () => {
@@ -240,8 +242,8 @@ function EditSeasonPage() {
       return;
     }
 
-    const creates = rows.filter((r) => !r.id); // new
-    const updates = rows.filter((r, i) => r.id && JSON.stringify(r) !== JSON.stringify(originalRows[i]));
+    const creates = rows.filter((r) => !r.Id); // new
+    const updates = rows.filter((r, i) => r.Id && JSON.stringify(r) !== JSON.stringify(originalRows[i]));
 
     if (!creates.length && !updates.length) {
       alert("No changes to save.");
@@ -254,23 +256,26 @@ function EditSeasonPage() {
     // POST new races
     for (const row of creates) {
       try {
-        if (!row.trackId) throw new Error("Track required");
+        if (!row.TrackId) throw new Error("Track required");
 
         // RaceRequest payload for your POST /api/race
         const payload = {
-          Game: row.f1_Game,
-          Season: row.season,
-          Division: row.division,
-          Round: row.round,
-          Sprint: row.sprint || "No",
-          TrackId: Number(row.trackId),
-          YoutubeLink: row.youtubeLink || "",
-          Date: row.date || null,
+          Game: row.F1_Game,
+          Season: row.Season,
+          Division: row.Division,
+          Round: row.Round,
+          Sprint: row.Sprint || "No",
+          TrackId: Number(row.TrackId),
+          YoutubeLink: row.YoutubeLink || "",
+          Date: row.Date || null,
         };
 
-        const res = await fetch("https://stbleague.fly.dev/api/race", {
+        const res = await fetch("https://stbleaguedata.vercel.app/api/race", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          },
           body: JSON.stringify(payload),
         });
 
@@ -286,13 +291,16 @@ function EditSeasonPage() {
     // PUT updates (existing rows)
     for (const row of updates) {
       try {
-        if (!row.trackId) throw new Error("Track required");
+        if (!row.TrackId) throw new Error("Track required");
 
         const payload = toUpdatePayload(row);
 
-        const res = await fetch(`https://stbleague.fly.dev/api/race/update/${row.id}`, {
+        const res = await fetch(`https://stbleaguedata.vercel.app/api/race/update/${row.Id}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          },
           body: JSON.stringify(payload),
         });
 
@@ -350,7 +358,7 @@ function EditSeasonPage() {
             disabled={!selectedSeason}
           >
             <option value="">Division…</option>
-            {Array.from(new Set(allRacesForSeason.map((r) => r.division)))
+            {Array.from(new Set(allRacesForSeason.map((r) => r.Division)))
               .sort((a, b) => a - b)
               .map((d) => (
                 <option key={d} value={d}>
@@ -405,14 +413,14 @@ function EditSeasonPage() {
               {rows.map((r, idx) => {
                 const changed = originalRows[idx] && JSON.stringify(r) !== JSON.stringify(originalRows[idx]);
                 return (
-                  <React.Fragment key={r.id ?? `new-${idx}`}>
+                  <React.Fragment key={r.Id ?? `new-${idx}`}>
                     <tr style={changed ? { boxShadow: "inset 0 0 0 2px var(--accent)" } : undefined}>
                       <td>
                         <input
                           className="cell-input"
                           type="number"
-                          value={r.round}
-                          onChange={(e) => updateCell(idx, "round", Number(e.target.value))}
+                          value={r.Round}
+                          onChange={(e) => updateCell(idx, "Round", Number(e.target.value))}
                           min={1}
                         />
                       </td>
@@ -429,11 +437,11 @@ function EditSeasonPage() {
                         ) : (
                           <select
                             className="cell-select"
-                            value={r.trackId || ""}
+                            value={r.TrackId || ""}
                             onChange={(e) =>
                               updateCell(
                                 idx,
-                                "trackId",
+                                "TrackId",
                                 e.target.value ? Number(e.target.value) : ""
                               )
                             }
@@ -442,10 +450,10 @@ function EditSeasonPage() {
                             <option value="">Select Track</option>
                             {tracks
                               .slice()
-                              .sort((a, b) => String(a.name).localeCompare(String(b.name)))
+                              .sort((a, b) => String(a.Name).localeCompare(String(b.Name)))
                               .map((t) => (
-                                <option key={t.id} value={t.id}>
-                                  {t.name} · {t.country}
+                                <option key={t.Id} value={t.Id}>
+                                  {t.Name} · {t.Country}
                                 </option>
                               ))}
                           </select>
@@ -454,8 +462,8 @@ function EditSeasonPage() {
                       <td style={{ textAlign: "center" }}>
                         <select
                           className="cell-select"
-                          value={r.sprint || "No"}
-                          onChange={(e) => updateCell(idx, "sprint", e.target.value)}
+                          value={r.Sprint || "No"}
+                          onChange={(e) => updateCell(idx, "Sprint", e.target.value)}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -465,8 +473,8 @@ function EditSeasonPage() {
                         <input
                           className="cell-input"
                           type="date"
-                          value={r.date || ""}
-                          onChange={(e) => updateCell(idx, "date", e.target.value)}
+                          value={r.Date || ""}
+                          onChange={(e) => updateCell(idx, "Date", e.target.value)}
                         />
                       </td>
                       <td>
@@ -474,8 +482,8 @@ function EditSeasonPage() {
                           className="cell-input"
                           type="url"
                           placeholder="https://www.youtube.com/watch?v=…"
-                          value={r.youtubeLink || ""}
-                          onChange={(e) => updateCell(idx, "youtubeLink", e.target.value)}
+                          value={r.YoutubeLink || ""}
+                          onChange={(e) => updateCell(idx, "YoutubeLink", e.target.value)}
                         />
                       </td>
                     </tr>
@@ -546,26 +554,26 @@ function EditSeasonPage() {
                   {/* Select Team */}
                   <select
                     className="select"
-                    value={td.teamId || ""}
+                    value={td.TeamId || ""}
                     onChange={(e) => {
                       const val = Number(e.target.value);
                       setTeamDrivers((prev) => {
                         const copy = [...prev];
-                        copy[idx].teamId = val;
+                        copy[idx].TeamId = val;
                         return copy;
                       });
                     }}
                   >
                     <option value="">Select Team…</option>
                     {teams.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.name}
+                      <option key={t.Id} value={t.Id}>
+                        {t.Name}
                       </option>
                     ))}
                   </select>
 
                   {/* Driver Inputs */}
-                  {(td.drivers || ["", ""]).map((d, j) => (
+                  {(td.Drivers || ["", ""]).map((d, j) => (
                     <input
                       key={j}
                       list="drivers-list"
@@ -576,8 +584,8 @@ function EditSeasonPage() {
                         const val = e.target.value;
                         setTeamDrivers((prev) => {
                           const copy = [...prev];
-                          if (!copy[idx].drivers) copy[idx].drivers = [];
-                          copy[idx].drivers[j] = val;
+                          if (!copy[idx].Drivers) copy[idx].Drivers = [];
+                          copy[idx].Drivers[j] = val;
                           return copy;
                         });
                       }}
@@ -585,15 +593,15 @@ function EditSeasonPage() {
                   ))}
 
                   {/* Add second driver if missing */}
-                  {(!td.drivers || td.drivers.length < 2) && (
+                  {(!td.Drivers || td.Drivers.length < 2) && (
                     <button
                       type="button"
                       className="button small"
                       onClick={() =>
                         setTeamDrivers((prev) => {
                           const copy = [...prev];
-                          if (!copy[idx].drivers) copy[idx].drivers = [];
-                          copy[idx].drivers.push("");
+                          if (!copy[idx].Drivers) copy[idx].Drivers = [];
+                          copy[idx].Drivers.push("");
                           return copy;
                         })
                       }
@@ -612,10 +620,10 @@ function EditSeasonPage() {
                   setTeamDrivers((prev) => [
                     ...prev,
                     {
-                      season: Number(selectedSeason),
-                      division: Number(selectedDivision),
-                      teamId: "",
-                      drivers: [""],
+                      Season: Number(selectedSeason),
+                      Division: Number(selectedDivision),
+                      TeamId: "",
+                      Drivers: [""],
                     },
                   ])
                 }
@@ -626,7 +634,7 @@ function EditSeasonPage() {
               {/* Driver list datalist */}
               <datalist id="drivers-list">
                 {drivers.map((d) => (
-                  <option key={d.id} value={d.name} />
+                  <option key={d.Id} value={d.Name} />
                 ))}
               </datalist>
 
@@ -640,9 +648,9 @@ function EditSeasonPage() {
                   const errors = [];
 
                   for (const td of teamDrivers) {
-                    if (!td.teamId) continue;
+                    if (!td.TeamId) continue;
 
-                    const validDrivers = (td.drivers || [])
+                    const validDrivers = (td.Drivers || [])
                       .map(d => d?.trim())
                       .filter(Boolean)
                       .slice(0, 2); // max 2 drivers
@@ -651,17 +659,20 @@ function EditSeasonPage() {
 
                     try {
                       const payload = {
-                        season: Number(selectedSeason),
-                        division: Number(selectedDivision),
-                        teamId: Number(td.teamId),
-                        drivers: validDrivers, // <-- ARRAY i.p.v. single driver
+                        Season: Number(selectedSeason),
+                        Division: Number(selectedDivision),
+                        TeamId: Number(td.TeamId),
+                        Drivers: validDrivers, // <-- ARRAY i.p.v. single driver
                       };
 
                       const res = await fetch(
-                        "https://stbleague.fly.dev/api/team/teamdrivers", // <-- nieuwe endpoint
+                        "https://stbleaguedata.vercel.app/api/team/teamdriver", // <-- nieuwe endpoint
                         {
                           method: "POST",
-                          headers: { "Content-Type": "application/json" },
+                          headers: { 
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                          },
                           body: JSON.stringify(payload),
                         }
                       );
@@ -671,7 +682,7 @@ function EditSeasonPage() {
                         throw new Error(txt || `HTTP ${res.status}`);
                       }
                     } catch (e) {
-                      errors.push(`Team ${td.teamId}: ${e.message}`);
+                      errors.push(`Team ${td.TeamId}: ${e.message}`);
                     }
                   }
 
