@@ -1,6 +1,7 @@
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import html2canvas from "html2canvas";
 import "./ChampionshipPage.css";
 import "@/Components/Links.css";
@@ -47,7 +48,7 @@ function ChampionshipPage() {
   // fetch claimed driver
   useEffect(() => {
     if (!isLoggedIn || !username) return;
-    fetch(`https://stbleague.fly.dev/api/driver/user/${username}`)
+    fetch(`https://stbleaguedata.vercel.app/api/driver/user/${username}`)
       .then((r) => r.json())
       .then((d) => setClaimedDriver(d))
       .catch((err) => console.error("Error fetching claimed driver:", err));
