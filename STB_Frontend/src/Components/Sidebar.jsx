@@ -58,8 +58,6 @@ function Sidebar() {
 
     const fetchSeasonRaced = async () => {
       try {
-        console.log("Fetching season raced for user:", username);
-
         const res = await fetch(
           `https://stbleaguedata.vercel.app/api/driver/claimeddriver/races/${username}`
         );
