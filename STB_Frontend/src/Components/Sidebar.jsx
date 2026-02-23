@@ -28,8 +28,8 @@ function Sidebar() {
     { year: 12, divisions: [] },
     { year: 11, divisions: [] },
     { year: 10, divisions: [] },
-    { year: 9, divisions: ["1", "2"] },
-    { year: 8, divisions: ["1", "2"] },
+    { year: 9, divisions: [] },
+    { year: 8, divisions: ["1"] },
   ];
 
   const [seasonRaced, setSeasonRaced] = useState([]);
