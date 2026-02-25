@@ -183,14 +183,17 @@ export default function AddRaceResults() {
   // ---------- UI handlers ----------
   const handleRaceSelect = async (e) => {
     const id = e.target.value;
-    const race = filteredRaces.find((r) => String(r.id) === id);
-    if (!race) return;
+    const race = filteredRaces.find((r) => String(r.Id) === id);
+    if (!race) {
+      console.error("Race not found:", id);
+      return;
+    }
     setSelectedRace(race);
     initResultsForRace(race, setRaceResults);
 
     try {
       const res = await fetch(
-        `https://stbleaguedata.vercel.app/api/team/teamdriver/${race.season}/${race.division}`
+        `https://stbleaguedata.vercel.app/api/team/teamdriver/${race.Season}/${race.Division}`
       );
       if (!res.ok) throw new Error("Failed to fetch team-driver links");
       const data = await res.json();
@@ -307,8 +310,8 @@ export default function AddRaceResults() {
           const name = String(value).trim().toLowerCase();
           const found = driverTeamMap.get(name);
           if (found) {
-            row.team = found.teamName;
-            row.teamId = found.teamId;
+            row.team = found.TeamName;
+            row.teamId = found.TeamId;
           }
         }
 
@@ -413,10 +416,10 @@ export default function AddRaceResults() {
   const driverTeamMap = useMemo(() => {
     const map = new Map();
     teamDriverLinks.forEach((t) => {
-      (t.drivers || []).forEach((driverName) => {
+      (t.Drivers || []).forEach((driverName) => {
         map.set(driverName.toLowerCase().trim(), {
-          teamId: t.teamId,
-          teamName: t.teamName,
+          teamId: t.TeamId,
+          teamName: t.TeamName,
         });
       });
     });
@@ -431,7 +434,7 @@ export default function AddRaceResults() {
       {/* Race Selection */}
       <div className="race-settings">
         <h2>Select Race</h2>
-        <select onChange={handleRaceSelect} required value={selectedRace?.id ?? ""}>
+        <select onChange={handleRaceSelect} required value={selectedRace?.Id ?? ""}>
           <option value="">Select a Race</option>
           {filteredRaces.length > 0 ? (
             filteredRaces.map((r) => (
