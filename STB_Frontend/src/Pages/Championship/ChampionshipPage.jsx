@@ -703,10 +703,6 @@ function ChampionshipPage() {
             <button onClick={toggleChampionshipMode} className="btn btn-secondary">
               {mode === "constructors" ? "View Drivers Championship" : "View Constructors Championship"}
             </button>
-
-            <button onClick={() => setShowStandings(false)} className="btn btn-ghost">
-              Close
-            </button>
           </div>
 
           {/* IMPORTANT: the capture ref stays on the table container */}
@@ -844,7 +840,6 @@ function DriversTable({ season, division, sortedDrivers, fastestLapData, renderC
   return (
     <div className="table-container">
       <table className="header-table">
-        <caption className="header-caption">Season {season} • Tier {division}</caption>
         {renderColGroup()}
 
         <thead>

@@ -376,7 +376,7 @@
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  justify-content: center;
 }
 
 /* =========================================================
@@ -385,7 +385,18 @@
 .table-container {
   width: 90%;
   max-width: min(92vw, 1400px);
-  margin: 0 auto;
+  margin-top: 10px;
+}
+
+.table-container.constructors-view {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.header-caption {
+  background: var(--header-bg);
+  font-weight: 800;
 }
 
 .header-table {
