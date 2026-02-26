@@ -488,21 +488,34 @@
   font-weight: 800;
 }
 
-/* MOBILE (your existing logic retained, slightly simplified) */
+/* =========================================================
+   📱 DRIVERS TABLE — MOBILE CLEAN FIX
+   ========================================================= */
 @media (max-width: 700px) {
+
+  /* verberg complexe header rijen */
   .header-table thead tr:nth-child(1),
-  .header-table thead tr:nth-child(2),
-  .header-table thead tr:nth-child(n+4) {
+  .header-table thead tr:nth-child(2) {
     display: none !important;
   }
 
-  .header-table col.col-race,
-  .scrollable-table col.col-race { display: none !important; }
+  /* 🔥 verberg race kolommen in header rij */
+  .header-table thead tr:nth-child(3) th:nth-child(n+3):not(:last-child) {
+    display: none !important;
+  }
 
+  /* verberg race kolommen in body */
   .scrollable-table table tbody td:nth-child(n+3):not(:last-child) {
     display: none !important;
   }
 
+  /* verberg colgroup races */
+  .header-table col.col-race,
+  .scrollable-table col.col-race {
+    display: none !important;
+  }
+
+  /* full width container */
   .table-container,
   .scrollable-wrapper {
     width: 100% !important;
