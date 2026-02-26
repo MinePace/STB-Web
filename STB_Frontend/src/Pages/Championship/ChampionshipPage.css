@@ -1,52 +1,403 @@
-/* === Theme (tweak these) === */
+/* =========================================================
+   BASE THEME (your existing variables kept)
+   ========================================================= */
 :root {
-  --pos-col-w: 44px;      /* "#" col */
-  --race-col-w: 54px;     /* each race col */
-  --points-col-w: 84px;   /* "Points" col */
-  --driver-min-w: 120px;  /* minimum driver column */
+  --pos-col-w: 44px;
+  --race-col-w: 54px;
+  --points-col-w: 84px;
+  --driver-min-w: 120px;
+
   --header-bg: rgb(0, 76, 169);
   --row-bg: linear-gradient(to bottom, rgb(0, 90, 199), rgb(0, 50, 110));
   --row-hover: rgba(200, 200, 200, 0.6);
   --text: #ffffff;
+
+  /* New */
+  --page-bg: transparent;
+
+  /* MATCH YOUR EXISTING BLUE THEME */
+  --card-bg: linear-gradient(
+    to bottom,
+    rgb(0, 90, 199),
+    rgb(0, 50, 110)
+  );
+
+  --card-border: rgba(255,255,255,0.18);
+  --soft: rgba(255,255,255,0.18);
+  --shadow: 0 4px 12px rgba(0,0,0,0.35);
 }
 
-/* === Page container bits you already have (kept) === */
+/* =========================================================
+   OVERVIEW PAGE (NO SCROLL)
+   ========================================================= */
+.championship-page {
+  width: 100%;
+  height: calc(100vh - 20px);
+  overflow: hidden;            /* no page scroll */
+  padding: 14px 16px;
+  box-sizing: border-box;
+  background: var(--page-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.championship-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.championship-title-main {
+  font-size: 1.05rem;
+  font-weight: 850;
+  color: #fff;
+}
+
+.championship-title-sub {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-top: 2px;
+  color: #fff;
+}
+
+.championship-topbar-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* 3 cards in one row (desktop), stack on small screens */
+.overview-grid {
+  flex: 1;
+  min-height: 0;              /* critical so grid can shrink without overflow */
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 1050px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+.card {
+  border: 1px solid var(--card-border) !important;
+  background: transparent !important;
+  border-radius: 16px !important;
+  box-shadow: var(--shadow) !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  margin-bottom: 0 !important;
+}
+
+.card-header {
+  padding: 12px 12px 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  border-bottom: 1px solid var(--soft);
+  background: rgba(0, 0, 0, 0.10);
+}
+
+.card-title {
+  font-weight: 900;
+  font-size: 1rem;
+  color: #fff;
+}
+
+.card-subtitle {
+  margin-top: 3px;
+  font-size: 0.82rem;
+  opacity: 0.85;
+  color: #fff;
+}
+
+.card-body {
+  padding: 10px 12px 12px 12px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* =========================================================
+   MINI TABLE (TOP10)
+   ========================================================= */
+.mini-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mini-head,
+.mini-row {
+  display: grid;
+  grid-template-columns: 34px 1fr 70px;
+  gap: 10px;
+  align-items: center;
+}
+
+.mini-head {
+  font-size: 0.78rem;
+  opacity: 0.85;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.06);
+}
+
+.mini-row {
+  padding: 5px 8px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+}
+
+.mini-row:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.mini-right {
+  text-align: right;
+}
+
+.mini-rank {
+  font-weight: 900;
+  color: #fff;
+}
+
+.mini-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: 800;
+}
+
+.mini-pts {
+  font-weight: 900;
+}
+
+.mini-logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  margin-right: 8px;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.4));
+}
+
+/* =========================================================
+   PODIUM
+   ========================================================= */
+.podium {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.podium-row {
+  display: grid;
+  grid-template-columns: 44px 1fr 70px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+}
+
+.podium-pos {
+  font-weight: 950;
+  font-size: 0.95rem;
+}
+
+.podium-driver {
+  font-weight: 900;
+  display: inline-block;
+  max-width: 100%;
+}
+
+.podium-team {
+  font-size: 0.82rem;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.podium-points {
+  text-align: right;
+  font-weight: 900;
+  opacity: 0.95;
+}
+
+.podium-1 { outline: 1px solid rgba(255,215,0,0.30); }
+.podium-2 { outline: 1px solid rgba(211,211,211,0.25); }
+.podium-3 { outline: 1px solid rgba(165,107,49,0.25); }
+
+.empty-state {
+  padding: 14px 10px;
+  opacity: 0.85;
+}
+
+/* =========================================================
+   STATS
+   ========================================================= */
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+}
+
+.stat-label {
+  font-weight: 850;
+  opacity: 0.9;
+}
+
+.stat-value {
+  text-align: right;
+  font-weight: 850;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* =========================================================
+   BUTTONS (simple hierarchy)
+   ========================================================= */
+.btn {
+  border-radius: 12px;
+  padding: 8px 10px;
+  font-weight: 850;
+  border: 1px solid rgba(255,255,255,0.18);
+  cursor: pointer;
+  color: #fff;
+  background: rgba(255,255,255,0.07);
+  transition: transform 0.05s ease, background 0.15s ease;
+  user-select: none;
+}
+
+.btn:active { transform: scale(0.99); }
+.btn:disabled { opacity: 0.55; cursor: default; }
+
+.btn-primary {
+  background: rgba(255, 215, 0, 0.18);
+  border-color: rgba(255, 215, 0, 0.35);
+}
+
+.btn-secondary {
+  background: rgba(76, 174, 255, 0.12);
+  border-color: rgba(76, 174, 255, 0.28);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: rgba(255,255,255,0.14);
+}
+
+/* =========================================================
+   MODAL (Full standings)
+   ========================================================= */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 14px;
+  z-index: 9999;
+}
+
+.modal {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 18px;
+  box-shadow: 0 18px 60px rgba(0,0,0,0.45);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(10px);
+}
+
+.modal-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.18);
+}
+
+.modal-title {
+  font-weight: 900;
+  color: #fff;
+}
+
+.modal-x {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 10px;
+  color: #fff;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 12px;
+  overflow: auto; /* modal scrolls, not page */
+}
+
+.modal-toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+/* =========================================================
+   EXISTING TABLE STYLES (mostly your original)
+   ========================================================= */
 .table-container {
   width: 90%;
-  max-width: min(92vw, 1400px); /* controls how wide it can get */
-  margin: 0 auto;               /* centers inside main content */
+  max-width: min(92vw, 1400px);
+  margin: 0 auto;
 }
 
-/* === Header table (separate table only for thead) === */
 .header-table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;              /* important */
+  table-layout: fixed;
   background: var(--header-bg);
   color: var(--text);
   box-shadow: 0 2px 5px rgba(0,0,0,.3);
 }
 
-.championship-buttons {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.championship-buttons-inner {
-  display: flex;
-  gap: 12px;
-}
-
-.constructors-table-wrapper {
-  margin: 0 auto;
-}
-
-/* Use the same model for the scrollable body table */
 .scrollable-table table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;              /* important */
+  table-layout: fixed;
   background: var(--row-bg);
   color: var(--text);
 }
@@ -55,19 +406,12 @@
 .scrollable-table td {
   text-align: center;
   white-space: nowrap;
-  overflow: hidden;          /* clip any overflowed content */
-  text-overflow: ellipsis;   /* show … if it doesn't fit */
+  overflow: hidden;
+  text-overflow: ellipsis;
   border: 1px solid rgba(255, 255, 255, 0.129);
   color: white;
 }
 
-/* Title row */
-.header-title th {
-  font-size: 1.05rem;
-  font-weight:750;
-}
-
-/* Sticky header effect is achieved by separate table; just keep body scrollable */
 .scrollable-wrapper {
   width: 100%;
   max-width: 100%;
@@ -77,7 +421,6 @@
   box-shadow: 0 2px 5px rgba(0,0,0,.3);
 }
 
-/* Slender scrollbar */
 .scrollable-wrapper::-webkit-scrollbar { width: 0.5px; }
 .scrollable-wrapper::-webkit-scrollbar-track { background: transparent; }
 .scrollable-wrapper::-webkit-scrollbar-thumb {
@@ -85,39 +428,34 @@
   border-radius: 3px;
 }
 
-.scrollable-table td:nth-child(2), .scrollable-table td:last-child { background-color: #194081; }
+.scrollable-table td:nth-child(2),
+.scrollable-table td:last-child {
+  background-color: #194081;
+}
 
-/* --- Column-specific sizing via <colgroup> classes --- */
-.col-pos    { width: var(--pos-col-w); }
-.col-driver {
-  width: clamp(120px, 16vw, 160px); /* min, preferred, max */
-}
-.col-race {
-  width: clamp(30px, 40px, 160px); /* min, preferred, max */
-}
+.col-pos { width: var(--pos-col-w); }
+.col-driver { width: clamp(120px, 16vw, 160px); }
+.col-race { width: clamp(30px, 40px, 160px); }
 .col-points { width: var(--points-col-w); }
 
-/* Flags should never size the column */
 .race-flag {
   width: 100%;
   height: auto;
   object-fit: cover;
   vertical-align: middle;
-  filter: drop-shadow(0 0 0 rgba(0,0,0,0));
   transition: filter .25s ease;
 }
 .race-flag:hover { filter: drop-shadow(0 0 6px aliceblue); }
 
-/* Race links */
 .race-link {
   text-decoration: none;
   color: inherit;
   font-weight: 800;
   transition: color .2s;
 }
-.race-link:hover { 
-  color: #4caeff; 
-  text-decoration: none; 
+.race-link:hover {
+  color: #4caeff;
+  text-decoration: none;
 }
 
 .race-dnf {
@@ -126,79 +464,42 @@
   font-weight: 800;
   letter-spacing: .25px;
 }
-
 .race-dnf:hover {
   color: rgb(198, 92, 92);
   transition: color 0.2s ease;
-  text-decoration: none ;
+  text-decoration: none;
 }
 
-/* Hover row */
-.scrollable-table tbody tr:hover { background: var(--row-hover); } /* Round cols */
-.scrollable-table tbody tr:hover td:nth-child(2),   /* Driver col */
-.scrollable-table tbody tr:hover td:last-child {   /* Points col */
+.scrollable-table tbody tr:hover { background: var(--row-hover); }
+.scrollable-table tbody tr:hover td:nth-child(2),
+.scrollable-table tbody tr:hover td:last-child {
   background: #3669c2;
 }
 
-
-/* Position coloring (first cell in body rows) */
-.scrollable-table tbody tr:nth-child(1) td:first-child { color: rgb(255,215,0);   font-weight: 800; }
+.scrollable-table tbody tr:nth-child(1) td:first-child { color: rgb(255,215,0); font-weight: 800; }
 .scrollable-table tbody tr:nth-child(2) td:first-child { color: rgb(211,211,211); font-weight: 800; }
-.scrollable-table tbody tr:nth-child(3) td:first-child { color: rgb(165,107,49);  font-weight: 800; }
+.scrollable-table tbody tr:nth-child(3) td:first-child { color: rgb(165,107,49); font-weight: 800; }
 
-/* Leftmost cell styling */
 .scrollable-table tbody td:first-child {
   background: var(--header-bg);
   font-weight: 800;
 }
 
-/* Hide mobile header by default */
-.header-table--mobile { display: none; }
-.header-table caption { display: none; }
-
-/* === MOBILE: show only the 3rd header row, and only # / Driver / Points === */
+/* MOBILE (your existing logic retained, slightly simplified) */
 @media (max-width: 700px) {
-  /* keep header table visible */
-  .header-table {
-    display: table !important;
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    background: var(--header-bg);
-    color: var(--text);
-    border-radius: 10px 10px 0 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,.3);
-  }
-
-  /* hide row 1 (title) and row 2 (flags); keep only row 3 */
   .header-table thead tr:nth-child(1),
   .header-table thead tr:nth-child(2),
   .header-table thead tr:nth-child(n+4) {
     display: none !important;
   }
 
-  /* in the 3rd row, hide race headers by class, keep the others */
-  .header-table thead tr.header-cols .col-race { display: none !important; }
-  .header-table thead tr.header-cols .col-pos,
-  .header-table thead tr.header-cols .col-driver,
-  .header-table thead tr.header-cols .col-points {
-    display: table-cell !important;
-  }
-
-  /* body: hide race columns as well */
   .header-table col.col-race,
   .scrollable-table col.col-race { display: none !important; }
+
   .scrollable-table table tbody td:nth-child(n+3):not(:last-child) {
     display: none !important;
   }
 
-  /* widths for the remaining 3 columns */
-  .scrollable-table table { table-layout: fixed; width: 100% !important; }
-  .col-pos    { width: 12% !important; }
-  .col-driver { width: 68% !important; }
-  .col-points { width: 20% !important; }
-
-  /* contain layout */
   .table-container,
   .scrollable-wrapper {
     width: 100% !important;
@@ -208,95 +509,30 @@
     overflow-x: hidden !important;
     box-sizing: border-box;
   }
-
-  .scrollable-table td {
-    padding: 6px 8px;
-    font-size: 0.95rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .header-table::before { content: none !important; }
-
-  /* show caption above the header row */
-  .header-table caption.header-caption {
-    display: table-caption;      /* proper table caption */
-    caption-side: top;           /* sits above the thead */
-    text-align: center;
-    font-weight: 750;
-    padding: 8px 0;
-    color: #fff;
-    border-bottom: 1px solid rgba(255,255,255,.15);
-    background: var(--header-bg);
-  }
-
-  /* Table & caption act as one rounded card */
-  .header-table {
-    /* keep your existing styles */
-    border-collapse: separate;      /* needed for clean radii with caption */
-    border-spacing: 0;
-    overflow: hidden;               /* clip inner corners */
-    border-radius: 0 0 10px 10px;   /* bottom corners only (caption owns top) */
-  }
-
-  /* Caption is the top bar */
-  .header-table caption.header-caption {
-    display: table-caption;
-    caption-side: top;
-    background: var(--header-bg);
-    color: #fff;
-    font-weight: 750;
-    text-align: center;
-    padding: 8px 10px;
-    border-radius: 10px 10px 0 0;   /* top corners */
-    border-bottom: 1px solid rgba(255,255,255,.15); /* seam that matches cell borders */
-    margin: 0;
-  }
-
-  /* Remove top border on the first visible header row so it connects to caption */
-  .header-table thead tr.header-cols th {
-    border-top: 0 !important;
-  }
-
-  /* Optional: make the outer edge match the table’s rounded shape */
-  .header-table thead tr.header-cols th:first-child { border-left: 0; }
-  .header-table thead tr.header-cols th:last-child  { border-right: 0; }
 }
 
-/* ========================================================
-   CONSTRUCTORS TABLE — FULLY CUSTOMISABLE THEME & SIZING
-   ======================================================== */
+/* =========================================================
+   CONSTRUCTORS TABLE (your theme, kept)
+   ========================================================= */
 :root {
-  /* Table width */
   --constructors-width: 400px;
-
-  /* Column widths */
   --col-pos-width: 40px;
   --col-team-width: 180px;
   --col-points-width: 100px;
-
-  /* Colors */
   --constructors-header-bg: rgb(0, 76, 169);
   --constructors-row-bg: #194081;
-  --constructors-row-alt-bg: #194081;
   --constructors-text-color: #ffffff;
   --constructors-border-color: rgba(255,255,255,0.2);
-
-  /* Hover style */
   --constructors-hover-bg: rgba(255,255,255,0.15);
 }
 
-/* Table wrapper width */
 .constructors-view .constructors-table-wrapper {
   max-width: var(--constructors-width);
   margin: 0 auto;
 }
 
-/* Main table styling */
 .constructors-view table {
   width: auto;
-  table-layout: auto;
   border-collapse: collapse;
   background: var(--constructors-row-bg);
   color: var(--constructors-text-color);
@@ -304,7 +540,6 @@
   table-layout: fixed;
 }
 
-/* Header */
 .constructors-view .header-table th {
   background: var(--constructors-header-bg);
   color: var(--constructors-text-color) !important;
@@ -318,7 +553,6 @@
   background: var(--constructors-hover-bg);
 }
 
-/* Body cells */
 .constructors-view td {
   padding: 10px 6px;
   text-align: center;
@@ -326,69 +560,15 @@
   border: 1px solid var(--constructors-border-color);
 }
 
-/* Column widths */
-.col-pos {
-  width: var(--col-pos-width) !important;
-  background-color: rgb(0, 76, 169) !important;
-}
+.col-team { width: var(--col-team-width) !important; }
 
-.col-team {
-  width: var(--col-team-width) !important;
-}
+.points-cell { font-weight: 900; padding: 8px 10px; }
 
-.col-points {
-  width: var(--col-points-width) !important;
-}
-
-.points-cell {
-  font-weight: 900;
-}
-
-.points-cell {
-  padding: 8px 10px;
-}
-
-.points-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;           /* spacing between points and movement */
-  font-weight: 900;
-}
-
-.points-value {
-  font-size: 1.05rem;
-  min-width: 42px;     /* ensures alignment across rows */
-  text-align: right;
-}
-
-.movement {
-  font-size: 0.85rem;
-  font-weight: 900;
-  min-width: 28px;     /* arrows align vertically */
-  text-align: left;
-  display: inline-block;
-}
-
-/* Colors */
-.movement.up {
-  color: #39c939;      /* green */
-}
-
-.movement.down {
-  color: #d13838;      /* red */
-}
-
-.movement.same {
-  color: #cccccc;      /* grey */
-}
-
-/* Team cell + logo */
 .team-cell {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 20px;
+  gap: 14px;
   font-weight: 900;
 }
 
@@ -398,3 +578,104 @@
   object-fit: contain;
   filter: drop-shadow(0 0 3px rgba(0,0,0,0.4));
 }
+
+.race-results-body {
+  overflow-y: auto;
+  padding-right: 4px; /* ruimte voor scrollbar */
+}
+
+/* mooie dunne scrollbar */
+.race-results-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.race-results-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.race-results-body::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.35);
+  border-radius: 6px;
+}
+
+/* 🔥 CRITICAL LAYOUT FIXES */
+
+.championship-page {
+  height: calc(100vh - 64px); /* pas aan aan je navbar hoogte */
+  max-height: calc(100vh - 64px);
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  padding: 14px 16px;
+  box-sizing: border-box;
+}
+
+.overview-grid {
+  flex: 1;
+  min-height: 0;     /* 🔥 CRITICAL */
+  height: 100%;
+
+  display: grid;
+  grid-template-columns: 1.05fr 1.25fr 1fr;
+  gap: 12px;
+}
+
+/* 🔥 RESULTS SCROLL */
+
+.race-results-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+/* result rows */
+
+.results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.result-row {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  text-decoration: none;
+  color: white;
+  transition: background 0.15s ease;
+}
+
+.result-row:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.result-track {
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.result-podium {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 0.8rem;
+}
+
+/* podium badges */
+
+.p-badge {
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.p1 { background: rgba(255,215,0,0.25); }
+.p2 { background: rgba(211,211,211,0.25); }
+.p3 { background: rgba(165,107,49,0.25); }
