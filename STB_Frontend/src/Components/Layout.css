@@ -22,10 +22,30 @@
   top: 60px;
 }
 
-/* Content */
+/* Content (default: geen sidebar ruimte) */
 .content-container {
   flex: 1;
-  margin-left: 100px; /* exact gelijk aan sidebar width */
   height: calc(100vh - 60px);
   overflow: auto;
+  margin-left: 0; /* ✅ standaard geen ruimte links */
+}
+
+/* Alleen als sidebar zichtbaar is */
+.content-container.with-sidebar {
+  margin-left: 100px; /* ✅ exact gelijk aan sidebar width */
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    margin-top: 96px; /* ✅ mobile topbar hoogte */
+  }
+
+  .content-container {
+    margin-left: 0 !important; /* ✅ geen sidebar ruimte */
+    height: calc(100vh - 96px);
+  }
+
+  .sidebar {
+    display: none; /* extra zekerheid */
+  }
 }

@@ -25,6 +25,9 @@
   --card-border: rgba(255,255,255,0.18);
   --soft: rgba(255,255,255,0.18);
   --shadow: 0 4px 12px rgba(0,0,0,0.35);
+
+  --nav-h-desktop: 60px;
+  --nav-h-mobile: 96px;
 }
 
 /* =========================================================
@@ -679,3 +682,110 @@
 .p1 { background: rgba(255,215,0,0.25); }
 .p2 { background: rgba(211,211,211,0.25); }
 .p3 { background: rgba(165,107,49,0.25); }
+
+/* =========================================================
+   📱 MOBILE FIX — CHAMPIONSHIP PAGE
+   ========================================================= */
+@media (max-width: 768px) {
+  /* Page: mag scrollen + compact */
+  .championship-page {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 10px 8px;
+    gap: 10px;
+  }
+
+  /* Topbar: wrap + buttons onder elkaar als nodig */
+  .championship-topbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .championship-topbar-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  /* Layout: single column (flex is stabieler dan grid op mobile) */
+  .overview-grid {
+    display: flex !important;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* Cards: full width + auto height */
+  .card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* Card spacing compacter */
+  .card-header {
+    padding: 10px;
+  }
+
+  .card-body {
+    padding: 8px;
+  }
+
+  /* =====================================================
+     MINI TABLE MOBILE
+     ===================================================== */
+  .mini-head,
+  .mini-row {
+    grid-template-columns: 28px 1fr 56px;
+    gap: 6px;
+    font-size: 0.85rem;
+  }
+
+  .mini-row {
+    padding: 6px;
+  }
+
+  .mini-name {
+    font-size: 0.9rem;
+  }
+
+  /* =====================================================
+     RACE RESULTS MOBILE
+     ===================================================== */
+  .result-row {
+    padding: 8px;
+  }
+
+  .result-track {
+    font-size: 0.9rem;
+  }
+
+  .result-podium {
+    font-size: 0.72rem;
+    gap: 4px;
+  }
+
+  .p-badge {
+    padding: 2px 5px;
+  }
+
+  /* Race-results card body: intern scrollbaar (optioneel) */
+  .race-results-body {
+    max-height: 45vh; /* pas aan naar smaak */
+    overflow-y: auto;
+  }
+
+  /* =====================================================
+     STATS MOBILE
+     ===================================================== */
+  .stat-row {
+    grid-template-columns: 1fr;
+    text-align: left;
+    gap: 4px;
+  }
+
+  .stat-value {
+    text-align: left;
+  }
+}
