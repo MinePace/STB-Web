@@ -517,9 +517,7 @@ function ChampionshipPage() {
       <div className="championship-topbar">
         <div className="championship-title">
           <div className="championship-title-main">Season {season} • Tier {division}</div>
-          <div className="championship-title-sub">
-            {mode === "constructors" ? "Constructors Overview" : "Championship Overview"}
-          </div>
+          <div className="championship-title-sub">Championship Overview</div>
         </div>
 
         <div className="championship-topbar-actions">
@@ -538,9 +536,11 @@ function ChampionshipPage() {
         {/* Card: Top 10 */}
         <section className="card">
           <div className="card-header">
-            <div>
-              <div className="card-title">Top 10 Championship</div>
-              <div className="card-subtitle">Current standings snapshot</div>
+            <div className="card-title-container">
+              <div className="card-title">
+                {mode === "constructors" ? "Constructors Standings" : "Top10 Championship"}
+              </div>
+              <div className="card-subtitle">Current standings after Round {latestRaceWithResults.round}</div>
             </div>
             <button onClick={() => setShowStandings(true)} className="btn btn-ghost">
               Expand
@@ -602,7 +602,7 @@ function ChampionshipPage() {
         {/* Card: Race results (scrollable) */}
         <section className="card">
           <div className="card-header">
-            <div>
+            <div className="card-title-container">
               <div className="card-title">Race Results</div>
               <div className="card-subtitle">All rounds</div>
             </div>
@@ -649,7 +649,7 @@ function ChampionshipPage() {
         {/* Card: Season stats */}
         <section className="card">
           <div className="card-header">
-            <div>
+            <div className="card-title-container">
               <div className="card-title">Season Stats</div>
               <div className="card-subtitle">Main races only</div>
             </div>

@@ -111,10 +111,16 @@
   padding: 12px 12px 10px 12px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   border-bottom: 1px solid var(--soft);
   background: rgba(0, 0, 0, 0.10);
+}
+
+.card-title-container {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
 }
 
 .card-title {
@@ -276,10 +282,12 @@
 .stat-label {
   font-weight: 850;
   opacity: 0.9;
+  text-align: left;
 }
 
 .stat-value {
   text-align: right;
+  font-size: 15px !important;
   font-weight: 850;
   overflow: hidden;
   white-space: nowrap;
