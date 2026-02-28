@@ -740,7 +740,7 @@ function DriverPage() {
                 <div className="stat-value">
                   {driverStats.races ?? "—"}
                 </div>
-                <div className="stat-label">Races</div>
+                <div className="stat-label">Race starts</div>
               </div>
             </div>
 

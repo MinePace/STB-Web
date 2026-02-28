@@ -540,7 +540,7 @@ function ChampionshipPage() {
               <div className="card-title">
                 {mode === "constructors" ? "Constructors Standings" : "Top10 Championship"}
               </div>
-              <div className="card-subtitle">Current standings after Round {latestRaceWithResults.round}</div>
+              <div className="card-subtitle">Current standings after Round {latestRaceWithResults?.round ?? "—"}</div>
             </div>
             <button onClick={() => setShowStandings(true)} className="btn btn-ghost">
               Expand
