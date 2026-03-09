@@ -43,8 +43,8 @@ function ChampionshipPage() {
     try {
       const decoded = jwtDecode(token);
       role = decoded.role;
-    } catch {
-      // ignore
+    } catch (e) {
+      console.log("JWT decode failed:", e);
     }
   }
 
@@ -460,7 +460,7 @@ function ChampionshipPage() {
       console.log("🏆 Championship upload complete:", json);
 
       // Notify Discord bot (admin only)
-      if (role === "admin") {
+      if (role === "Admin") {
         try {
           await fetch("http://localhost:3000/api/notify-championship", {
             method: "POST",
@@ -478,6 +478,9 @@ function ChampionshipPage() {
         } catch (err) {
           console.error("❌ Failed to notify Discord bot:", err);
         }
+      }
+      else{
+        console.log("⚠️ Not notifying bot since user is not admin");
       }
     } catch (err) {
       console.error("❌ Championship upload failed:", err);

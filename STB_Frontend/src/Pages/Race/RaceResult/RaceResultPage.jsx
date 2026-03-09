@@ -22,11 +22,9 @@ function RaceResultPage() {
   const token = localStorage.getItem("token");
 
   let role = "user";
-
   if (token) {
     try {
       const decoded = jwtDecode(token);
-
       role = decoded.role;
     } catch (e) {
       console.log("JWT decode failed:", e);
