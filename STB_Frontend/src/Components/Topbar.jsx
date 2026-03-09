@@ -135,7 +135,7 @@ function Topbar() {
     <div className="topbar">
       <div className="logo-container">
         <Link to="/">
-          <img src="/STB.png" alt="Championship Logo" className="logo" />
+          <img src="/STB3.png" alt="Championship Logo" className="logo" />
         </Link>
       </div>
 
