@@ -1,184 +1,103 @@
 .home-container {
-    display: flex;
-    min-height: 100vh; /* allow content to grow */
-    overflow: hidden; /* prevent scrollbar from tiny overflow */
+  min-height: 100vh;
+  width: 100%;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  position: relative;
+  color: white;
 }
 
-/* Zorg dat de topbar items zich aanpassen binnen het beschikbare scherm */
-.topbar {
-    display: flex;
-    flex-wrap: wrap; /* Sta knoppen toe om naar de volgende regel te gaan als er geen ruimte is */
-    justify-content: flex-end; /* Plaats de knoppen aan de rechterkant */
-    align-items: center; /* Centreer de knoppen verticaal */
-    padding: 10px 20px; /* Ruimte rondom de knoppen */
-    position: fixed; /* Zorg dat de topbar altijd zichtbaar is */
-    top: 0;
-    left: 200px; /* Start na de sidebar */
-    width: calc(100% - 200px); /* Zorg dat de topbar naast de sidebar blijft */
-    background: transparent; /* Maak het transparant */
-    z-index: 10; /* Zorg dat het bovenaan blijft */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 64, 128, 0.75),
+    rgba(0, 43, 86, 0.9)
+  );
+  backdrop-filter: blur(3px);
+  z-index: 1;
 }
 
-/* Stijl voor de knoppen */
-.admin-hub-button, .logout-button {
-    margin-left: 10px; /* Ruimte tussen de knoppen */
-    padding: 10px 15px; /* Maak de knoppen klikbaar */
-    font-size: 14px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff; /* Blauwe achtergrond */
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.admin-hub-button:hover, .logout-button:hover {
-    background-color: #0056b3; /* Donkerder blauw bij hover */
-}
-
-/* Zorg dat de hoofdinhoud naast de sidebar wordt weergegeven */
 .main-content {
-    margin: 0 auto;
-    padding: 20px;
-    flex-grow: 1;
-    min-height: calc(100vh - 60px);
-    overflow-y: auto;
-    max-width: 1200px; /* Optional: limit max width */
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: auto;
+  padding: 60px 30px;
+  text-align: center;
 }
 
-.info-blocks {
-  display: flex;
-  flex-wrap: wrap; /* Wrap to next line on small screens */
-  justify-content: center;
-  gap: 20px; /* Space between blocks */
-  margin-top: 30px;
+.hero-title {
+  font-size: 56px;
+  font-weight: 700;
+  margin-bottom: 10px;
 }
 
-.info-block {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 15px;
+.hero-sub {
+  font-size: 18px;
+  opacity: 0.8;
+  margin-bottom: 50px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(340px,1fr));
+  gap: 30px;
+}
+
+.info-card {
+  background: rgba(20,40,80,0.55);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
   padding: 25px;
-  flex: 1 1 300px; /* Grow, shrink, min width */
-  max-width: 400px; /* Optional: prevent them from stretching too much */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
   text-align: left;
-  color: #fff;
-  transition: transform 0.2s ease;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.45),
+              inset 0 1px 0 rgba(255,255,255,0.05);
+  transition: all .2s ease;
 }
 
-.info-block:hover {
+.info-card:hover {
   transform: translateY(-5px);
 }
 
-.info-block h2 {
-  font-size: 1.4rem;
+.info-card h2 {
+  color: #ffd700;
   margin-bottom: 10px;
-  color: #ffd700; /* Gold accent */
 }
 
-.info-block p,
-.info-block li,
-.info-block a {
-  font-size: 1rem;
-  margin: 5px 0;
+.race-title,
+.tier-label {
+  color: #ffd700;
+  margin-bottom: 10px;
 }
 
-.info-block ol {
-  list-style: decimal inside;
-  padding-left: 0;
-}
-
-.info-block ul {
+.info-card ul {
   list-style: none;
   padding: 0;
 }
 
-a {
+.info-card li {
+  margin: 6px 0;
+}
+
+.card-link {
+  display: inline-block;
+  margin-top: 10px;
   color: #00bfff;
-  text-decoration: none;
   font-weight: bold;
 }
 
-a:hover {
+.card-link:hover {
   text-decoration: underline;
 }
 
-.carousel-controls {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 10px;
-}
-
-.carousel-controls button {
-  background: rgba(204, 166, 166, 0.15);
-  border: none;
-  color: #0084ff;
-  font-size: 1rem;      /* smaller text size */
-  margin: 0 5px;        /* less space between buttons */
-  padding: 4px 8px;     /* tighter button padding */
-  border-radius: 50%;   /* circular buttons */
-  width: 30px;          /* fixed size */
-  height: 30px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.carousel-controls button:hover {
-  background: rgba(255, 255, 255, 0.4);
-  transform: scale(1.1);
-}
-
-.carousel-controls span {
-  color: #ffd700;
-  font-weight: bold;
-}
-
-.tier-slider-wrapper {
-  display: inline-block;
-  overflow: hidden;
-  width: 80px; /* Adjust width to fit your tier names */
-  vertical-align: middle;
-}
-
-.tier-slider {
-  display: flex;
-  transition: transform 0.4s ease-in-out;
-}
-
-.tier-slide {
-  min-width: 80px; /* Match wrapper width */
-  text-align: left;
-}
-
-/* Standings content slider */
-.standings-slider-wrapper {
-  overflow: hidden;
-  width: 100%;
-}
-
-.standings-slider {
-  display: flex;
-  transition: transform 0.4s ease-in-out;
-}
-
-.standings-slide {
-  width: 100%;
-  flex-shrink: 0;
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        width: 150px; /* Verklein de sidebar op kleine schermen */
-    }
-
-    .topbar {
-        left: 150px; /* Pas aan op basis van de nieuwe sidebarbreedte */
-        width: calc(100% - 150px);
-    }
-
-    .main-content {
-        margin-left: 150px; /* Laat ruimte voor de kleinere sidebar */
-    }
+@media (max-width:768px) {
+  .hero-title {
+    font-size: 38px;
+  }
 }

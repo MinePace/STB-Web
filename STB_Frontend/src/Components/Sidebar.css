@@ -3,7 +3,7 @@
     top: 0;
     left: 0; /* Zet de zijbalk tegen de linker rand */
     height: 100%; /* Laat de zijbalk de volledige hoogte van het scherm innemen */
-    background-color: #0040805f; /* Donkerblauw */
+    background-color: #004080c1; /* Donkerblauw */
     color: #ffffff;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2); /* Voeg een subtiele schaduw toe */
     z-index: 1000; /* Zorg dat de zijbalk altijd bovenaan blijft */

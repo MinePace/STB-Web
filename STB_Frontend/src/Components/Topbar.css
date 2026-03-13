@@ -25,7 +25,8 @@
     height: 60px; /* Adjust based on your logo size */
     width: auto; /* Keeps aspect ratio */
     margin-left: 0; /* Ensures no unintended margin */
-    padding: 0px 0px; /* Adds spacing inside the topbar */
+    padding: 0px 10px; /* Adds spacing inside the topbar */
+    margin-top: 3px; /* Aligns logo with top of topbar */
   }
   
   .nav-container {
@@ -33,6 +34,7 @@
     justify-content: flex-end;
     align-items: center;
     flex-grow: 1;
+    padding-right: 10px;
   }
   
   .nav-links {
