@@ -1,0 +1,46 @@
+{
+    "misc": {
+        "loading": "Loading..."
+    },
+
+    "nav": {
+        "home": "Home",
+        "socials": "Socials",
+        "adminHub": "Admin Hub",
+        "myDriver": "My Driver",
+        "login": "Login",
+        "logout": "Logout"
+    },
+
+    "sidebar": {
+        "season": "Season",
+        "division": "Division"
+    },
+
+    "home": {
+        "welcome": "The home of competitive sim racing",
+        "latest": "Latest Race",
+        "viewDetails": "View Full Results",
+        "standings": "Championship Standings",
+        "stats": {
+            "title": "League Stats",
+            "seasons": "Seasons",
+            "races": "Races",
+            "drivers": "Drivers",
+            "mostWins": "Most Wins",
+            "mostPodiums": "Most Races"
+        }
+    },
+
+    "loader": {
+        "driver": {
+            "loading": "Gathering driver data"
+        },
+        "race": {
+            "season": "Season",
+            "division": "Tier",
+            "loading": "Loading Championship data"
+        }
+
+    }
+}

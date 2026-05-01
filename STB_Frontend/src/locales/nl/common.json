@@ -1,0 +1,47 @@
+{
+    "misc": {
+        "loading": "Laden..."
+    },
+
+    "nav": {
+        "home": "Home",
+        "socials": "Socials",
+        "adminHub": "Admin Hub",
+        "myDriver": "Mijn Coureur",
+        "login": "Inloggen",
+        "logout": "Uitloggen"
+    },
+
+    "sidebar": {
+        "season": "Seizoen",
+        "division": "Divisie"
+    },
+
+    "home": {
+        "welcome": "De thuisbasis van competitief simracen",
+        "latest": "Laatste Race",
+        "viewDetails": "Bekijk Volledige Resultaten",
+        "standings": "Huidige Stand",
+        "stats": {
+            "title": "League Statistieken",
+            "seasons": "Seizoenen",
+            "races": "Races",
+            "drivers": "Coureurs",
+            "mostWins": "Meeste Winst",
+            "mostRaces": "Meeste Races"
+        }
+    },
+
+    "loader": {
+        "driver": {
+            "loading": "Coureur data verzamelen"
+        },
+        "race": {
+            "season": "Seizoen",
+            "division": "Divisie",
+            "loading": "Kampionshap data laden"
+        }
+    }
+
+    
+}

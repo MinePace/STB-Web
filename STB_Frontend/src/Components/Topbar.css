@@ -156,6 +156,72 @@
   display: none;
 }
 
+.langdd {
+  position: relative;
+}
+
+.langdd__btn {
+  color: #fff;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.langdd__flag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.langdd__caret {
+  transition: transform 0.2s ease;
+}
+
+.langdd__caret.is-open {
+  transform: rotate(180deg);
+}
+
+.langdd__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 170px;
+  background: #2774e1f1;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  z-index: 1000;
+  padding: 6px;
+  animation: sdd-in .16s ease-out;
+}
+
+.langdd__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.langdd__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.langdd__item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
 /* Responsive topbar (mobile-friendly) */
 @media (max-width: 700px) {
   .topbar {

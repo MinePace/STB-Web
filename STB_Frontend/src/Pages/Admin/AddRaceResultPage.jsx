@@ -204,6 +204,38 @@ export default function AddRaceResults() {
     }
   };
 
+  function formatRaceTimeInput(input) {
+    if (!input) return "";
+
+    const str = String(input).trim();
+
+    // Als al geformatteerd of tekst zoals "1 Lap" → laten staan
+    if (str.includes(":") || str.includes(".") || /[a-zA-Z]/.test(str)) {
+      return str;
+    }
+
+    if (!/^\d+$/.test(str)) return str;
+
+    const ms = str.slice(-3).padStart(3, "0");
+    const beforeMs = str.slice(0, -3);
+
+    if (!beforeMs) return `0.${ms}`;
+
+    // Laatste 2 cijfers vóór ms = seconden
+    const secondsRaw = beforeMs.slice(-2);
+    const minutesRaw = beforeMs.slice(0, -2);
+
+    const seconds = Number(secondsRaw);
+    const minutes = minutesRaw ? Number(minutesRaw) : 0;
+
+    // Geen minuten tonen als die niet zijn meegegeven
+    if (!minutesRaw || minutes === 0) {
+      return `${seconds}.${ms}`;
+    }
+
+    return `${minutes}:${String(seconds).padStart(2, "0")}.${ms}`;
+  }
+
   const handleResultChange = (index, field, value) => {
     setRaceResults((prev) => {
       const updated = [...prev];
@@ -561,6 +593,10 @@ export default function AddRaceResults() {
                     onChange={(e) => handleResultChange(i, "raceTime", e.target.value)}
                     onKeyDown={(e) => handleTabKeyDown(e, i, "time")}
                     onPaste={(e) => handleColumnPaste(e, i, "raceTime")}
+                    onBlur={(e) => {
+                      const formatted = formatRaceTimeInput(e.target.value);
+                      handleResultChange(i, "raceTime", formatted);
+                    }}
                     placeholder="Enter race time"
                     className="ar-time-input"
                   />

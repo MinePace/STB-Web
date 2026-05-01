@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { jwtDecode } from "jwt-decode";
 import "./EditRaceResultPage.css";
@@ -13,11 +13,15 @@ function EditRaceResults() {
     type,
   } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const raceIdFromQuery = searchParams.get("race");
 
   const [seasons, setSeasons] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState(paramSeason || "");
   const [races, setRaces] = useState([]);
-  const [selectedRaceId, setSelectedRace] = useState(paramRound || "");
+  const [selectedRaceId, setSelectedRace] = useState(
+    raceIdFromQuery || paramRound || ""
+  );
   const [selectedDivision, setSelectedDivision] = useState(paramDivision || "");
   const [FastestLap, setFastestLap] = useState(""); // driver name (display only)
   const [raceResults, setRaceResults] = useState([]);
@@ -47,8 +51,13 @@ function EditRaceResults() {
   useEffect(() => {
     if (paramSeason !== undefined) setSelectedSeason(paramSeason || "");
     if (paramDivision !== undefined) setSelectedDivision(paramDivision || "");
-    if (paramRound !== undefined) setSelectedRace(paramRound || "");
-  }, [paramSeason, paramDivision, paramRound]);
+
+    if (raceIdFromQuery) {
+      setSelectedRace(raceIdFromQuery);
+    } else if (paramRound !== undefined) {
+      setSelectedRace(paramRound || "");
+    }
+  }, [paramSeason, paramDivision, paramRound, raceIdFromQuery]);
 
   // Load seasons
   useEffect(() => {
@@ -67,32 +76,39 @@ function EditRaceResults() {
         .catch((err) => console.error("Error fetching races:", err));
     } else {
       setRaces([]);
-      setSelectedRace("");
-      setSelectedDivision("");
     }
   }, [selectedSeason]);
 
   // Clear race when division changes
   useEffect(() => {
-    setSelectedRace("");
-  }, [selectedDivision]);
+    if (!raceIdFromQuery) {
+      setSelectedRace("");
+    }
+  }, [selectedDivision, raceIdFromQuery]);
 
   // Helper: when we load race results, also build the original points map
   const hydrateRaceResults = (raceObj) => {
-    const results = raceObj?.raceResults ?? [];
+    const results =
+      raceObj?.raceResults ??
+      raceObj?.RaceResults ??
+      raceObj?.results ??
+      [];
+
     const sorted = [...results].sort(
-      (a, b) => (a.position ?? 0) - (b.position ?? 0)
+      (a, b) => (a.position ?? a.Position ?? 0) - (b.position ?? b.Position ?? 0)
     );
 
     setRaceResults(sorted);
 
-    // Snapshot: which points belong to each finishing position
     const map = {};
     sorted.forEach((row) => {
-      if (row.position != null) {
-        map[row.position] = row.points ?? 0;
+      const position = row.position ?? row.Position;
+
+      if (position != null) {
+        map[position] = row.points ?? row.Points ?? 0;
       }
     });
+
     setOriginalPointsByPosition(map);
   };
 
@@ -107,18 +123,31 @@ function EditRaceResults() {
     fetch(`https://stbleaguedata.vercel.app/api/race/${selectedRaceId}`)
       .then((res) => res.json())
       .then((data) => {
+        console.log("Race API response:", data);
+
         const raceObj = data?.race ?? data;
         const flObj = data?.fastestLap ?? raceObj?.fastestLap ?? null;
 
+        const season = raceObj?.Season ?? raceObj?.season;
+        const division = raceObj?.Division ?? raceObj?.division;
+
+        if (season !== undefined && season !== null) {
+          setSelectedSeason(String(season));
+        }
+
+        if (division !== undefined && division !== null) {
+          setSelectedDivision(String(division));
+        }
+
         hydrateRaceResults(raceObj);
 
-        // Fastest lap (display only, not used for points anymore)
         if (flObj) {
           const name =
             flObj?.driver?.name ??
             flObj?.driverName ??
             flObj?.name ??
             (typeof flObj === "string" ? flObj : "");
+
           setFastestLap(name || "");
         } else {
           setFastestLap("");
@@ -127,27 +156,180 @@ function EditRaceResults() {
       .catch((err) => console.error("Error fetching race results:", err));
   }, [selectedRaceId]);
 
-  // Optional: dedicated fastest-lap endpoint (again, only to display name)
-  useEffect(() => {
-    if (!selectedSeason || !selectedRaceId) return;
+  function applyPenaltyToTime(timeValue, penaltySeconds) {
+    if (!timeValue) return null;
 
-    fetch(`https://stbleaguedata.vercel.app/api/fastestlap/${selectedRaceId}`)
-      .then(async (res) => {
-        const text = await res.text();
-        try {
-          const obj = JSON.parse(text);
-          const name =
-            obj?.driver?.name ??
-            obj?.driverName ??
-            obj?.name ??
-            (typeof obj === "string" ? obj : "");
-          setFastestLap(name || "");
-        } catch {
-          setFastestLap(text || "");
-        }
-      })
-      .catch((err) => console.error("Error fetching fastest lap:", err));
-  }, [selectedSeason, selectedRaceId]);
+    const time = String(timeValue).trim();
+    const penalty = Number(penaltySeconds || 0);
+
+    const isFullTime = /^\d+:\d{2}\.\d{3}$/.test(time); // 39:21.797
+    const isGapTime = /^\d+\.\d{3}$/.test(time); // 7.410
+
+    if (!isFullTime && !isGapTime) {
+      return time; // 1 Lap, 2 Laps, DNF etc.
+    }
+
+    let totalMs = 0;
+
+    if (isFullTime) {
+      const [minutesPart, secondsPart] = time.split(":");
+      const [seconds, milliseconds] = secondsPart.split(".");
+
+      totalMs =
+        Number(minutesPart) * 60 * 1000 +
+        Number(seconds) * 1000 +
+        Number(milliseconds);
+    } else {
+      const [seconds, milliseconds] = time.split(".");
+
+      totalMs = Number(seconds) * 1000 + Number(milliseconds);
+    }
+
+    totalMs += penalty * 1000;
+
+    if (totalMs < 0) totalMs = 0;
+
+    const minutes = Math.floor(totalMs / 60000);
+    const seconds = Math.floor((totalMs % 60000) / 1000);
+    const milliseconds = totalMs % 1000;
+
+    if (isFullTime || minutes > 0) {
+      return `${minutes}:${String(seconds).padStart(2, "0")}.${String(milliseconds).padStart(3, "0")}`;
+    }
+
+    return `${seconds}.${String(milliseconds).padStart(3, "0")}`;
+  }
+
+
+
+  function parseRaceTimeToMs(timeValue) {
+    if (!timeValue) return null;
+
+    const time = String(timeValue).trim().replace("+", "");
+
+    // Full time: 44:43.927
+    if (/^\d+:\d{2}\.\d{3}$/.test(time)) {
+      const [minPart, rest] = time.split(":");
+      const [secPart, msPart] = rest.split(".");
+
+      return (
+        Number(minPart) * 60 * 1000 +
+        Number(secPart) * 1000 +
+        Number(msPart)
+      );
+    }
+
+    // Gap: 0.161 / 2.851 / 21.103
+    if (/^\d+\.\d{3}$/.test(time)) {
+      const [secPart, msPart] = time.split(".");
+      return Number(secPart) * 1000 + Number(msPart);
+    }
+
+    return null;
+  }
+
+  function formatFullTime(msValue) {
+    const totalMs = Math.max(0, Math.round(msValue));
+
+    const minutes = Math.floor(totalMs / 60000);
+    const seconds = Math.floor((totalMs % 60000) / 1000);
+    const ms = totalMs % 1000;
+
+    return `${minutes}:${String(seconds).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
+  }
+
+  function formatGapTime(msValue) {
+    const totalMs = Math.max(0, Math.round(msValue));
+
+    const minutes = Math.floor(totalMs / 60000);
+    const seconds = Math.floor((totalMs % 60000) / 1000);
+    const ms = totalMs % 1000;
+
+    // 👉 ALS >= 1 minuut → mm:ss.mmm
+    if (minutes > 0) {
+      return `${minutes}:${String(seconds).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
+    }
+
+    // 👉 ANDERS → ss.mmm
+    return `${seconds}.${String(ms).padStart(3, "0")}`;
+  }
+
+  function calculateTimePenaltyMap(rows, editedResults) {
+    if (!rows || rows.length === 0) return {};
+
+    const orderedRows = [...rows].sort(
+      (a, b) => (a.position ?? a.Position ?? 0) - (b.position ?? b.Position ?? 0)
+    );
+
+    // Zoek de originele volledige racetijd, bijvoorbeeld 44:43.927
+    const originalLeaderRow = orderedRows.find((row) => {
+      const edited = editedResults[row.id] || {};
+      const rawTime = edited.time ?? row.time ?? row.Time ?? "";
+      return String(rawTime).includes(":");
+    });
+
+    if (!originalLeaderRow) return {};
+
+    const originalLeaderTime =
+      editedResults[originalLeaderRow.id]?.time ??
+      originalLeaderRow.time ??
+      originalLeaderRow.Time;
+
+    const originalLeaderMs = parseRaceTimeToMs(originalLeaderTime);
+
+    if (originalLeaderMs === null) return {};
+
+    const absoluteById = {};
+
+    orderedRows.forEach((row) => {
+      const edited = editedResults[row.id] || {};
+
+      const rawTime = edited.time ?? row.time ?? row.Time;
+      const penalty = Number(edited.penalty ?? row.penalty ?? row.Penalty ?? 0);
+
+      const parsedMs = parseRaceTimeToMs(rawTime);
+
+      if (parsedMs === null) {
+        absoluteById[row.id] = null;
+        return;
+      }
+
+      const isFullRaceTime = String(rawTime).includes(":");
+
+      const absoluteMs = isFullRaceTime
+        ? parsedMs + penalty * 1000
+        : originalLeaderMs + parsedMs + penalty * 1000;
+
+      absoluteById[row.id] = absoluteMs;
+    });
+
+    // Belangrijk: huidige rij 1 is de nieuwe winnaar
+    const currentLeader = orderedRows[0];
+    const currentLeaderMs = absoluteById[currentLeader.id];
+
+    if (currentLeaderMs === null || currentLeaderMs === undefined) return {};
+
+    const map = {};
+
+    orderedRows.forEach((row, index) => {
+      const absoluteMs = absoluteById[row.id];
+
+      if (absoluteMs === null || absoluteMs === undefined) {
+        const edited = editedResults[row.id] || {};
+        map[row.id] = edited.time ?? row.time ?? row.Time ?? "";
+        return;
+      }
+
+      if (index === 0) {
+        map[row.id] = formatFullTime(absoluteMs);
+      } else {
+        const gapMs = absoluteMs - currentLeaderMs;
+        map[row.id] = `${formatGapTime(gapMs)}`;
+      }
+    });
+
+    return map;
+  }
 
   /** Generic field change */
   const handleInputChange = (id, field, value) => {
@@ -201,6 +383,7 @@ function EditRaceResults() {
       Pos_Change: updated.pos_Change ?? base.pos_Change,
       Time: updated.time ?? base.time,
       Penalty: updated.penalty ?? base.penalty,
+      TimePenalty: applyPenaltyToTime(updated.time ?? base.time, updated.penalty ?? base.penalty),
     };
 
     console.log("Saving DTO:", dto);
@@ -258,6 +441,7 @@ function EditRaceResults() {
           Pos_Change: updated.pos_Change ?? base.pos_Change,
           Time: updated.time ?? base.time,
           Penalty: updated.penalty ?? base.penalty,
+          TimePenalty: applyPenaltyToTime(updated.time ?? base.time, updated.penalty ?? base.penalty),
         };
 
         return fetch(`https://stbleaguedata.vercel.app/api/race/raceresult/update/${id}`, {
@@ -492,6 +676,7 @@ function EditRaceResults() {
                     <th>Pos Δ</th>
                     <th>Time</th>
                     <th>Penalty</th>
+                    <th>Time + Penalty</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -687,6 +872,12 @@ function EditRaceResults() {
                                         );
                                       }}
                                     />
+                                  </td>
+
+                                  <td>
+                                    {
+                                      calculateTimePenaltyMap(raceResults, editedResults)[result.id] ?? ""
+                                    }
                                   </td>
 
                                   <td>

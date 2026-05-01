@@ -231,6 +231,14 @@ function RaceResultPage() {
                 📸 Save Screenshot
               </button>
             )}
+            {role === "Admin" && raceResults.length > 0 && (
+              <Link
+                to={`/STB/Edit/RaceResults?race=${race.id}`}
+                className="edit-race-results-btn"
+              >
+                ✏️ Edit Race Results
+              </Link>
+            )}
             <table className="result-table" border="1">
               <thead>
                 <tr>
@@ -325,8 +333,8 @@ function RaceResultPage() {
                             {row.time ? (
                               <>
                                 {index === 0
-                                  ? row.time
-                                  : `+${row.time}`}
+                                  ? row.timePenalty
+                                  : `+${row.timePenalty}`}
                                 {row.penalty !== 0 &&
                                   row.penalty !== null && (
                                     <span

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./HomePage.css";
 import bgImage from "../../assets/STBWeb.png";
+import { useTranslation } from "react-i18next";
 
 function HomePage() {
   const [latestRace, setLatestRace] = useState(null);
@@ -13,6 +14,8 @@ function HomePage() {
 
   const [standings, setStandings] = useState([]);
   const [currentTier, setCurrentTier] = useState(0);
+
+  const { t } = useTranslation();
 
   const safeName = (entity) =>
     typeof entity === "object" ? entity?.Name ?? "Unknown" : entity ?? "Unknown";
@@ -111,14 +114,14 @@ function HomePage() {
 
       <div className="main-content">
         <h1 className="hero-title">STB Racing League</h1>
-        <p className="hero-sub">The home of competitive sim racing</p>
+        <p className="hero-sub">{t("home.welcome")}</p>
 
         <div className="info-grid">
           <div className="info-card">
-            <h2>🏁 Latest Race</h2>
+            <h2>🏁 {t("home.latest")}</h2>
 
             {loadingLatest ? (
-              <p>Loading...</p>
+              <p>{t("misc.loading")}</p>
             ) : latestRace ? (
               <>
                 <h3 className="race-title">
@@ -137,7 +140,7 @@ function HomePage() {
                 </ul>
 
                 <Link to={`/STB/race/${latestRace.Id}`} className="card-link">
-                  View Full Results
+                  {t("home.viewDetails")}
                 </Link>
               </>
             ) : (
@@ -146,7 +149,7 @@ function HomePage() {
           </div>
 
           <div className="info-card">
-            <h2>🏆 Championship Standings</h2>
+            <h2>🏆 {t("home.standings")}</h2>
 
             {standings.length > 0 && (
               <>
@@ -167,17 +170,17 @@ function HomePage() {
           </div>
 
           <div className="info-card">
-            <h2>📊 League Stats</h2>
+            <h2>📊 {t("home.stats.title")}</h2>
 
             {loadingStats ? (
-              <p>Loading...</p>
+              <p>{t("misc.loading")}</p>
             ) : leagueStats ? (
               <ul>
-                <li>📅 Seasons: {leagueStats.totalSeasons}</li>
-                <li>🏁 Races: {leagueStats.totalRaces}</li>
-                <li>🧑‍🚀 Drivers: {leagueStats.totalDrivers}</li>
-                <li>🏆 Most Wins: {leagueStats.mostWins.Driver.Name} ({leagueStats.mostWins.Wins} wins)</li>
-                <li>🏁 Most Races: {leagueStats.mostRaces.Driver.Name} ({leagueStats.mostRaces.Races} races)</li>
+                <li>📅 {t("home.stats.seasons")}: {leagueStats.totalSeasons}</li>
+                <li>🏁 {t("home.stats.races")}: {leagueStats.totalRaces}</li>
+                <li>🧑‍🚀 {t("home.stats.drivers")}: {leagueStats.totalDrivers}</li>
+                <li>🏆 {t("home.stats.mostWins")}: {leagueStats.mostWins.Driver.Name} ({leagueStats.mostWins.Wins} wins)</li>
+                <li>🏁 {t("home.stats.mostRaces")}: {leagueStats.mostRaces.Driver.Name} ({leagueStats.mostRaces.Races} races)</li>
               </ul>
             ) : (
               <p>No stats</p>

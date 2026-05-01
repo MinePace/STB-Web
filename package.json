@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "i18next": "^26.0.7",
     "jwt-decode": "^4.0.0",
+    "react-i18next": "^17.0.4",
     "recharts": "^3.2.1"
   }
 }

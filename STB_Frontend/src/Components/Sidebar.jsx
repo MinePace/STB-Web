@@ -3,8 +3,11 @@ import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "./Sidebar.css";
 import "@/Components/Links.css";
+import { useTranslation } from "react-i18next";
 
 function Sidebar() {
+  const { t } = useTranslation();
+
   const seasons = [
     { year: 31, divisions: ["1", "2", "3", "4", "5"]},
     { year: 30, divisions: ["1", "2", "3", "4", "5", "6", "7", "8"] },
@@ -109,7 +112,9 @@ function Sidebar() {
               key={season.year}
               className={`season-item ${seasonRaced ? "season-item--raced" : ""}`}
             >
-              <span className="season-label">Season {season.year}</span>
+              <span className="season-label">
+                {t("sidebar.season")} {season.year}
+              </span>
               <ul className="division-dropdown">
                 {season.divisions.map((division) => {
                   const raced = didRaceDivision(season.year, division);
@@ -119,7 +124,7 @@ function Sidebar() {
                         to={`/STB/Championship/${season.year}/${division}`}
                         className={`division-link ${raced ? "division-link--raced" : ""}`}
                       >
-                        Division {division}
+                        {t("sidebar.division")} {division}
                       </Link>
                     </li>
                   );

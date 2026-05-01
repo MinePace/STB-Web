@@ -1,6 +1,9 @@
 import "./DriverLoader.css";
+import { useTranslation } from "react-i18next";
 
 function DriverLoader() {
+  const { t } = useTranslation();
+
   return (
     <div className="driver-loader-container">
       <div className="driver-loader-card">
@@ -17,7 +20,7 @@ function DriverLoader() {
         </div>
 
         <div className="driver-loader-subtext">
-          Gathering data
+          {t("loader.driver.loading")}
           <span className="dots">
             <span>.</span><span>.</span><span>.</span>
           </span>
