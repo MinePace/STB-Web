@@ -1,6 +1,11 @@
 {
     "misc": {
-        "loading": "Laden..."
+        "loading": "Laden...",
+        "season": "Seizoen",
+        "division": "Divisie",
+        "save": "Sla op",
+        "saving": "Opslaan...",
+        "close": "Sluiten"
     },
 
     "nav": {
@@ -32,6 +37,72 @@
         }
     },
 
+    "championship": {
+        "title": "Kampioenschap Overzicht",
+        "season": "Seizoen",
+        "division": "Divisie",
+        "viewConstructors": "Bekijk Constructeurs",
+        "viewDrivers": "Bekijk Coureurs",
+        "fullStandings": "Volledige Stand",
+        "standings": {
+            "top10": "Top 10 Stand",
+            "subtitle": "Huidige stand na ronde",
+            "expand": "Uitbreiden",
+            "driver": "Coureur",
+            "constructor": "Constructor Stand",
+            "Team": "Team"
+        },
+        "results": {
+            "raceResults": "Race Resultaten",
+            "allRounds": "Alle Ronden"
+        },
+        "Stats": {
+            "seasonStats": "Seizoen Statistieken",
+            "subtitle": "Alleen non-sprint races",
+            "mostWins": "Meeste overwinningen",
+            "mostPodiums": "Meeste podiums",
+            "avgQuali": "Beste Gem. Kwalificatie",
+            "posGained": "Meest gewonnen posities",
+            "mostDnfs": "Meeste DNFs"
+        }
+     },
+
+     "driver": {
+        "title": "Coureur Profiel",
+        "last5Races": "Laatste 5 Races",
+        "lastRace": {
+            "title": "Laatste Race",
+            "driver": "Coureur",
+            "date": "Datum",
+            "noRace": "Geen Race Gevonden"
+        },
+        "stats": {
+            "title": "Statistieken",
+            "totalPoints": "Totale Punten",
+            "wins": "Overwinningen",
+            "podiums": "Podiums",
+            "poles": "Poles",
+            "fastestLaps": "Snelste Ronden",
+            "dnfs": "DNFs",
+            "avgFinish": "Gem. Finish",
+            "avgQuali": "Gem. Kwali",
+            "raceStarts": "Aantal Races",
+            "claimedBy": "Geclaimd door"
+        },
+        "graphs": {
+            "startVSFinish": "Start vs Finish",
+            "less": "minder",
+            "more": "meer", 
+            "subtitle": "Exclusief DNFs — alleen races waar de coureur is gefinisht",
+            "count": "aantal"
+        }
+     },
+
+     "flagPicker": {
+        "title": "Verandere nationaliteit coureur",
+        "select": "Selecteer een land"
+     },
+
     "loader": {
         "driver": {
             "loading": "Coureur data verzamelen"
@@ -41,7 +112,30 @@
             "division": "Divisie",
             "loading": "Kampionshap data laden"
         }
-    }
+    },
 
-    
+    "countries": {
+        "United States": "Verenigde Staten",
+        "Netherlands": "Nederland",
+        "Great Britain": "Groot-Brittannië",
+        "Germany": "Duitsland",
+        "France": "Frankrijk",
+        "Italy": "Italië",
+        "Spain": "Spanje",
+        "Belgium": "België",
+        "Abu Dhabi": "Abu Dhabi",
+        "Australia": "Australië",
+        "Brazil": "Brazilië",
+        "Canada": "Canada",
+        "China": "China",
+        "Malaysia": "Malaysië",
+        "Mexico": "Mexico",
+        "Monaco": "Monaco",
+        "Russia": "Rusland",
+        "Singapore": "Singapore",
+        "Portugal": "Portugal",
+        "Japan": "Japan",
+        "Austria": "Oostenrijk",
+        "Turkey": "Turkije"
+    }
 }

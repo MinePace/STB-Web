@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./FlagPicker.css";
+import { useTranslation } from "react-i18next";
 
 export default function FlagPicker({ driver, onClose }) {
   const [user, setUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [countries, setCountries] = useState([]);
+    
+  const { t } = useTranslation();
 
   useEffect(() => {
     // Simulated user fetch (replace with your real one)

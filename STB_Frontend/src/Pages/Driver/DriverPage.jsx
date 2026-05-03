@@ -6,6 +6,7 @@ import "./DriverPage.css";
 import DriverLoader from "@/Components/Loaders/DriverLoader";
 import "@/Components/Links.css";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { useTranslation } from "react-i18next";
 
 function DriverPage() {
   const { driverName } = useParams();
@@ -20,6 +21,8 @@ function DriverPage() {
   const [roleState, setRoleState] = useState("user");
   const [name, setUsername] = useState("");
   const [token, setToken] = useState("");
+  
+  const { t } = useTranslation();
 
   useEffect(() => {
       setToken(localStorage.getItem("token"));
@@ -202,7 +205,7 @@ function DriverPage() {
       <div className="sf-heatmap-wrap" style={{ display: "grid", gap: 12 }}>
         {/* legend */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ opacity: 0.85 }}>Less</span>
+          <span style={{ opacity: 0.85 }}>{t("driver.graphs.less")}</span>
           <div
             style={{
               flex: 1,
@@ -212,7 +215,7 @@ function DriverPage() {
                 "linear-gradient(90deg, rgba(59,130,0,0.2), rgba(16,185,129,0.9))",
             }}
           />
-          <span style={{ opacity: 0.85 }}>More</span>
+          <span style={{ opacity: 0.85 }}>{t("driver.graphs.more")}</span>
         </div>
 
         {/* grid */}
@@ -285,7 +288,7 @@ function DriverPage() {
         </div>
 
         <div style={{ fontSize: 12, opacity: 0.7 }}>
-          *DNFs excluded — only races with valid start & finish positions shown.
+          *{t("driver.graphs.subtitle")}.
         </div>
 
         {/* popup */}
@@ -319,7 +322,7 @@ function DriverPage() {
               className="heatmap-flyout-close"
               onClick={() => setSelectedCell(null)}
             >
-              Close
+              {t("misc.close")}
             </button>
           </div>
         )}
@@ -423,7 +426,7 @@ function DriverPage() {
     <div className="driver-page">
       {/* Banner */}
       <section className="profile-banner">
-        <div className="banner-title">Driver Profile</div>
+        <div className="banner-title">{t("driver.title")}</div>
         <div className="banner-meta">
           <div className="nat-badge" title={nat}>
             {flagPath && (
@@ -434,7 +437,7 @@ function DriverPage() {
                 aria-hidden="true"
               />
             )}
-            <span className="nat-text">{nat}</span>
+            <span className="nat-text">{t("countries." + nat)}</span>
           </div>
           <h1 className="driver-name">{driverStats.driver}</h1>
         </div>
@@ -444,10 +447,10 @@ function DriverPage() {
       <div className="panels">
         {/* Last Race */}
         <article className="panel">
-          <header className="panel-header">Last Race</header>
+          <header className="panel-header">{t("driver.lastRace.title")}</header>
           <div className="panel-body">
             {!driverStats.lastRace ? (
-              <div className="empty">No race recorded.</div>
+              <div className="empty">{t("driver.lastRace.noRace")}</div>
             ) : (() => {
               const race = driverStats.lastRace;
 
@@ -482,7 +485,7 @@ function DriverPage() {
                       to={`/STB/Championship/${race.Season}/${race.Division}?driver=${driverStats.driver}`}
                       className="primary-link"
                     >
-                      Season {race.Season} Tier {race.Division}
+                      {t("misc.season")} {race.Season} {t("misc.division")} {race.Division}
                     </Link>
                     <h>•</h>
                     <Link
@@ -492,14 +495,14 @@ function DriverPage() {
                       {trackLabel}
                     </Link>
                     <div>
-                      <strong>Date:</strong> {dateLabel}
+                      <strong>{t("driver.lastRace.date")}:</strong> {dateLabel}
                     </div>
                   </div>
 
                   <div className="tp-results" style={{ marginTop: 12 }}>
                     <div className="tp-results-head">
                       <div>Pos</div>
-                      <div>Driver</div>
+                      <div>{t("driver.lastRace.driver")}</div>
                       <div className="tp-right">Pts</div>
                     </div>
 
@@ -590,7 +593,7 @@ function DriverPage() {
 
         {/* Last 5 Races */}
         <article className="panel">
-          <header className="panel-header">Last 5 Races</header>
+          <header className="panel-header">{t("driver.last5Races")}</header>
           <div className="panel-body">
             {(() => {
               const lastFive = (driverStats.allRaces ?? []).slice(0, 5);
@@ -683,42 +686,42 @@ function DriverPage() {
 
         {/* Stats */}
         <article className="panel">
-          <header className="panel-header">Stats</header>
+          <header className="panel-header">{t("driver.stats.title")}</header>
           <div className="panel-body">
             <div className="stats-grid">
               <div className="stat">
                 <div className="stat-value">
                   {driverStats.totalPoints ?? "—"}
                 </div>
-                <div className="stat-label">Total Points</div>
+                <div className="stat-label">{t("driver.stats.totalPoints")}</div>
               </div>
               <div className="stat">
                 <div className="stat-value">{driverStats.wins ?? "—"}</div>
-                <div className="stat-label">Wins</div>
+                <div className="stat-label">{t("driver.stats.wins")}</div>
               </div>
               <div className="stat">
                 <div className="stat-value">
                   {driverStats.podiums ?? "—"}
                 </div>
-                <div className="stat-label">Podiums</div>
+                <div className="stat-label">{t("driver.stats.podiums")}</div>
               </div>
               <div className="stat">
                 <div className="stat-value">
                   {driverStats.poles ?? "—"}
                 </div>
-                <div className="stat-label">Poles</div>
+                <div className="stat-label">{t("driver.stats.poles")}</div>
               </div>
               <div className="stat">
                 <div className="stat-value">
                   {driverStats.fastestLaps ?? "—"}
                 </div>
-                <div className="stat-label">Fastest Laps</div>
+                <div className="stat-label">{t("driver.stats.fastestLaps")}</div>
               </div>
               <div className="stat">
                 <div className="stat-value">
                   {driverStats.dnfs ?? "—"}
                 </div>
-                <div className="stat-label">DNF's</div>
+                <div className="stat-label">{t("driver.stats.dnfs")}</div>
               </div>
               <div className="stat">
                 <div className="stat-value">
@@ -726,7 +729,7 @@ function DriverPage() {
                     ? driverStats.averagePosition.toFixed(2)
                     : "—"}
                 </div>
-                <div className="stat-label">Avg Finish</div>
+                <div className="stat-label">{t("driver.stats.avgFinish")}</div>
               </div>
               <div className="stat">
                 <div className="stat-value">
@@ -734,19 +737,19 @@ function DriverPage() {
                     ? driverStats.averageQualifying.toFixed(2)
                     : "—"}
                 </div>
-                <div className="stat-label">Avg Qualifying</div>
+                <div className="stat-label">{t("driver.stats.avgQuali")}</div>
               </div>
               <div className="stat">
                 <div className="stat-value">
                   {driverStats.races ?? "—"}
                 </div>
-                <div className="stat-label">Race starts</div>
+                <div className="stat-label">{t("driver.stats.raceStarts")}</div>
               </div>
             </div>
 
             <p className="claimed-by">
               {driverStats.driverOBJ?.Username
-                ? `Claimed by: ${driverStats.driverOBJ.Username}`
+                ? `${t("driver.stats.claimedBy")}: ${driverStats.driverOBJ.Username}`
                 : "🚨 Unclaimed"}
             </p>
 
@@ -914,7 +917,7 @@ function DriverPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <header className="drawer-header">
-              <h2>Change Driver Country</h2>
+              <h2>{t("flagPicker.title")}</h2>
               <button
                 className="drawer-close"
                 onClick={() => setShowPopup(false)}
@@ -925,7 +928,7 @@ function DriverPage() {
 
             <div className="drawer-body">
               <label htmlFor="countrySelect">
-                Select Country:
+                {t("flagPicker.select")}:
               </label>
               <select
                 id="countrySelect"
@@ -952,7 +955,7 @@ function DriverPage() {
                 className="save-button"
                 disabled={savingCountry || !newCountry}
               >
-                {savingCountry ? "Saving..." : "💾 Save"}
+                {savingCountry ? t("misc.saving") : "💾 " + t("misc.save")}
               </button>
             </div>
           </div>

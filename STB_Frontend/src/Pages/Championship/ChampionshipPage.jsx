@@ -6,6 +6,7 @@ import html2canvas from "html2canvas";
 import "./ChampionshipPage.css";
 import "@/Components/Links.css";
 import RaceLoader from "@/Components/Loaders/RaceLoader";
+import { useTranslation } from "react-i18next";
 
 // helper to safely extract driver/team name
 const safeName = (entity) =>
@@ -18,6 +19,8 @@ function ChampionshipPage() {
   const [searchParams] = useSearchParams();
   const prefillDriver = searchParams.get("driver");
   const navigate = useNavigate();
+  
+  const { t } = useTranslation();
 
   // constructors mode
   const mode = searchParams.get("c") === "constructors" ? "constructors" : "drivers";
@@ -519,17 +522,17 @@ function ChampionshipPage() {
       {/* Top bar */}
       <div className="championship-topbar">
         <div className="championship-title">
-          <div className="championship-title-main">Season {season} • Tier {division}</div>
-          <div className="championship-title-sub">Championship Overview</div>
+          <div className="championship-title-main">{t("championship.season")} {season} • {t("championship.division")} {division}</div>
+          <div className="championship-title-sub">{t("championship.title")}</div>
         </div>
 
         <div className="championship-topbar-actions">
           <button onClick={toggleChampionshipMode} className="btn btn-secondary">
-            {mode === "constructors" ? "View Drivers" : "View Constructors"}
+            {mode === "constructors" ? t("championship.viewDrivers") : t("championship.viewConstructors")}
           </button>
 
           <button onClick={() => setShowStandings(true)} className="btn btn-primary">
-            Full Standings
+            {t("championship.fullStandings")}
           </button>
         </div>
       </div>
@@ -543,10 +546,10 @@ function ChampionshipPage() {
               <div className="card-title">
                 {mode === "constructors" ? "Constructors Standings" : "Top10 Championship"}
               </div>
-              <div className="card-subtitle">Current standings after Round {latestRaceWithResults?.round ?? "—"}</div>
+              <div className="card-subtitle">{t("championship.standings.subtitle")} {latestRaceWithResults?.round ?? "—"}</div>
             </div>
             <button onClick={() => setShowStandings(true)} className="btn btn-ghost">
-              Expand
+              {t("championship.standings.expand")}
             </button>
           </div>
 
@@ -554,7 +557,7 @@ function ChampionshipPage() {
             <div className="card-body">
               <div className="mini-table">
                 <div className="mini-head">
-                  <span>#</span><span>Team</span><span className="mini-right">Pts</span>
+                  <span>#</span><span>{t("championship.standings.team")}</span><span className="mini-right">Pts</span>
                 </div>
                 {constructors.slice(0, 10).map((t, i) => (
                   <div className="mini-row" key={`${t.team}-${i}`}>
@@ -577,7 +580,7 @@ function ChampionshipPage() {
             <div className="card-body">
               <div className="mini-table">
                 <div className="mini-head">
-                  <span>#</span><span>Driver</span><span className="mini-right">Pts</span>
+                  <span>#</span><span>{t("championship.standings.driver")}</span><span className="mini-right">Pts</span>
                 </div>
 
                 {top10.map((d, i) => (
@@ -606,8 +609,8 @@ function ChampionshipPage() {
         <section className="card">
           <div className="card-header">
             <div className="card-title-container">
-              <div className="card-title">Race Results</div>
-              <div className="card-subtitle">All rounds</div>
+              <div className="card-title">{t("championship.results.raceResults")}</div>
+              <div className="card-subtitle">{t("championship.results.allRounds")}</div>
             </div>
           </div>
 
@@ -653,24 +656,24 @@ function ChampionshipPage() {
         <section className="card">
           <div className="card-header">
             <div className="card-title-container">
-              <div className="card-title">Season Stats</div>
-              <div className="card-subtitle">Main races only</div>
+              <div className="card-title">{t("championship.Stats.seasonStats")}</div>
+              <div className="card-subtitle">{t("championship.Stats.subtitle")}</div>
             </div>
           </div>
 
           <div className="card-body stats">
             <StatRow
-              label="Most Wins"
+              label={t("championship.Stats.mostWins")}
               value={overviewStats.mostWins ? `${overviewStats.mostWins.driver} (${overviewStats.mostWins.wins})` : "—"}
               link={overviewStats.mostWins ? `/STB/Driver/${encodeURIComponent(overviewStats.mostWins.driver)}` : null}
             />
             <StatRow
-              label="Most Podiums"
+              label={t("championship.Stats.mostPodiums")}
               value={overviewStats.mostPodiums ? `${overviewStats.mostPodiums.driver} (${overviewStats.mostPodiums.podiums})` : "—"}
               link={overviewStats.mostPodiums ? `/STB/Driver/${encodeURIComponent(overviewStats.mostPodiums.driver)}` : null}
             />
             <StatRow
-              label="Best Avg. Qualifying"
+              label={t("championship.Stats.avgQuali")}
               value={
                 overviewStats.bestAvgQualy
                   ? `${overviewStats.bestAvgQualy.driver} (${overviewStats.bestAvgQualy.avgQualy.toFixed(2)})`
@@ -679,12 +682,12 @@ function ChampionshipPage() {
               link={overviewStats.bestAvgQualy ? `/STB/Driver/${encodeURIComponent(overviewStats.bestAvgQualy.driver)}` : null}
             />
             <StatRow
-              label="Most Positions Gained"
+              label={t("championship.Stats.posGained")}
               value={overviewStats.mostPosGained ? `${overviewStats.mostPosGained.driver} (${overviewStats.mostPosGained.posGain})` : "—"}
               link={overviewStats.mostPosGained ? `/STB/Driver/${encodeURIComponent(overviewStats.mostPosGained.driver)}` : null}
             />
             <StatRow
-              label="Most DNFs"
+              label={t("championship.Stats.mostDnfs")}
               value={overviewStats.mostDNFs ? `${overviewStats.mostDNFs.driver} (${overviewStats.mostDNFs.dnfs})` : "—"}
               link={overviewStats.mostDNFs ? `/STB/Driver/${encodeURIComponent(overviewStats.mostDNFs.driver)}` : null}
             />

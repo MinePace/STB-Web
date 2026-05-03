@@ -1,6 +1,11 @@
 {
     "misc": {
-        "loading": "Loading..."
+        "loading": "Loading...",
+        "season": "Season",
+        "division": "Division",
+        "save": "Save",
+        "saving": "Saving...",
+        "close": "Close"
     },
 
     "nav": {
@@ -32,6 +37,72 @@
         }
     },
 
+    "championship": {
+        "title": "Championship Overview",
+        "season": "Season",
+        "division": "Division",
+        "viewConstructors": "View Constructors",
+        "viewDrivers": "View Drivers",
+        "fullStandings": "Full Standings",
+        "standings": {
+            "top10": "Top 10 Stand",
+            "subtitle": "Current standings after round",
+            "expand": "Expand",
+            "driver": "Driver",
+            "constructor": "Constructor Stand",
+            "team": "Team"
+        },
+        "results": {
+            "raceResults": "Race Results",
+            "allRounds": "All Rounds"
+        },
+        "Stats": {
+            "seasonStats": "Season Stats",
+            "subtitle": "Main races only",
+            "mostWins": "Most Wins",
+            "mostPodiums": "Most Podiums",
+            "avgQuali": "Best Average Qualifying",
+            "posGained": "Most Positions Gained",
+            "mostDnfs": "Most DNFs"
+        }
+     },
+
+     "driver": {
+        "title": "Driver Profile",
+        "last5Races": "Last 5 Races",
+        "lastRace": {
+            "title": "Last Race",
+            "driver": "Driver",
+            "date": "Date",
+            "noRace": "No Race Recorded"
+        },
+        "stats": {
+            "title": "Stats",
+            "totalPoints": "Total Points",
+            "wins": "Wins",
+            "podiums": "Podiums",
+            "poles": "Poles",
+            "fastestLaps": "Fastest Laps",
+            "dnfs": "DNFs",
+            "avgFinish": "Avg. Finish",
+            "avgQuali": "Avg. Quali",
+            "raceStarts": "Race Starts",
+            "claimedBy": "Claimed by"
+        },
+        "graphs": {
+            "startVSFinish": "Start vs Finish",
+            "less": "less",
+            "more": "more", 
+            "subtitle": "DNFs excluded — only races where the driver finished",
+            "count": "count"
+        }
+     },
+
+     "flagPicker": {
+        "title": "Change Driver Nationality",
+        "select": "Select a Country"
+     },
+
     "loader": {
         "driver": {
             "loading": "Gathering driver data"
@@ -41,6 +112,30 @@
             "division": "Tier",
             "loading": "Loading Championship data"
         }
+    },
 
+    "countries": {
+        "United States": "United States",
+        "Netherlands": "Netherlands",
+        "Great Britain": "Great Britain",
+        "Germany": "Germany",
+        "France": "France",
+        "Italy": "Italy",
+        "Spain": "Spain",
+        "Belgium": "Belgium",
+        "Abu Dhabi": "Abu Dhabi",
+        "Australia": "Australia",
+        "Brazil": "Brazil",
+        "Canada": "Canada",
+        "China": "China",
+        "Malaysia": "Malaysia",
+        "Mexico": "Mexico",
+        "Monaco": "Monaco",
+        "Russia": "Russia",
+        "Singapore": "Singapore",
+        "Portugal": "Portugal",
+        "Japan": "Japan",
+        "Austria": "Austria",
+        "Turkey": "Turkey"
     }
 }

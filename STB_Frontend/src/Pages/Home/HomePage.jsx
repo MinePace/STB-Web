@@ -125,7 +125,7 @@ function HomePage() {
             ) : latestRace ? (
               <>
                 <h3 className="race-title">
-                  {latestRace.Name} - {latestRace.Country} - Tier {latestRace.Division}
+                  {latestRace.Name} - {t(`countries.${latestRace.Country}`)} - Tier {latestRace.Division}
                 </h3>
 
                 <ul>
