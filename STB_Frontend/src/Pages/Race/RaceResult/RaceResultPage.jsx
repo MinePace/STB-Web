@@ -334,7 +334,7 @@ function RaceResultPage() {
                               <>
                                 {index === 0
                                   ? row.timePenalty
-                                  : `+${row.timePenalty}`}
+                                  : `+${row.timePenalty?? row.time}`}
                                 {row.penalty !== 0 &&
                                   row.penalty !== null && (
                                     <span
