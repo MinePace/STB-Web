@@ -59,9 +59,6 @@ export default function AddRaceResults() {
       const decoded = jwtDecode(token);
       const role = decoded.role;
 
-      console.log("Decoded JWT:", decoded);
-      console.log("Decoded JWT role:", role);
-
       if (role !== "Admin") {
         navigate("/");
       }
