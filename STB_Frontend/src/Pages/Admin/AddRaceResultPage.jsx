@@ -393,7 +393,7 @@ export default function AddRaceResults() {
       Pos_Change: r.pos_Change,
       FastestLap: r.fastestLap,
       Time: r.raceTime.trim(),
-      TimePenalty: r.raceTime.trim() && r.dnf === "No" ? r.raceTime.trim() : null,
+      TimePenalty: r.raceTime.trim()
     }))
 
     const url = "https://stbleaguedata.vercel.app/api/race/raceresult";

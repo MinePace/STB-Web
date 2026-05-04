@@ -12,6 +12,21 @@ function AddSeasonPage() {
     season: "",
     division: "",
   });
+  
+  // ---------- Access control ----------
+  const token = localStorage.getItem("token");
+  
+  let role = "user";
+
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+
+      role = decoded.role;
+    } catch (e) {
+      console.log("JWT decode failed:", e);
+    }
+  }
 
   const [importSeason, setImportSeason] = useState("");
   const [isImporting, setIsImporting] = useState(false);
@@ -56,7 +71,7 @@ function AddSeasonPage() {
   }, [navigate]);
 
   useEffect(() => {
-    fetch("https://stbleague.fly.dev/api/race/tracks")
+    fetch("https://stbleaguedata.vercel.app/api/track")
       .then((r) => r.json())
       .then(setTracks)
       .catch((e) => console.error("Error fetching tracks:", e));
@@ -143,17 +158,47 @@ function AddSeasonPage() {
 
     try {
       const res = await fetch(
-        `https://stbleague.fly.dev/api/race/races/${importSeason}`
+        `https://stbleaguedata.vercel.app/api/race/season/${importSeason}`
       );
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message || "Import failed");
+      }
+
       const races = await res.json();
 
-      const firstDivision = races[0].division;
-      const divisionRaces = races.filter(r => r.division === firstDivision);
+      if (!Array.isArray(races) || races.length === 0) {
+        alert("No races found for this season");
+        return;
+      }
+
+      // Maak casing veilig: werkt met Round én round, TrackId én trackId, etc.
+      const normalizedRaces = races.map((r) => ({
+        id: r.Id ?? r.id,
+        game: r.Game ?? r.game,
+        season: r.Season ?? r.season,
+        division: r.Division ?? r.division,
+        round: r.Round ?? r.round,
+        sprint: r.Sprint ?? r.sprint,
+        trackId: r.TrackId ?? r.trackId,
+        youtubeLink: r.YoutubeLink ?? r.youtubeLink,
+        date: r.Date ?? r.date,
+        track: r.Tracks ?? r.Track ?? r.track,
+      }));
+
+      const firstDivision = normalizedRaces[0].division;
+
+      const divisionRaces = normalizedRaces.filter(
+        (r) => r.division === firstDivision
+      );
 
       const roundsMap = {};
 
       for (const r of divisionRaces) {
         const roundNr = Number(r.round);
+
+        if (!roundNr) continue;
 
         if (!roundsMap[roundNr]) {
           roundsMap[roundNr] = {
@@ -164,19 +209,31 @@ function AddSeasonPage() {
 
         const isSprint =
           r.sprint === true ||
-          String(r.sprint).toLowerCase() === "yes";
+          String(r.sprint).toLowerCase() === "yes" ||
+          String(r.sprint).toLowerCase() === "true";
 
-        if (isSprint) roundsMap[roundNr].sprintWeekend = true;
-        else if (r.trackId) roundsMap[roundNr].trackId = r.trackId;
+        if (isSprint) {
+          roundsMap[roundNr].sprintWeekend = true;
+        } else if (r.trackId) {
+          roundsMap[roundNr].trackId = r.trackId;
+        }
       }
 
-      const maxRound = Math.max(...Object.keys(roundsMap).map(Number));
+      const roundNumbers = Object.keys(roundsMap).map(Number);
+      const maxRound = Math.max(...roundNumbers);
+
+      if (!maxRound || maxRound < 1) {
+        alert("No valid rounds found in this season");
+        return;
+      }
+
       setRoundCount(maxRound);
 
       setRounds(
         Array.from({ length: maxRound }, (_, i) => {
           const round = i + 1;
           const data = roundsMap[round] || {};
+
           return {
             round,
             trackId: data.trackId ?? "",
@@ -189,9 +246,10 @@ function AddSeasonPage() {
         })
       );
 
-      alert(`Imported from season ${importSeason}`);
-    } catch {
-      alert("Import failed");
+      alert(`Imported races from season ${importSeason}`);
+    } catch (error) {
+      console.error("Import failed:", error);
+      alert(error.message || "Import failed");
     } finally {
       setIsImporting(false);
     }
@@ -225,36 +283,53 @@ function AddSeasonPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!validateHeader() || !validateRounds()) return;
 
     const payloads = [];
 
     for (const r of rounds) {
-      payloads.push(toRaceRequest({
-        round: r.round,
-        trackId: r.trackId,
-        youtubeLink: r.raceYoutube,
-        date: r.raceDate,
-        sprintFlag: false,
-      }));
+      payloads.push({
+        Game: String(header.game),
+        Season: String(header.season),
+        Division: String(header.division),
+        Round: Number(r.round),
+        Sprint: "No",
+        TrackId: Number(r.trackId),
+        YoutubeLink: r.raceYoutube || "",
+        Date: r.raceDate || null,
+      });
 
       if (r.sprintWeekend) {
-        payloads.push(toRaceRequest({
-          round: r.round,
-          trackId: r.trackId,
-          youtubeLink: r.sprintYoutube,
-          date: r.sprintDate || r.raceDate,
-          sprintFlag: true,
-        }));
+        payloads.push({
+          Game: String(header.game),
+          Season: String(header.season),
+          Division: String(header.division),
+          Round: Number(r.round),
+          Sprint: "Yes",
+          TrackId: Number(r.trackId),
+          YoutubeLink: r.sprintYoutube || "",
+          Date: r.sprintDate || r.raceDate || null,
+        });
       }
     }
 
     for (const p of payloads) {
-      await fetch("https://stbleague.fly.dev/api/race", {
+      const res = await fetch("https://stbleaguedata.vercel.app/api/race", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(p),
       });
+
+      if (!res.ok) {
+        const err = await res.json();
+        console.error("Failed payload:", p);
+        alert(err.message || "Race toevoegen mislukt");
+        return;
+      }
     }
 
     alert("Season added!");
@@ -345,7 +420,7 @@ function AddSeasonPage() {
                     <select value={r.trackId} onChange={(e)=>updateRound(idx,"trackId",Number(e.target.value)||"")}>
                       <option value="">Select Track</option>
                       {tracks.map(t=>(
-                        <option key={t.id} value={t.id}>{t.country} ({t.name})</option>
+                        <option key={t.Id} value={t.Id}>{t.Country} ({t.Name})</option>
                       ))}
                     </select>
                   </td>
