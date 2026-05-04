@@ -46,6 +46,31 @@ export default function AddRaceResults() {
     }
   }
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    // Geen token? Meteen terug naar home/login
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      const role = decoded.role;
+
+      console.log("Decoded JWT:", decoded);
+      console.log("Decoded JWT role:", role);
+
+      if (role !== "Admin") {
+        navigate("/");
+      }
+    } catch (e) {
+      console.log("JWT decode failed:", e);
+      navigate("/");
+    }
+  }, [navigate]);
+
   // ---------- Load all races, then know which already have results ----------
   useEffect(() => {
     fetch("https://stbleaguedata.vercel.app/api/race/races")

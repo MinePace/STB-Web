@@ -16,33 +16,28 @@ function EditTrackPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user is an admin
     const token = localStorage.getItem("token");
-    let role = "user";
-  
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-  
-        role = decoded.role;
-        if (role !== "Admin") navigate("/");
-      } catch (e) {
-        console.log("JWT decode failed:", e);
-      }
+
+    // Geen token? Meteen terug naar home/login
+    if (!token) {
+      navigate("/");
+      return;
     }
 
-    // Fetch all tracks
-    fetch("https://stbleague.fly.dev/api/race/tracks")
-      .then((res) => res.json())
-      .then((data) => {
-        setTracks(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching tracks:", err);
-        setError("Failed to load tracks.");
-        setLoading(false);
-      });
+    try {
+      const decoded = jwtDecode(token);
+      const role = decoded.role;
+
+      console.log("Decoded JWT:", decoded);
+      console.log("Decoded JWT role:", role);
+
+      if (role !== "Admin") {
+        navigate("/");
+      }
+    } catch (e) {
+      console.log("JWT decode failed:", e);
+      navigate("/");
+    }
   }, [navigate]);
 
   // Handle track selection

@@ -42,17 +42,26 @@ function EditSeasonPage() {
   // ----- Auth guard -----
   useEffect(() => {
     const token = localStorage.getItem("token");
-    let role = "user";
-  
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-  
-        role = decoded.role;
-        if (role !== "Admin") navigate("/");
-      } catch (e) {
-        console.log("JWT decode failed:", e);
+
+    // Geen token? Meteen terug naar home/login
+    if (!token) {
+      navigate("/");
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode(token);
+      const role = decoded.role;
+
+      console.log("Decoded JWT:", decoded);
+      console.log("Decoded JWT role:", role);
+
+      if (role !== "Admin") {
+        navigate("/");
       }
+    } catch (e) {
+      console.log("JWT decode failed:", e);
+      navigate("/");
     }
   }, [navigate]);
 
