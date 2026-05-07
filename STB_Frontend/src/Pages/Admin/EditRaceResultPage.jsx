@@ -379,6 +379,8 @@ function EditRaceResults() {
       base?.team?.name ??
       (typeof base?.team === "string" ? base.team : "");
 
+    const timePenaltyMap = calculateTimePenaltyMap(raceResults, editedResults);
+
     const dto = {
       Position: updated.position ?? base.position,
       Driver: driverName,
@@ -389,7 +391,7 @@ function EditRaceResults() {
       Pos_Change: updated.pos_Change ?? base.pos_Change,
       Time: updated.time ?? base.time,
       Penalty: updated.penalty ?? base.penalty ?? 0,
-      TimePenalty: applyPenaltyToTime(updated.time ?? base.time, updated.penalty ?? base.penalty),
+      TimePenalty: timePenaltyMap[id] ?? updated.time ?? base.time,
     };
 
     console.log("Saving DTO:", dto);
@@ -421,6 +423,8 @@ function EditRaceResults() {
     if (!window.confirm("Are you sure you want to save all edited results?"))
       return;
 
+    const timePenaltyMap = calculateTimePenaltyMap(raceResults, editedResults);
+
     const updates = editedIds
       .map((idStr) => {
         const id = parseInt(idStr, 10);
@@ -447,7 +451,7 @@ function EditRaceResults() {
           Pos_Change: updated.pos_Change ?? base.pos_Change,
           Time: updated.time ?? base.time,
           Penalty: updated.penalty ?? base.penalty,
-          TimePenalty: applyPenaltyToTime(updated.time ?? base.time, updated.penalty ?? base.penalty),
+          TimePenalty: timePenaltyMap[id] ?? updated.time ?? base.time,
         };
 
         return fetch(`https://stbleaguedata.vercel.app/api/race/raceresult/update/${id}`, {
