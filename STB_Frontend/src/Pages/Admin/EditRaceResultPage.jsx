@@ -32,6 +32,7 @@ function EditRaceResults() {
   // Only admins allowed
   useEffect(() => {
     const token = localStorage.getItem("token");
+    setToken(token || "");
 
     // Geen token? Meteen terug naar home/login
     if (!token) {
@@ -387,7 +388,7 @@ function EditRaceResults() {
       Qualifying: updated.qualifying ?? base.qualifying,
       Pos_Change: updated.pos_Change ?? base.pos_Change,
       Time: updated.time ?? base.time,
-      Penalty: updated.penalty ?? base.penalty,
+      Penalty: updated.penalty ?? base.penalty ?? 0,
       TimePenalty: applyPenaltyToTime(updated.time ?? base.time, updated.penalty ?? base.penalty),
     };
 

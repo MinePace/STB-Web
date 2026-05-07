@@ -11,6 +11,7 @@ function AddTrackPage() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    setToken(token || "");
 
     // Geen token? Meteen terug naar home/login
     if (!token) {
