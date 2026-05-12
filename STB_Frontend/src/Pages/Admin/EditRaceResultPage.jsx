@@ -251,12 +251,10 @@ function EditRaceResults() {
     const seconds = Math.floor((totalMs % 60000) / 1000);
     const ms = totalMs % 1000;
 
-    // 👉 ALS >= 1 minuut → mm:ss.mmm
     if (minutes > 0) {
       return `${minutes}:${String(seconds).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
     }
 
-    // 👉 ANDERS → ss.mmm
     return `${seconds}.${String(ms).padStart(3, "0")}`;
   }
 
@@ -267,30 +265,42 @@ function EditRaceResults() {
       (a, b) => (a.position ?? a.Position ?? 0) - (b.position ?? b.Position ?? 0)
     );
 
-    // Zoek de originele volledige racetijd, bijvoorbeeld 44:43.927
-    const originalLeaderRow = orderedRows.find((row) => {
-      const edited = editedResults[row.id] || {};
-      const rawTime = edited.time ?? row.time ?? row.Time ?? "";
-      return String(rawTime).includes(":");
-    });
+    const map = {};
 
-    if (!originalLeaderRow) return {};
+    // Fallback wanneer leider geen echte racetijd heeft, zoals ??:??.???
+    const leaderRow = orderedRows[0];
+    const leaderEdited = editedResults[leaderRow.id] || {};
+    const leaderRawTime = leaderEdited.time ?? leaderRow.time ?? leaderRow.Time ?? "";
+    const leaderPenalty = Number(
+      leaderEdited.penalty ?? leaderRow.penalty ?? leaderRow.Penalty ?? 0
+    );
 
-    const originalLeaderTime =
-      editedResults[originalLeaderRow.id]?.time ??
-      originalLeaderRow.time ??
-      originalLeaderRow.Time;
+    const leaderParsedMs = parseRaceTimeToMs(leaderRawTime);
 
-    const originalLeaderMs = parseRaceTimeToMs(originalLeaderTime);
+    // Als leider niet te parsen is, bereken gewoon per rij: Time + eigen penalty
+    if (leaderParsedMs === null) {
+      orderedRows.forEach((row) => {
+        const edited = editedResults[row.id] || {};
+        const rawTime = edited.time ?? row.time ?? row.Time ?? "";
+        const penalty = Number(edited.penalty ?? row.penalty ?? row.Penalty ?? 0);
 
-    if (originalLeaderMs === null) return {};
+        const parsedMs = parseRaceTimeToMs(rawTime);
+
+        if (parsedMs === null) {
+          map[row.id] = rawTime;
+        } else {
+          map[row.id] = formatGapTime(parsedMs + penalty * 1000);
+        }
+      });
+
+      return map;
+    }
 
     const absoluteById = {};
 
     orderedRows.forEach((row) => {
       const edited = editedResults[row.id] || {};
-
-      const rawTime = edited.time ?? row.time ?? row.Time;
+      const rawTime = edited.time ?? row.time ?? row.Time ?? "";
       const penalty = Number(edited.penalty ?? row.penalty ?? row.Penalty ?? 0);
 
       const parsedMs = parseRaceTimeToMs(rawTime);
@@ -302,26 +312,18 @@ function EditRaceResults() {
 
       const isFullRaceTime = String(rawTime).includes(":");
 
-      const absoluteMs = isFullRaceTime
+      absoluteById[row.id] = isFullRaceTime
         ? parsedMs + penalty * 1000
-        : originalLeaderMs + parsedMs + penalty * 1000;
-
-      absoluteById[row.id] = absoluteMs;
+        : leaderParsedMs + parsedMs + penalty * 1000;
     });
 
-    // Belangrijk: huidige rij 1 is de nieuwe winnaar
-    const currentLeader = orderedRows[0];
-    const currentLeaderMs = absoluteById[currentLeader.id];
-
-    if (currentLeaderMs === null || currentLeaderMs === undefined) return {};
-
-    const map = {};
+    const currentLeaderMs = absoluteById[leaderRow.id];
 
     orderedRows.forEach((row, index) => {
       const absoluteMs = absoluteById[row.id];
+      const edited = editedResults[row.id] || {};
 
       if (absoluteMs === null || absoluteMs === undefined) {
-        const edited = editedResults[row.id] || {};
         map[row.id] = edited.time ?? row.time ?? row.Time ?? "";
         return;
       }
@@ -329,8 +331,7 @@ function EditRaceResults() {
       if (index === 0) {
         map[row.id] = formatFullTime(absoluteMs);
       } else {
-        const gapMs = absoluteMs - currentLeaderMs;
-        map[row.id] = `${formatGapTime(gapMs)}`;
+        map[row.id] = formatGapTime(absoluteMs - currentLeaderMs);
       }
     });
 
