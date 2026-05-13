@@ -267,18 +267,17 @@ function EditRaceResults() {
 
     const map = {};
 
-    // Fallback wanneer leider geen echte racetijd heeft, zoals ??:??.???
-    const leaderRow = orderedRows[0];
-    const leaderEdited = editedResults[leaderRow.id] || {};
-    const leaderRawTime = leaderEdited.time ?? leaderRow.time ?? leaderRow.Time ?? "";
-    const leaderPenalty = Number(
-      leaderEdited.penalty ?? leaderRow.penalty ?? leaderRow.Penalty ?? 0
-    );
+    // Zoek de rij met een echte volledige racetijd, bijvoorbeeld 45:05.639
+    // Dit blijft de vaste referentie, ook als deze rij niet meer P1 is.
+    const referenceRow = orderedRows.find((row) => {
+      const edited = editedResults[row.id] || {};
+      const rawTime = edited.time ?? row.time ?? row.Time ?? "";
 
-    const leaderParsedMs = parseRaceTimeToMs(leaderRawTime);
+      return /^\d+:\d{2}\.\d{3}$/.test(String(rawTime).trim().replace(/^\+/, ""));
+    });
 
-    // Als leider niet te parsen is, bereken gewoon per rij: Time + eigen penalty
-    if (leaderParsedMs === null) {
+    // Als er nergens een echte racetijd is, dan kunnen we alleen losse gaps + penalty tonen
+    if (!referenceRow) {
       orderedRows.forEach((row) => {
         const edited = editedResults[row.id] || {};
         const rawTime = edited.time ?? row.time ?? row.Time ?? "";
@@ -296,6 +295,14 @@ function EditRaceResults() {
       return map;
     }
 
+    const referenceEdited = editedResults[referenceRow.id] || {};
+    const referenceRawTime =
+      referenceEdited.time ?? referenceRow.time ?? referenceRow.Time ?? "";
+
+    const referenceMs = parseRaceTimeToMs(referenceRawTime);
+
+    if (referenceMs === null) return {};
+
     const absoluteById = {};
 
     orderedRows.forEach((row) => {
@@ -310,14 +317,20 @@ function EditRaceResults() {
         return;
       }
 
-      const isFullRaceTime = String(rawTime).includes(":");
+      const isFullRaceTime = /^\d+:\d{2}\.\d{3}$/.test(
+        String(rawTime).trim().replace(/^\+/, "")
+      );
 
       absoluteById[row.id] = isFullRaceTime
         ? parsedMs + penalty * 1000
-        : leaderParsedMs + parsedMs + penalty * 1000;
+        : referenceMs + parsedMs + penalty * 1000;
     });
 
-    const currentLeaderMs = absoluteById[leaderRow.id];
+    // De huidige P1 na drag/drop
+    const currentLeader = orderedRows[0];
+    const currentLeaderMs = absoluteById[currentLeader.id];
+
+    if (currentLeaderMs === null || currentLeaderMs === undefined) return {};
 
     orderedRows.forEach((row, index) => {
       const absoluteMs = absoluteById[row.id];
