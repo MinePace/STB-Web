@@ -64,7 +64,6 @@ function LoginPage() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
-    setRole("user");
     alert("Logged out");
     navigate("/login");
   };
