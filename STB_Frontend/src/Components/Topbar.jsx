@@ -348,6 +348,7 @@ function Topbar() {
   );
 
   return (
+    <>
     <header className="site-header">
       <div className="site-header__stripe" />
       <div className="site-header__inner">
@@ -391,8 +392,9 @@ function Topbar() {
           <span />
         </button>
       </div>
+    </header>
 
-      {/* Mobile drawer */}
+      {/* Mobile drawer: outside the header, because the header's backdrop-filter would clip it */}
       <div className={`drawer-backdrop ${menuOpen ? "is-open" : ""}`} onClick={close} />
       <aside className={`drawer ${menuOpen ? "is-open" : ""}`} aria-hidden={!menuOpen}>
         <nav className="drawer__nav" aria-label="Mobile">
@@ -421,7 +423,7 @@ function Topbar() {
           {account}
         </div>
       </aside>
-    </header>
+    </>
   );
 }
 

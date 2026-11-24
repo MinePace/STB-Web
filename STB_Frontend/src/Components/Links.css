@@ -13,7 +13,7 @@ a.primary-link {
 a.primary-link:hover,
 a.primary-link:focus-visible {
   background: rgba(0,129,235,0.25);
-  color: #4caeff;
+  color: var(--primary);
   letter-spacing: .5px;
   transform: translateY(-1px);
 }
@@ -38,7 +38,7 @@ a.champions-link {
 a.champions-link:hover,
 a.champions-link:focus-visible {
   background: rgba(0,129,235,0.25);
-  color: #4caeff;
+  color: var(--primary);
   letter-spacing: .5px;
   transform: translateY(-1px);
 }
@@ -58,7 +58,7 @@ a.champions-link:active {
 }
 
 .driver-link:hover {
-  color: #4caeff;
+  color: var(--primary);
   text-decoration: none;
   font-weight: bold;
 }
@@ -81,13 +81,13 @@ a.champions-link:active {
 }
 
 .driver-link-season:hover {
-  color: #4caeff !important;
+  color: var(--primary) !important;
   text-decoration: underline;
 }
 
 /* ----- Download Button ----- */
 .download-button {
-  background: #004ca9;
+  background: var(--elevated);
   color: #fff;
   font-size: 16px;
   font-weight: 800;
@@ -101,13 +101,13 @@ a.champions-link:active {
 }
 
 .download-button:hover  { 
-  background: #003b85; 
+  background: #23468a; 
   letter-spacing: .5px;
   transform: translateY(-1px);
 }
 
 .download-button:active { 
-  background: #002a5f;
+  background: var(--surface);
   letter-spacing: -.45px;
   transform: translateY(1px);
 }
@@ -162,7 +162,7 @@ a.division-link {
 }
 
 a.division-link:hover {
-    color: #4caeff;
+    color: var(--primary);
     text-decoration: underline;
     font-weight: bold;
 }

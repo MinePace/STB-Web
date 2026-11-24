@@ -297,8 +297,14 @@ function RaceResultPage() {
 
                     return (
                       <tr key={index}>
-                        <td className={isDNF ? "dnf-cell" : ""}>
-                          {isDNF ? "DNF" : row.position}
+                        <td className="pos-col">
+                          <span
+                            className={`pos-badge ${
+                              isDNF ? "dnf" : row.position <= 3 ? `p${row.position}` : ""
+                            }`}
+                          >
+                            {isDNF ? "DNF" : row.position}
+                          </span>
                         </td>
 
                         <td className="driver-col">
@@ -318,15 +324,20 @@ function RaceResultPage() {
                           </Link>
                         </td>
 
-                        <td
-                          className="team-name"
-                          style={{
-                            color:
-                              teamColors[teamName] ??
-                              "white"
-                          }}
-                        >
-                          {teamName}
+                        <td className="team-name">
+                          <span className="team-tag">
+                            <span
+                              className="team-tag__bar"
+                              style={{ backgroundColor: teamColors[teamName] ?? "var(--muted-fg)" }}
+                            />
+                            <img
+                              src={`/team-logos/${teamName}.png`}
+                              alt=""
+                              className="team-tag__logo"
+                              onError={(e) => (e.currentTarget.style.display = "none")}
+                            />
+                            {teamName}
+                          </span>
                         </td>
 
                         {hasAnyTime && (
@@ -359,7 +370,15 @@ function RaceResultPage() {
                           </td>
                         )}
 
-                        <td>{row.qualifying}</td>
+                        <td className="grid-col">
+                          {row.qualifying}
+                          {!isDNF && row.qualifying > 0 && row.qualifying !== row.position && (
+                            <span className={row.qualifying > row.position ? "pos-up" : "pos-down"}>
+                              {row.qualifying > row.position ? "▲" : "▼"}
+                              {Math.abs(row.qualifying - row.position)}
+                            </span>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}

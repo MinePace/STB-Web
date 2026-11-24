@@ -121,6 +121,7 @@
 /* ---------- Championship dropdown ---------- */
 .champ-menu { position: relative; }
 .champ-menu__panel {
+  text-align: left;
   position: absolute;
   top: calc(100% + 12px);
   left: 0;
@@ -284,6 +285,7 @@
   transform: translateX(100%);
   transition: transform 0.25s ease;
   z-index: 120;
+  text-align: left;
   display: flex;
   flex-direction: column;
   gap: 8px;

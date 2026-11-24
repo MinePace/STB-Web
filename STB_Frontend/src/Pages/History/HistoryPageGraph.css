@@ -21,7 +21,7 @@
 }
 
 .sp-title {
-  color: #eaf2ff;
+  color: var(--fg);
   margin: 8px 0 12px;
   font-size: 48px;
   font-weight: 800;
@@ -32,7 +32,7 @@
   gap: 12px;
   flex-wrap: wrap;
   margin-bottom: 12px;
-  color: #eaf2ff;
+  color: var(--fg);
 }
 .sp-controls input[type="number"] {
   width: 80px;
@@ -46,7 +46,7 @@
   gap: 6px;
 }
 
-.sp-msg { color: #eaf2ff; opacity: .95; margin-top: 12px; }
+.sp-msg { color: var(--fg); opacity: .95; margin-top: 12px; }
 .sp-err { color: #ffb4b4; }
 
 /* Card */
@@ -80,7 +80,7 @@
   flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
-  color: #eaf2ff;
+  color: var(--fg);
   padding-top: 6px;
 }
 .sp-legend-item {
@@ -98,11 +98,11 @@
 
 /* Tooltip */
 .sp-tooltip {
-  background: #0b2a57;
+  background: var(--surface);
   border: 1px solid rgba(255,255,255,.15);
   border-radius: 8px;
   padding: 10px;
-  color: #eaf2ff;
+  color: var(--fg);
   min-width: 180px;
 }
 .sp-tooltip-title { font-weight: 800; margin-bottom: 6px; }
@@ -135,7 +135,7 @@
 
 /* Title */
 .sp-title {
-  color: #eaf2ff;
+  color: var(--fg);
   margin: 4px 0 12px;
   font-size: 44px;
   line-height: 1.15;
@@ -148,7 +148,7 @@
   gap: 12px;
   flex-wrap: wrap;
   align-items: center;
-  color: #eaf2ff;
+  color: var(--fg);
   margin-bottom: 12px;
 }
 
@@ -165,7 +165,7 @@
 
 /* Status text */
 .sp-msg {
-  color: #eaf2ff;
+  color: var(--fg);
   opacity: 0.95;
   margin-top: 8px;
 }
@@ -189,7 +189,7 @@
   flex-wrap: wrap;
   gap: 12px;
   justify-content: center;
-  color: #eaf2ff;
+  color: var(--fg);
   padding-top: 8px;
 }
 .sp-legend__item {
@@ -206,11 +206,11 @@
 
 /* Tooltip */
 .sp-tooltip {
-  background: #0b2a57;
+  background: var(--surface);
   border: 1px solid rgba(255,255,255,.15);
   border-radius: 8px;
   padding: 10px;
-  color: #eaf2ff;
+  color: var(--fg);
   min-width: 180px;
 }
 .sp-tooltip__title { font-weight: 800; margin-bottom: 6px; }

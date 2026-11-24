@@ -8,7 +8,7 @@
 /* Banner */
 .profile-banner {
   background: rgba(255, 255, 255, 0.15);
-  color: #eaf2ff;
+  color: var(--fg);
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0,0,0,.25);
   padding: 10px 22px;
@@ -87,7 +87,7 @@
 
 .panel {
   background: rgba(255, 255, 255, 0.15);
-  color: #eaf2ff;
+  color: var(--fg);
   border-radius: 16px;
   box-shadow: 0 8px 20px rgba(0,0,0,.2);
   overflow: hidden;
@@ -252,7 +252,7 @@
   color: #cfe3ff;
 }
 .race-card-title:hover {
-  color: #4caeff;
+  color: var(--primary);
   text-decoration: none;
 }
 
@@ -315,7 +315,7 @@
   padding: 8px 12px;
   border-radius: 999px;
   text-decoration: none;
-  color: #eaf2ff;
+  color: var(--fg);
   background: rgba(255,255,255,0.06);
   border: 1px solid rgba(255,255,255,0.16);
   transition: transform .06s ease, background-color .2s ease, border-color .2s ease;
@@ -362,11 +362,11 @@
 /* Ensure badges/text inside don't change on hover */
 .race-chip-pts,
 .race-chip-sprint {
-  color: #eaf2ff !important;
+  color: var(--fg) !important;
 }
 .race-chip:hover .race-chip-pts,
 .race-chip:hover .race-chip-sprint {
-  color: #eaf2ff !important;
+  color: var(--fg) !important;
 }
 
 .tp-medal-dnf {

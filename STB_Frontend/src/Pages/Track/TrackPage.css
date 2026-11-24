@@ -195,7 +195,7 @@
 }
 
 .tp-driver:hover {
-  color: #4caeff;
+  color: var(--primary);
   font-weight: bold;
   text-decoration: none;
 }
@@ -217,7 +217,7 @@
 
 .tp-showmore:hover {
   background: rgba(255,255,255,0.06);
-  color: #4caeff;
+  color: var(--primary);
   text-decoration: none;
   transition: color 0.2s, background-color 0.2s;
 }
