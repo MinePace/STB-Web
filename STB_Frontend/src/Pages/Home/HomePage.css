@@ -309,4 +309,6 @@
   .hp-podium__name { font-size: 15px; }
   .hp-podium__step--p1 .hp-podium__name { font-size: 17px; }
   .hp-podium__step .hp-team__name { display: none; }
+  .hp-podium__meta { flex-direction: column; align-items: center; gap: 0; }
+  .hp-podium__pts { font-size: 17px; }
 }

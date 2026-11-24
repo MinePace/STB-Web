@@ -50,7 +50,7 @@ function Skeleton({ lines = 3 }) {
 
 function StatCard({ label, value, sub, icon }) {
   return (
-    <div className="hp-stat panel">
+    <div className="hp-stat stb-panel">
       <div className="hp-stat__top">
         <span className="hp-stat__label">{label}</span>
         <span className="hp-stat__icon" aria-hidden>
@@ -172,7 +172,7 @@ function HomePage() {
   return (
     <div className="hp">
       {/* ---------- Hero ---------- */}
-      <section className="hp-hero panel racing-stripes">
+      <section className="hp-hero stb-panel racing-stripes">
         <div className="hp-hero__glow" />
         <img src="/STB3.png" alt="" aria-hidden className="hp-hero__logo" />
         <p className="eyebrow">
@@ -245,7 +245,7 @@ function HomePage() {
 
         {/* ---------- Championship (rotating divisions) ---------- */}
         <section
-          className="hp-card panel"
+          className="hp-card stb-panel"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
@@ -319,7 +319,7 @@ function HomePage() {
       </section>
 
       {/* ---------- Community ---------- */}
-      <section className="hp-community panel racing-stripes">
+      <section className="hp-community stb-panel racing-stripes">
         <div>
           <p className="eyebrow">{t("home.community.eyebrow")}</p>
           <h2 className="hp-community__title">{t("home.community.title")}</h2>
