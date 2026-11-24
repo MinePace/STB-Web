@@ -7,21 +7,26 @@
         "saving": "Opslaan...",
         "close": "Sluiten"
     },
-
     "nav": {
         "home": "Home",
         "socials": "Socials",
         "adminHub": "Admin Hub",
         "myDriver": "Mijn Coureur",
         "login": "Inloggen",
-        "logout": "Uitloggen"
+        "logout": "Uitloggen",
+        "championship": "Kampioenschap",
+        "history": "Geschiedenis",
+        "stats": "Statistieken",
+        "currentSeason": "Huidig seizoen",
+        "pastSeasons": "Eerdere seizoenen",
+        "menu": "Menu",
+        "youRaced": "Hier heb je gereden",
+        "claimDriverFirst": "Claim eerst je coureur"
     },
-
     "sidebar": {
         "season": "Seizoen",
         "division": "Divisie"
     },
-
     "home": {
         "welcome": "De thuisbasis van competitief simracen",
         "latest": "Laatste Race",
@@ -36,7 +41,6 @@
             "mostRaces": "Meeste Races"
         }
     },
-
     "championship": {
         "title": "Kampioenschap Overzicht",
         "season": "Seizoen",
@@ -65,9 +69,8 @@
             "posGained": "Meest gewonnen posities",
             "mostDnfs": "Meeste DNFs"
         }
-     },
-
-     "driver": {
+    },
+    "driver": {
         "title": "Coureur Profiel",
         "last5Races": "Laatste 5 Races",
         "lastRace": {
@@ -92,17 +95,15 @@
         "graphs": {
             "startVSFinish": "Start vs Finish",
             "less": "minder",
-            "more": "meer", 
+            "more": "meer",
             "subtitle": "Exclusief DNFs — alleen races waar de coureur is gefinisht",
             "count": "aantal"
         }
-     },
-
-     "flagPicker": {
+    },
+    "flagPicker": {
         "title": "Verandere nationaliteit coureur",
         "select": "Selecteer een land"
-     },
-
+    },
     "loader": {
         "driver": {
             "loading": "Coureur data verzamelen"
@@ -113,7 +114,6 @@
             "loading": "Kampionshap data laden"
         }
     },
-
     "countries": {
         "United States": "Verenigde Staten",
         "Netherlands": "Nederland",
@@ -137,5 +137,8 @@
         "Japan": "Japan",
         "Austria": "Oostenrijk",
         "Turkey": "Turkije"
+    },
+    "footer": {
+        "tagline": "Esports racing kampioenschap"
     }
 }
