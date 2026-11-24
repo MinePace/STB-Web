@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { jwtDecode } from "jwt-decode";
 import "./EditRaceResultPage.css";
 import "@/Components/Links.css";
+import { API_BASE } from "@/config";
 
 function EditRaceResults() {
   const {
@@ -67,7 +68,7 @@ function EditRaceResults() {
 
   // Load seasons
   useEffect(() => {
-    fetch(`https://stbleaguedata.vercel.app/api/race/seasons`)
+    fetch(`${API_BASE}/api/race/seasons`)
       .then((res) => res.json())
       .then((data) => (Array.isArray(data) ? setSeasons(data) : setSeasons([])))
       .catch((err) => console.error("Error fetching seasons:", err));
@@ -76,7 +77,7 @@ function EditRaceResults() {
   // Load races for a season
   useEffect(() => {
     if (selectedSeason) {
-      fetch(`https://stbleaguedata.vercel.app/api/race/season/${selectedSeason}`)
+      fetch(`${API_BASE}/api/race/season/${selectedSeason}`)
         .then((res) => res.json())
         .then((data) => setRaces(Array.isArray(data) ? data : []))
         .catch((err) => console.error("Error fetching races:", err));
@@ -126,7 +127,7 @@ function EditRaceResults() {
       return;
     }
 
-    fetch(`https://stbleaguedata.vercel.app/api/race/${selectedRaceId}`)
+    fetch(`${API_BASE}/api/race/${selectedRaceId}`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Race API response:", data);
@@ -410,7 +411,7 @@ function EditRaceResults() {
 
     console.log("Saving DTO:", dto);
     const resp = await fetch(
-      `https://stbleaguedata.vercel.app/api/race/raceresult/update/${id}`,
+      `${API_BASE}/api/race/raceresult/update/${id}`,
       {
         method: "PUT",
         headers: { 
@@ -468,7 +469,7 @@ function EditRaceResults() {
           TimePenalty: timePenaltyMap[id] ?? updated.time ?? base.time,
         };
 
-        return fetch(`https://stbleaguedata.vercel.app/api/race/raceresult/update/${id}`, {
+        return fetch(`${API_BASE}/api/race/raceresult/update/${id}`, {
           method: "PUT",
           headers: { 
             "Content-Type": "application/json",
@@ -493,7 +494,7 @@ function EditRaceResults() {
 
     // Clear edits & refetch fresh data (and refresh original points map)
     setEditedResults({});
-    fetch(`https://stbleaguedata.vercel.app/api/race/${selectedRaceId}`)
+    fetch(`${API_BASE}/api/race/${selectedRaceId}`)
       .then((res) => res.json())
       .then((data) => {
         const raceObj = data?.race ?? data;
@@ -506,7 +507,7 @@ function EditRaceResults() {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this result?")) return;
     const resp = await fetch(
-      `https://stbleaguedata.vercel.app/api/race/raceresult/delete/${id}`,
+      `${API_BASE}/api/race/raceresult/delete/${id}`,
       { 
         method: "DELETE",
         headers: { 

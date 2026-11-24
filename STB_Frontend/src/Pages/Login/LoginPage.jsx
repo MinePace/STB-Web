@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
+import { API_BASE } from "@/config";
 
 function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -40,7 +41,7 @@ function LoginPage() {
 
   // 🔹 Login
   const handleLogin = async () => {
-    const response = await fetch("https://stbleaguedata.vercel.app/api/auth/login", {
+    const response = await fetch(`${API_BASE}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),

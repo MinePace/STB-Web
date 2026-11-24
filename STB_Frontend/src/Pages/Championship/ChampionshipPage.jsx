@@ -7,6 +7,7 @@ import "./ChampionshipPage.css";
 import "@/Components/Links.css";
 import RaceLoader from "@/Components/Loaders/RaceLoader";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/config";
 
 // helper to safely extract driver/team name
 const safeName = (entity) =>
@@ -54,7 +55,7 @@ function ChampionshipPage() {
   // fetch claimed driver
   useEffect(() => {
     if (!isLoggedIn || !username) return;
-    fetch(`https://stbleaguedata.vercel.app/api/driver/user/${username}`)
+    fetch(`${API_BASE}/api/driver/user/${username}`)
       .then((r) => r.json())
       .then((d) => setClaimedDriver(d))
       .catch((err) => console.error("Error fetching claimed driver:", err));
@@ -69,7 +70,7 @@ function ChampionshipPage() {
     setLoading(true);
     setNotFound(false);
 
-    fetch(`https://stbleaguedata.vercel.app/api/championship/${season}/${division}`)
+    fetch(`${API_BASE}/api/championship/${season}/${division}`)
       .then((res) => res.json())
       .then((raceData) => {
         if (!Array.isArray(raceData) || raceData.length === 0) {
@@ -113,7 +114,7 @@ function ChampionshipPage() {
         setConstructors(computeConstructors(normalized));
 
         // fastest laps fetch
-        fetch(`https://stbleaguedata.vercel.app/api/fastestlap/${season}/${division}`)
+        fetch(`${API_BASE}/api/fastestlap/${season}/${division}`)
           .then((res) => res.json())
           .then((data) => {
             setFastestLapData(Array.isArray(data) ? data : []);
@@ -451,7 +452,7 @@ function ChampionshipPage() {
     formData.append("file", file);
 
     try {
-      const response = await fetch("https://stbleaguedata.vercel.app/api/auth/upload-championship", {
+      const response = await fetch(`${API_BASE}/api/auth/upload-championship`, {
         method: "POST",
         body: formData,
         headers: {

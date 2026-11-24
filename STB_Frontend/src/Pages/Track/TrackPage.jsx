@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import "./TrackPage.css";
 import "@/Components/Links.css";
 import DriverLoader from "@/Components/Loaders/DriverLoader";
+import { API_BASE } from "@/config";
 
 /* ---------- maps & helpers at module scope ---------- */
 
@@ -88,7 +89,7 @@ function TrackPage() {
     (async () => {
       try {
         const res = await fetch(
-          `https://stbleaguedata.vercel.app/api/track/${encodeURIComponent(trackId || "")}`
+          `${API_BASE}/api/track/${encodeURIComponent(trackId || "")}`
         );
         if (!res.ok) throw new Error("Failed to fetch track info");
         const data = await res.json();
@@ -103,7 +104,7 @@ function TrackPage() {
     (async () => {
       try {
         const res = await fetch(
-          `https://stbleaguedata.vercel.app/api/track/races/${encodeURIComponent(trackId || "")}`
+          `${API_BASE}/api/track/races/${encodeURIComponent(trackId || "")}`
         );
         if (!res.ok) throw new Error("Failed to fetch track races");
         const races = await res.json();

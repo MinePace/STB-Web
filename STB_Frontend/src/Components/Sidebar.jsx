@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import "./Sidebar.css";
 import "@/Components/Links.css";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/config";
 
 function Sidebar() {
   const { t } = useTranslation();
@@ -62,7 +63,7 @@ function Sidebar() {
     const fetchSeasonRaced = async () => {
       try {
         const res = await fetch(
-          `https://stbleaguedata.vercel.app/api/driver/claimeddriver/races/${username}`
+          `${API_BASE}/api/driver/claimeddriver/races/${username}`
         );
 
         if (!res.ok) throw new Error("Failed to fetch driver stats");

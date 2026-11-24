@@ -7,6 +7,7 @@ import DriverLoader from "@/Components/Loaders/DriverLoader";
 import "@/Components/Links.css";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/config";
 
 function DriverPage() {
   const { driverName } = useParams();
@@ -49,7 +50,7 @@ function DriverPage() {
       if (!token || !name) return;
 
       try {
-        const res = await fetch(`https://stbleaguedata.vercel.app/api/user/${name}`, {
+        const res = await fetch(`${API_BASE}/api/user/${name}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
@@ -80,7 +81,7 @@ function DriverPage() {
       setError(null);
 
       const res = await fetch(
-        `https://stbleaguedata.vercel.app/api/driver/stats/${driverName}`
+        `${API_BASE}/api/driver/stats/${driverName}`
       );
 
       if (!res.ok) {
@@ -110,7 +111,7 @@ function DriverPage() {
     if (!token) return;
 
     try {
-      const response = await fetch(`https://stbleaguedata.vercel.app/api/driver/claim/${driverStats.Driver}`, {
+      const response = await fetch(`${API_BASE}/api/driver/claim/${driverStats.Driver}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: user.username }),
@@ -146,7 +147,7 @@ function DriverPage() {
       setSavingCountry(true);
       const driverId = driverStats.driverOBJ.Id;
       console.log("Selected driver ID:", driverId, "New country:", newCountry);
-      const res = await fetch(`https://stbleaguedata.vercel.app/api/driver/updateCountry/${driverId}`, {
+      const res = await fetch(`${API_BASE}/api/driver/updateCountry/${driverId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ country: newCountry }),

@@ -1,0 +1,70 @@
+.sa-panel {
+  margin: 16px auto 24px;
+  max-width: 1100px;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  text-align: left;
+}
+.sa-panel.sa-disabled { opacity: 0.85; }
+
+.sa-header { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.sa-header h2 { margin: 0; font-size: 1.2rem; }
+.sa-hint { font-size: 12px; color: #8a909a; }
+
+.sa-drop {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 28px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  cursor: pointer;
+  color: #c9ced6;
+}
+.sa-drop:hover { border-color: #38bdf8; }
+
+.sa-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 12px 0 8px; }
+.sa-tab { display: inline-flex; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; overflow: hidden; }
+.sa-tab.is-active { border-color: #38bdf8; }
+.sa-tab button, .sa-add {
+  background: transparent;
+  color: inherit;
+  border: 0;
+  padding: 4px 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.sa-add { border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; }
+.sa-x { color: #8a909a !important; padding: 4px 8px !important; }
+
+.sa-view {
+  max-height: 520px;
+  overflow: auto;
+  border-radius: 6px;
+  background: #000;
+}
+.sa-view img { display: block; width: 100%; height: auto; }
+.sa-view.is-zoom img { width: 200%; max-width: none; }
+
+.sa-actions { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.sa-read {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: 0;
+  background: #0052cc;
+  color: #fff;
+  cursor: pointer;
+}
+.sa-read:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.sa-status { margin: 10px 0 0; font-size: 13px; color: #c9ced6; }
+.sa-raw { margin-top: 8px; font-size: 12px; }
+.sa-raw pre { max-height: 200px; overflow: auto; white-space: pre-wrap; background: rgba(0, 0, 0, 0.3); padding: 8px; }
+
+/* Cells filled from a screenshot, to be checked by the admin */
+.results-table .ar-auto { background: rgba(250, 204, 21, 0.18) !important; border-color: #facc15 !important; }
+.results-table .ar-auto-weak { background: rgba(249, 115, 22, 0.25) !important; border-color: #f97316 !important; }

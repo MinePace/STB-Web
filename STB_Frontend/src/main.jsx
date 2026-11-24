@@ -24,9 +24,22 @@ import EditTrackPage from "./Pages/Admin/EditTrackPage";
 
 import Layout from "./Components/Layout";
 import "./index.css";
+import { IS_TEST_SITE, BLOCK_LIVE_WRITES, API_BASE, installTestSiteGuard } from "./config";
+
+installTestSiteGuard();
+
+function TestBanner() {
+  if (!IS_TEST_SITE) return null;
+  return (
+    <div className="test-banner">
+      TEST SITE — {BLOCK_LIVE_WRITES ? "reading live data, saving is blocked" : `data from ${API_BASE.replace(/^https?:\/\//, "")}`}
+    </div>
+  );
+}
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Router>
+    <TestBanner />
     <Routes>
       <Route path="/" element={<Layout showSidebar={true}><HomePage /></Layout>} />
       <Route path="/STB/Championship/:season/:division" element={<Layout showSidebar={true}><ChampionshipPage /></Layout>} />

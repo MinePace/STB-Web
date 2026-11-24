@@ -3,10 +3,24 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "./AddRaceResultPage.css";
 import "@/Components/Links.css";
+import ScreenshotAssist from "./ScreenshotAssist";
+import { API_BASE } from "@/config";
 
 // Points Table for Main and Sprint Races
 const MAIN_RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 const SPRINT_RACE_POINTS = [8, 7, 6, 5, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+const isSprint = (race) => race?.Sprint === "Yes";
+
+function recalcPoints(rows, race) {
+  return rows.map((row, i) => {
+    const base = isSprint(race) ? (SPRINT_RACE_POINTS[i] || 0) : (MAIN_RACE_POINTS[i] || 0);
+    const season = Number(race?.Season);
+    const bonus =
+      row.fastestLap === true && row.position <= 10 && !isSprint(race) && season <= 28 && season >= 15 ? 1 : 0;
+    return { ...row, points: base + bonus };
+  });
+}
 
 export default function AddRaceResults() {
   const navigate = useNavigate();
@@ -22,6 +36,9 @@ export default function AddRaceResults() {
 
   // Rows to submit
   const [raceResults, setRaceResults] = useState([]);
+
+  // Cells filled from a screenshot: key "row:field" -> "auto" | "weak"
+  const [autoFilled, setAutoFilled] = useState({});
 
   // Drivers (datalist)
   const [driversList, setDriversList] = useState([]);
@@ -70,12 +87,12 @@ export default function AddRaceResults() {
 
   // ---------- Load all races, then know which already have results ----------
   useEffect(() => {
-    fetch("https://stbleaguedata.vercel.app/api/race/races")
+    fetch(`${API_BASE}/api/race/races`)
       .then((res) => res.json())
       .then((allRaces) => {
         setRaces(allRaces || [])
 
-        return fetch("https://stbleaguedata.vercel.app/api/race/raceresult")
+        return fetch(`${API_BASE}/api/race/raceresult`)
           .then((res) => res.json())
           .then((allResults) => {
             const withResults = new Set(
@@ -99,7 +116,7 @@ export default function AddRaceResults() {
                 initResultsForRace(target, setRaceResults)
 
                 fetch(
-                  `https://stbleaguedata.vercel.app/api/team/teamdriver/${target.Season}/${target.Division}`
+                  `${API_BASE}/api/team/teamdriver/${target.Season}/${target.Division}`
                 )
                   .then((res) => res.json())
                   .then((data) => setTeamDriverLinks(data || []))
@@ -114,7 +131,7 @@ export default function AddRaceResults() {
 
   // ---------- Load drivers ----------
   useEffect(() => {
-    fetch("https://stbleaguedata.vercel.app/api/driver")
+    fetch(`${API_BASE}/api/driver`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setDriversList(data);
@@ -128,7 +145,7 @@ export default function AddRaceResults() {
     setTeamsLoading(true);
     setTeamsError(null);
 
-    fetch("https://stbleaguedata.vercel.app/api/team")
+    fetch(`${API_BASE}/api/team`)
       .then((r) => r.json())
       .then((json) => {
         if (abort) return;
@@ -161,7 +178,8 @@ export default function AddRaceResults() {
 
   // ---------- Helpers ----------
   const initResultsForRace = (race, setFn) => {
-    const table = race?.sprint === "Yes" ? SPRINT_RACE_POINTS : MAIN_RACE_POINTS;
+    const table = isSprint(race) ? SPRINT_RACE_POINTS : MAIN_RACE_POINTS;
+    setAutoFilled({});
     setFn(
       Array.from({ length: 20 }, (_, i) => ({
         position: i + 1,
@@ -215,7 +233,7 @@ export default function AddRaceResults() {
 
     try {
       const res = await fetch(
-        `https://stbleaguedata.vercel.app/api/team/teamdriver/${race.Season}/${race.Division}`
+        `${API_BASE}/api/team/teamdriver/${race.Season}/${race.Division}`
       );
       if (!res.ok) throw new Error("Failed to fetch team-driver links");
       const data = await res.json();
@@ -259,6 +277,13 @@ export default function AddRaceResults() {
   }
 
   const handleResultChange = (index, field, value) => {
+    setAutoFilled((prev) => {
+      const key = `${index}:${field === "qualifying" ? "qualifying" : field}`;
+      if (!(key in prev)) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
     setRaceResults((prev) => {
       const updated = [...prev];
       const next = { ...updated[index], [field]: value };
@@ -275,7 +300,7 @@ export default function AddRaceResults() {
       // if team changed via dropdown or paste, set teamId too
       if (field === "team") {
         const t = teamByName.get(String(value));
-        next.teamId = t?.id ?? null;
+        next.teamId = t?.Id ?? null;
       }
 
       // keep pos_Change in sync
@@ -299,21 +324,7 @@ export default function AddRaceResults() {
         updated.forEach((row, i) => {
           if (i !== index) row.fastestLap = false;
         });
-
-        updated.forEach((row, i) => {
-          const base =
-            selectedRace?.sprint === "Yes" ? (SPRINT_RACE_POINTS[i] || 0) : (MAIN_RACE_POINTS[i] || 0);
-          row.points = base;
-          if (
-            row.fastestLap === true &&
-            row.position <= 10 &&
-            selectedRace?.sprint !== "Yes" &&
-            Number(selectedRace?.season) <= 28 &&
-            Number(selectedRace?.season) >= 15
-          ) {
-            row.points += 1;
-          }
-        });
+        return recalcPoints(updated, selectedRace);
       }
 
       return updated;
@@ -364,8 +375,8 @@ export default function AddRaceResults() {
           const name = String(value).trim().toLowerCase();
           const found = driverTeamMap.get(name);
           if (found) {
-            row.team = found.TeamName;
-            row.teamId = found.TeamId;
+            row.team = found.teamName;
+            row.teamId = found.teamId;
           }
         }
 
@@ -376,7 +387,7 @@ export default function AddRaceResults() {
 
         if (field === "team") {
           const t = teamByName.get(String(value));
-          row.teamId = t?.id ?? null;
+          row.teamId = t?.Id ?? null;
         }
 
         updated[idx] = row;
@@ -418,7 +429,7 @@ export default function AddRaceResults() {
       TimePenalty: r.raceTime.trim()
     }))
 
-    const url = "https://stbleaguedata.vercel.app/api/race/raceresult";
+    const url = `${API_BASE}/api/race/raceresult`;
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), 15000);
 
@@ -481,6 +492,60 @@ export default function AddRaceResults() {
     return map;
   }, [teamDriverLinks]);
 
+  // ---------- Screenshot auto-fill ----------
+  const seasonDriverNames = useMemo(
+    () => teamDriverLinks.flatMap((t) => t.Drivers || []),
+    [teamDriverLinks]
+  );
+  const allDriverNames = useMemo(() => driversList.map((d) => d.Name).filter(Boolean), [driversList]);
+  const teamNames = useMemo(() => teams.map((t) => t.Name).filter(Boolean), [teams]);
+
+  const applyScreenshot = ({ rows, fastestLapPosition }) => {
+    const marks = {};
+    const updated = raceResults.map((r) => ({ ...r }));
+    for (const r of rows) {
+      const i = r.position - 1;
+      if (i < 0 || i >= updated.length) continue;
+      const row = updated[i];
+
+      if (r.driver) {
+        row.driver = r.driver;
+        marks[`${i}:driver`] = r.driverSource === "all" || r.driverScore < 0.8 ? "weak" : "auto";
+      }
+      const linked = r.driver ? driverTeamMap.get(r.driver.toLowerCase().trim()) : null;
+      const teamName = linked?.teamName ?? r.team;
+      if (teamName) {
+        row.team = teamName;
+        row.teamId = linked?.teamId ?? teamByName.get(teamName)?.Id ?? null;
+        marks[`${i}:team`] = linked ? "auto" : "weak";
+      }
+      if (r.raceTime) {
+        row.raceTime = r.raceTime;
+        marks[`${i}:raceTime`] = "auto";
+      }
+      if (r.dnf) {
+        row.dnf = "Yes";
+        marks[`${i}:dnf`] = "auto";
+      }
+      if (r.grid) {
+        row.qualifying = r.grid;
+        row.pos_Change = r.grid - row.position;
+        marks[`${i}:qualifying`] = "weak";
+      }
+    }
+    if (fastestLapPosition) {
+      updated.forEach((row) => (row.fastestLap = row.position === fastestLapPosition));
+      marks[`${fastestLapPosition - 1}:fastestLap`] = "weak";
+    }
+    setRaceResults(recalcPoints(updated, selectedRace));
+    setAutoFilled(marks);
+  };
+
+  const autoClass = (i, field) => {
+    const m = autoFilled[`${i}:${field}`];
+    return m === "weak" ? " ar-auto-weak" : m ? " ar-auto" : "";
+  };
+
   // ---------- Render ----------
   return (
     <div className="ar-container">
@@ -503,6 +568,14 @@ export default function AddRaceResults() {
           )}
         </select>
       </div>
+
+      <ScreenshotAssist
+        disabled={!selectedRace}
+        seasonDrivers={seasonDriverNames}
+        allDrivers={allDriverNames}
+        teams={teamNames}
+        onApply={applyScreenshot}
+      />
 
       {/* Results Form */}
       <div className="ar-form">
@@ -539,7 +612,7 @@ export default function AddRaceResults() {
                     onKeyDown={(e) => handleTabKeyDown(e, i, "driver")}
                     onPaste={(e) => handleColumnPaste(e, i, "driver")}
                     placeholder="Select or type driver..."
-                    className="ar-driver-input"
+                    className={"ar-driver-input" + autoClass(i, "driver")}
                   />
                   <datalist id="drivers-list">
                     {driversList.map((d, idx) => (
@@ -561,7 +634,7 @@ export default function AddRaceResults() {
                       onChange={(e) => handleResultChange(i, "team", e.target.value)}
                       onKeyDown={(e) => handleTabKeyDown(e, i, "team")}
                       onPaste={(e) => handleColumnPaste(e, i, "team")}
-                      className="ar-team-input"
+                      className={"ar-team-input" + autoClass(i, "team")}
                       required
                     >
                       <option value="">Select team…</option>
@@ -583,7 +656,7 @@ export default function AddRaceResults() {
                   <select
                     value={row.dnf}
                     onChange={(e) => handleResultChange(i, "dnf", e.target.value)}
-                    className="ar-dnf-select"
+                    className={"ar-dnf-select" + autoClass(i, "dnf")}
                   >
                     <option value="No">No</option>
                     <option value="Yes">Yes</option>
@@ -597,11 +670,11 @@ export default function AddRaceResults() {
                     onChange={(e) => handleResultChange(i, "qualifying", e.target.value)}
                     onKeyDown={(e) => handleTabKeyDown(e, i, "quali")}
                     onPaste={(e) => handleColumnPaste(e, i, "qualifying")}
-                    className="ar-quali-input"
+                    className={"ar-quali-input" + autoClass(i, "qualifying")}
                   />
                 </td>
 
-                <td>
+                <td className={autoClass(i, "fastestLap").trim()}>
                   <input
                     type="checkbox"
                     checked={row.fastestLap}
@@ -621,7 +694,7 @@ export default function AddRaceResults() {
                       handleResultChange(i, "raceTime", formatted);
                     }}
                     placeholder="Enter race time"
-                    className="ar-time-input"
+                    className={"ar-time-input" + autoClass(i, "raceTime")}
                   />
                 </td>
               </tr>

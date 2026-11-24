@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import html2canvas from "html2canvas";
 import "./RaceResultPage.css";
 import "@/Components/Links.css";
+import { API_BASE } from "@/config";
 
 // helper: convert driver/team object → name string
 const safeName = (entity) =>
@@ -73,7 +74,7 @@ function RaceResultPage() {
     setLoading(true);
     setError(null);
 
-    fetch(`https://stbleaguedata.vercel.app/api/race/${raceId}`)
+    fetch(`${API_BASE}/api/race/${raceId}`)
       .then((res) => {
         if (!res.ok) throw new Error("This Race doesn't exist.");
         return res.json();
@@ -158,7 +159,7 @@ function RaceResultPage() {
 
         try {
           const response = await fetch(
-            `https://stbleaguedata.vercel.app/api/auth/upload-result`,
+            `${API_BASE}/api/auth/upload-result`,
             {
               method: "POST",
               body: formData,

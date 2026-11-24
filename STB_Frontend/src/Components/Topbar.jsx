@@ -4,6 +4,7 @@ import { jwtDecode } from "jwt-decode";
 import "./Topbar.css";
 import { useShortcut } from "@/Components/ShortCut";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/config";
 
 function useOutsideClick(ref, handler, when = true) {
   useEffect(() => {
@@ -213,7 +214,7 @@ function Topbar() {
 
   useEffect(() => {
     if (isLoggedIn && username) {
-      fetch(`https://stbleaguedata.vercel.app/api/driver/user/${username}`)
+      fetch(`${API_BASE}/api/driver/user/${username}`)
         .then((res) => res.json())
         .then((data) => data && setClaimedDriver(data))
         .catch((err) => console.error("Error fetching claimed driver:", err));

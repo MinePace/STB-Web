@@ -82,3 +82,21 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Shown on test (preview) deployments only */
+.test-banner {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #facc15;
+  color: #111;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}

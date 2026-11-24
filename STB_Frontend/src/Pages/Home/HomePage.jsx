@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./HomePage.css";
 import bgImage from "../../assets/STBWeb.png";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/config";
 
 function HomePage() {
   const [latestRace, setLatestRace] = useState(null);
@@ -23,7 +24,7 @@ function HomePage() {
   useEffect(() => {
     const fetchLatestRace = async () => {
       try {
-        const res = await fetch("https://stbleaguedata.vercel.app/api/race/latest");
+        const res = await fetch(`${API_BASE}/api/race/latest`);
         if (!res.ok) throw new Error("Latest race failed");
         const data = await res.json();
 
@@ -52,7 +53,7 @@ function HomePage() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch("https://stbleaguedata.vercel.app/api/stats/league");
+        const res = await fetch(`${API_BASE}/api/stats/league`);
         const data = await res.json();
 
         setLeagueStats({
@@ -75,7 +76,7 @@ function HomePage() {
   useEffect(() => {
     const fetchStandings = async () => {
       try {
-        const res = await fetch("https://stbleaguedata.vercel.app/api/championship/current");
+        const res = await fetch(`${API_BASE}/api/championship/current`);
         const data = await res.json();
 
         const mapped = data.map((tier) => ({
