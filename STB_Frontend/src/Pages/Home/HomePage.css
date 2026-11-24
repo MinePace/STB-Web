@@ -1,103 +1,312 @@
-.home-container {
-  min-height: 100vh;
-  width: 100%;
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  position: relative;
-  color: white;
+/* =====================================================================
+   Home page (layout taken over from the STB Racing Hub)
+   ===================================================================== */
+.hp {
+  padding: 32px 24px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  text-align: left;
 }
 
-.hero-overlay {
+/* ---------- Buttons ---------- */
+.hp-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--elevated);
+  color: var(--fg);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: transform 0.15s, border-color 0.15s, background-color 0.15s;
+}
+.hp-btn:hover { color: var(--fg); border-color: var(--primary); transform: translateY(-1px); }
+.hp-btn img { width: 18px; height: 18px; object-fit: contain; }
+.hp-btn--primary {
+  background: var(--gradient-primary);
+  color: var(--primary-fg);
+  border-color: transparent;
+  box-shadow: var(--shadow-glow);
+}
+.hp-btn--primary:hover { color: var(--primary-fg); border-color: transparent; }
+.hp-btn--ghost { background: transparent; }
+.hp-btn--small { padding: 7px 12px; font-size: 13px; }
+
+.hp-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.hp-link:hover { color: var(--fg); }
+
+/* ---------- Hero ---------- */
+.hp-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 56px 48px;
+  border-radius: 18px;
+}
+.hp-hero__glow {
   position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    to bottom,
-    rgba(0, 64, 128, 0.75),
-    rgba(0, 43, 86, 0.9)
-  );
-  backdrop-filter: blur(3px);
-  z-index: 1;
+  right: -120px;
+  top: -120px;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  background: rgba(26, 163, 255, 0.3);
+  filter: blur(70px);
+  pointer-events: none;
+}
+.hp-hero__logo {
+  position: absolute;
+  right: 48px;
+  top: 50%;
+  width: 320px;
+  transform: translateY(-50%);
+  filter: drop-shadow(0 0 30px rgba(26, 163, 255, 0.4));
+  pointer-events: none;
+}
+.hp-hero .eyebrow { position: relative; }
+.hp-hero__title {
+  position: relative;
+  max-width: 760px;
+  margin: 14px 0 0;
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1;
+}
+.hp-accent { color: var(--accent); }
+.hp-hero__sub {
+  position: relative;
+  max-width: 620px;
+  margin: 18px 0 0;
+  font-size: 17px;
+  color: var(--muted-fg);
+}
+.hp-hero__actions {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
 }
 
-.main-content {
-  position: relative;
-  z-index: 2;
-  max-width: 1200px;
-  margin: auto;
-  padding: 60px 30px;
+/* ---------- Cards ---------- */
+.hp-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 24px;
+}
+.hp-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.hp-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.hp-card__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 0;
+  font-size: 28px;
+  font-weight: 800;
+}
+.hp-card__sub { margin: 4px 0 0; font-size: 14px; color: var(--muted-fg); }
+.hp-card__actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+.hp-flag { width: 34px; height: auto; border-radius: 3px; }
+.hp-empty { color: var(--muted-fg); }
+
+/* ---------- Team tag & driver ---------- */
+.hp-team {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--muted-fg);
+}
+.hp-team__bar { width: 4px; height: 16px; border-radius: 2px; flex-shrink: 0; }
+.hp-team__logo { width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; }
+.hp-team__name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hp-driver { color: var(--fg); font-weight: 700; }
+.hp-driver:hover { color: var(--accent); }
+
+/* ---------- Podium ---------- */
+.hp-podium {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1.1fr 1fr;
+  align-items: end;
+  gap: 14px;
+}
+.hp-podium__step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   text-align: center;
 }
-
-.hero-title {
-  font-size: 56px;
-  font-weight: 700;
-  margin-bottom: 10px;
-}
-
-.hero-sub {
+.hp-podium__step .pos-badge { min-width: 40px; height: 32px; font-size: 16px; }
+.hp-podium__name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 18px;
-  opacity: 0.8;
-  margin-bottom: 50px;
 }
-
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(340px,1fr));
-  gap: 30px;
+.hp-podium__step--p1 .hp-podium__name { font-size: 22px; }
+.hp-podium__meta { display: flex; gap: 10px; align-items: baseline; font-variant-numeric: tabular-nums; }
+.hp-podium__time { font-size: 13px; color: var(--muted-fg); }
+.hp-podium__pts { font-family: var(--font-display); font-size: 20px; font-weight: 800; }
+.hp-podium__pts small { font-family: var(--font-sans); font-size: 11px; font-weight: 600; color: var(--muted-fg); }
+.hp-podium__block {
+  width: 100%;
+  margin-top: 6px;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(180deg, var(--elevated), rgba(28, 58, 117, 0.2));
+  border-top: 3px solid var(--border);
 }
+.hp-podium__step--p1 .hp-podium__block { height: 96px; border-top-color: var(--gold); }
+.hp-podium__step--p2 .hp-podium__block { height: 64px; border-top-color: var(--silver); }
+.hp-podium__step--p3 .hp-podium__block { height: 44px; border-top-color: var(--bronze); }
 
-.info-card {
-  background: rgba(20,40,80,0.55);
-  backdrop-filter: blur(8px);
-  border-radius: 14px;
-  padding: 25px;
-  text-align: left;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 15px 40px rgba(0,0,0,0.45),
-              inset 0 1px 0 rgba(255,255,255,0.05);
-  transition: all .2s ease;
-}
-
-.info-card:hover {
-  transform: translateY(-5px);
-}
-
-.info-card h2 {
-  color: #ffd700;
-  margin-bottom: 10px;
-}
-
-.race-title,
-.tier-label {
-  color: #ffd700;
-  margin-bottom: 10px;
-}
-
-.info-card ul {
-  list-style: none;
+/* ---------- Rotating standings ---------- */
+.hp-dots { display: flex; gap: 6px; padding-top: 10px; }
+.hp-dot {
+  width: 8px;
+  height: 8px;
   padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--elevated);
+  transition: width 0.25s, background-color 0.25s;
+}
+.hp-dot.is-active { width: 24px; background: var(--accent); }
+
+.hp-standings {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: hp-slide-in 0.45s ease;
+}
+@keyframes hp-slide-in {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: none; }
+}
+.hp-standings__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(28, 58, 117, 0.5);
+}
+.hp-standings__pos {
+  width: 26px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 900;
+  text-align: center;
+}
+.hp-standings__pos--p1 { color: var(--gold); }
+.hp-standings__pos--p2 { color: var(--silver); }
+.hp-standings__pos--p3 { color: var(--bronze); }
+.hp-standings__who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.hp-standings__who .hp-driver { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hp-standings__pts { font-family: var(--font-display); font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* ---------- League in numbers ---------- */
+.hp-section__title { margin: 0 0 14px; font-size: 26px; font-weight: 800; }
+.hp-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 16px;
+}
+.hp-stat { padding: 16px 18px; min-width: 0; }
+.hp-stat__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.hp-stat__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+}
+.hp-stat__icon { font-size: 16px; opacity: 0.85; }
+.hp-stat__value {
+  margin-top: 6px;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+.hp-stat__sub { margin-top: 2px; font-size: 13px; color: var(--muted-fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- Community ---------- */
+.hp-community {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 32px;
+  border-radius: 18px;
+}
+.hp-community__title { margin: 8px 0 0; font-size: 30px; font-weight: 900; }
+.hp-community__text { margin: 6px 0 0; max-width: 560px; color: var(--muted-fg); }
+.hp-community__actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+
+/* ---------- Loading ---------- */
+.hp-skeleton { display: flex; flex-direction: column; gap: 10px; }
+.hp-skeleton span {
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(28, 58, 117, 0.4), rgba(28, 58, 117, 0.8), rgba(28, 58, 117, 0.4));
+  background-size: 200% 100%;
+  animation: hp-shimmer 1.4s infinite linear;
+}
+@keyframes hp-shimmer { to { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hp-standings, .hp-skeleton span { animation: none; }
 }
 
-.info-card li {
-  margin: 6px 0;
+/* ---------- Responsive ---------- */
+@media (max-width: 1280px) {
+  .hp-hero__logo { width: 240px; opacity: 0.5; }
+  .hp-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-
-.card-link {
-  display: inline-block;
-  margin-top: 10px;
-  color: var(--primary);
-  font-weight: bold;
+@media (max-width: 1000px) {
+  .hp-grid { grid-template-columns: 1fr; }
+  .hp-hero__logo { display: none; }
+  .hp-community { flex-direction: column; align-items: flex-start; }
+  .hp-community__actions { justify-content: flex-start; }
 }
-
-.card-link:hover {
-  text-decoration: underline;
-}
-
-@media (max-width:768px) {
-  .hero-title {
-    font-size: 38px;
-  }
+@media (max-width: 640px) {
+  .hp { padding: 20px 14px 40px; gap: 20px; }
+  .hp-hero { padding: 32px 22px; }
+  .hp-card { padding: 18px; }
+  .hp-card__head { flex-direction: column; }
+  .hp-card__actions { justify-content: flex-start; }
+  .hp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hp-podium { gap: 8px; }
+  .hp-podium__name { font-size: 15px; }
+  .hp-podium__step--p1 .hp-podium__name { font-size: 17px; }
+  .hp-podium__step .hp-team__name { display: none; }
 }

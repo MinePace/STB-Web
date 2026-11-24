@@ -39,6 +39,20 @@
             "drivers": "Coureurs",
             "mostWins": "Meeste Winst",
             "mostRaces": "Meeste Races"
+        },
+        "heroTitle": "Lights out voor de",
+        "divisions": "divisies",
+        "nextRace": "Volgende race: {{track}} op {{date}}.",
+        "seasonDone": "Seizoen afgerond: {{rounds}} rondes per divisie. Beleef elke race en elk punt hieronder opnieuw.",
+        "round": "Ronde",
+        "watch": "Bekijk",
+        "fullStandings": "Volledige stand",
+        "noData": "Geen racegegevens beschikbaar.",
+        "community": {
+            "eyebrow": "Community",
+            "title": "Rijd mee",
+            "text": "Race met ons in het officiële F1-spel: wekelijkse league-races, meerdere divisies en livestreams van elke ronde.",
+            "join": "Word lid via Discord"
         }
     },
     "championship": {

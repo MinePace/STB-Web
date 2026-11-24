@@ -39,6 +39,20 @@
             "drivers": "Drivers",
             "mostWins": "Most Wins",
             "mostRaces": "Most Races"
+        },
+        "heroTitle": "Lights out for the",
+        "divisions": "divisions",
+        "nextRace": "Next race: {{track}} on {{date}}.",
+        "seasonDone": "Season complete: {{rounds}} rounds per division. Relive every race and every point below.",
+        "round": "Round",
+        "watch": "Watch",
+        "fullStandings": "Full standings",
+        "noData": "No race data available.",
+        "community": {
+            "eyebrow": "Community",
+            "title": "Join the grid",
+            "text": "Race with us in the official F1 game: weekly league races, multiple divisions and live streams of every round.",
+            "join": "Join on Discord"
         }
     },
     "championship": {
