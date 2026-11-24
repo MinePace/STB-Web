@@ -37,7 +37,7 @@ export default function AddRaceResults() {
   // Rows to submit
   const [raceResults, setRaceResults] = useState([]);
 
-  // Cells filled from a screenshot: key "row:field" -> "auto" | "weak"
+  // Cells filled from a screenshot (DNF, qualifying, time, fastest lap): key "row:field" -> "auto"
   const [autoFilled, setAutoFilled] = useState({});
 
   // Drivers (datalist)
@@ -508,43 +508,45 @@ export default function AddRaceResults() {
       if (i < 0 || i >= updated.length) continue;
       const row = updated[i];
 
-      if (r.driver) {
-        row.driver = r.driver;
-        marks[`${i}:driver`] = r.driverSource === "all" || r.driverScore < 0.8 ? "weak" : "auto";
-      }
-      const linked = r.driver ? driverTeamMap.get(r.driver.toLowerCase().trim()) : null;
+      // Driver and team: database name when found, otherwise the text from the screenshot.
+      // Their colour (green/red) comes from the database check below, not from these marks.
+      if (r.driver) row.driver = r.driver;
+      const linked = r.driverFound ? driverTeamMap.get(r.driver.toLowerCase().trim()) : null;
       const teamName = linked?.teamName ?? r.team;
       if (teamName) {
         row.team = teamName;
         row.teamId = linked?.teamId ?? teamByName.get(teamName)?.Id ?? null;
-        marks[`${i}:team`] = linked ? "auto" : "weak";
       }
+
       if (r.raceTime) {
         row.raceTime = r.raceTime;
         marks[`${i}:raceTime`] = "auto";
       }
-      if (r.dnf) {
-        row.dnf = "Yes";
-        marks[`${i}:dnf`] = "auto";
-      }
+      row.dnf = r.dnf ? "Yes" : "No";
+      marks[`${i}:dnf`] = "auto";
       if (r.grid) {
         row.qualifying = r.grid;
         row.pos_Change = r.grid - row.position;
-        marks[`${i}:qualifying`] = "weak";
+        marks[`${i}:qualifying`] = "auto";
       }
     }
     if (fastestLapPosition) {
       updated.forEach((row) => (row.fastestLap = row.position === fastestLapPosition));
-      marks[`${fastestLapPosition - 1}:fastestLap`] = "weak";
+      marks[`${fastestLapPosition - 1}:fastestLap`] = "auto";
     }
     setRaceResults(recalcPoints(updated, selectedRace));
     setAutoFilled(marks);
   };
 
-  const autoClass = (i, field) => {
-    const m = autoFilled[`${i}:${field}`];
-    return m === "weak" ? " ar-auto-weak" : m ? " ar-auto" : "";
+  // Green = exists in the database, red = not found (saving creates a new driver / fails for a team).
+  const driverNames = useMemo(() => new Set(driversList.map((d) => d.Name)), [driversList]);
+  const dbClass = (value, known) => {
+    const v = String(value || "");
+    if (!v.trim()) return "";
+    return known ? " ar-db-ok" : " ar-db-missing";
   };
+
+  const autoClass = (i, field) => (autoFilled[`${i}:${field}`] ? " ar-auto" : "");
 
   // ---------- Render ----------
   return (
@@ -585,6 +587,12 @@ export default function AddRaceResults() {
           then paste — it fills down from the focused row.
         </p>
 
+        <div className="ar-legend">
+          <span><i className="ar-db-ok" /> Driver / team found in the database</span>
+          <span><i className="ar-db-missing" /> Not found — check spelling (a new driver is created on save; an unknown team cannot be saved)</span>
+          <span><i className="ar-auto" /> Filled in from the screenshot — check against the screenshot</span>
+        </div>
+
         <table className="results-table">
           <thead>
             <tr>
@@ -612,7 +620,7 @@ export default function AddRaceResults() {
                     onKeyDown={(e) => handleTabKeyDown(e, i, "driver")}
                     onPaste={(e) => handleColumnPaste(e, i, "driver")}
                     placeholder="Select or type driver..."
-                    className={"ar-driver-input" + autoClass(i, "driver")}
+                    className={"ar-driver-input" + dbClass(row.driver, driverNames.has(row.driver))}
                   />
                   <datalist id="drivers-list">
                     {driversList.map((d, idx) => (
@@ -634,10 +642,13 @@ export default function AddRaceResults() {
                       onChange={(e) => handleResultChange(i, "team", e.target.value)}
                       onKeyDown={(e) => handleTabKeyDown(e, i, "team")}
                       onPaste={(e) => handleColumnPaste(e, i, "team")}
-                      className={"ar-team-input" + autoClass(i, "team")}
+                      className={"ar-team-input" + dbClass(row.team, teamByName.has(row.team))}
                       required
                     >
                       <option value="">Select team…</option>
+                      {row.team && !teamByName.has(row.team) && (
+                        <option value={row.team}>{row.team} (not in database)</option>
+                      )}
                       {teams
                         .slice()
                         .sort((a, b) => a.Name.localeCompare(b.Name))

@@ -65,6 +65,18 @@
 .sa-raw { margin-top: 8px; font-size: 12px; }
 .sa-raw pre { max-height: 200px; overflow: auto; white-space: pre-wrap; background: rgba(0, 0, 0, 0.3); padding: 8px; }
 
-/* Cells filled from a screenshot, to be checked by the admin */
-.results-table .ar-auto { background: rgba(250, 204, 21, 0.18) !important; border-color: #facc15 !important; }
-.results-table .ar-auto-weak { background: rgba(249, 115, 22, 0.25) !important; border-color: #f97316 !important; }
+/* ---- Result table colours ----
+   green  = driver/team exists in the database
+   red    = not found in the database
+   purple = filled in from the screenshot (DNF, qualifying, race time, fastest lap) */
+.results-table .ar-db-ok { background: #dcfce7 !important; border: 2px solid #16a34a !important; color: #14532d !important; }
+.results-table .ar-db-missing { background: #fee2e2 !important; border: 2px solid #dc2626 !important; color: #7f1d1d !important; }
+.results-table .ar-auto { background: #ede9fe !important; border: 2px solid #7c3aed !important; color: #2e1065 !important; }
+.results-table td.ar-auto { border-radius: 4px; }
+
+.ar-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: center; margin: 8px 0 4px; font-size: 13px; }
+.ar-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.ar-legend i { display: inline-block; width: 16px; height: 16px; border-radius: 3px; }
+.ar-legend i.ar-db-ok { background: #dcfce7; border: 2px solid #16a34a; }
+.ar-legend i.ar-db-missing { background: #fee2e2; border: 2px solid #dc2626; }
+.ar-legend i.ar-auto { background: #ede9fe; border: 2px solid #7c3aed; }

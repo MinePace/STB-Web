@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { parseResultsText } from "./screenshotParser";
+import { parseResultsOcr, mergeResults } from "./screenshotParser";
 import "./ScreenshotAssist.css";
 
 // Free OCR that runs in the admin's browser. Loaded on first use only.
@@ -25,8 +25,8 @@ function loadTesseract() {
   return tesseractPromise;
 }
 
-// Results screens are light text on dark rows: upscale, grayscale and invert
-// so Tesseract sees dark text on a light background.
+// Results screens are light text on dark rows, except the highlighted (white) row with dark text.
+// Upscale and binarise per pixel row so Tesseract always sees black text on white.
 function preprocess(url) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -40,10 +40,26 @@ function preprocess(url) {
       ctx.drawImage(img, 0, 0, c.width, c.height);
       const d = ctx.getImageData(0, 0, c.width, c.height);
       const px = d.data;
-      for (let i = 0; i < px.length; i += 4) {
-        const g = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
-        const v = g > 140 ? 0 : 255; // bright text -> black, background -> white
-        px[i] = px[i + 1] = px[i + 2] = v;
+      const w = c.width;
+      const gray = new Uint8ClampedArray(w);
+      const hist = new Uint32Array(256);
+      for (let y = 0; y < c.height; y++) {
+        hist.fill(0);
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          const g = 0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2];
+          gray[x] = g;
+          hist[gray[x]]++;
+        }
+        // Median brightness of this pixel row = its background.
+        let median = 0;
+        for (let acc = 0; median < 256; median++) if ((acc += hist[median]) >= w / 2) break;
+        const brightRow = median > 128;
+        for (let x = 0; x < w; x++) {
+          const i = (y * w + x) * 4;
+          const isText = brightRow ? gray[x] < median - 60 : gray[x] > 140;
+          px[i] = px[i + 1] = px[i + 2] = isText ? 0 : 255;
+        }
       }
       ctx.putImageData(d, 0, 0);
       resolve(c);
@@ -64,7 +80,15 @@ async function readScreenshot(url, onProgress) {
   try {
     await worker.setParameters({ tessedit_pageseg_mode: "6", preserve_interword_spaces: "1" });
     const { data } = await worker.recognize(canvas);
-    return data.text || "";
+    // Keep word positions: the parser uses them to tell the columns apart.
+    return {
+      text: data.text || "",
+      width: canvas.width,
+      lines: (data.lines || []).map((l) => ({
+        text: l.text,
+        words: (l.words || []).map((w) => ({ text: w.text, bbox: w.bbox })),
+      })),
+    };
   } finally {
     await worker.terminate();
   }
@@ -129,22 +153,27 @@ export default function ScreenshotAssist({ disabled, seasonDrivers, allDrivers, 
     setBusy(true);
     setRawText("");
     try {
+      // Each screenshot is read on its own; overlapping positions are merged afterwards.
+      const opts = { seasonDrivers, allDrivers, teams };
+      const results = [];
       let text = "";
       for (let i = 0; i < images.length; i++) {
         setStatus(`Reading screenshot ${i + 1} of ${images.length}…`);
         setProgress(0);
-        text += (await readScreenshot(images[i].url, setProgress)) + "\n";
+        const ocr = await readScreenshot(images[i].url, setProgress);
+        text += `--- Screenshot ${i + 1} ---\n${ocr.text}\n`;
+        results.push(parseResultsOcr(ocr, opts));
       }
       setRawText(text);
-      const result = parseResultsText(text, { seasonDrivers, allDrivers, teams });
-      const found = result.rows.filter((r) => r.driver).length;
+      const result = mergeResults(results);
+      const found = result.rows.filter((r) => r.driverFound).length;
       if (!result.rows.length) {
         setStatus("No result rows recognised. Fill in by hand, or try a sharper / cropped screenshot.");
       } else {
         onApply(result);
         setStatus(
-          `Filled ${result.rows.length} rows (${found} drivers recognised). ` +
-            "Yellow cells were filled automatically — check them against the screenshot."
+          `Filled ${result.rows.length} rows: ${found} drivers found in the database, ` +
+            `${result.rows.length - found} not found (red). Check the table against the screenshot.`
         );
       }
     } catch (err) {
