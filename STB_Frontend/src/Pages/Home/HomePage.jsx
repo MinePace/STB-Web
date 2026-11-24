@@ -207,7 +207,7 @@ function HomePage() {
 
       <div className="hp-grid">
         {/* ---------- Latest race ---------- */}
-        <section className="hp-card panel hp-card--wide">
+        <section className="hp-card stb-panel hp-card--wide">
           <header className="hp-card__head">
             <div>
               <p className="eyebrow">{t("home.latest")}</p>
