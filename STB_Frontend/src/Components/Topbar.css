@@ -144,6 +144,18 @@
   color: var(--accent);
 }
 .season-grid__title:not(:first-child) { margin-top: 16px; }
+.season-grid__fold { margin-top: 12px; }
+.season-grid__fold > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.season-grid__fold > summary::-webkit-details-marker { display: none; }
+.season-grid__fold > summary::after { content: "▾"; font-size: 12px; transition: transform 0.15s; }
+.season-grid__fold[open] > summary::after { transform: rotate(180deg); }
+
 .season-row {
   display: grid;
   grid-template-columns: 96px 1fr;

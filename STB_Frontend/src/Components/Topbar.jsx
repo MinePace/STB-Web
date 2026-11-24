@@ -199,7 +199,7 @@ function useRacedSeasons(username) {
 }
 
 /** Season -> division picker (replaces the old sidebar). Used in the dropdown and the mobile menu. */
-function SeasonGrid({ raced, onPick }) {
+function SeasonGrid({ raced, onPick, collapsePast = false }) {
   const { t } = useTranslation();
   const [current, ...past] = SEASONS;
   const row = (season) => (
@@ -226,8 +226,17 @@ function SeasonGrid({ raced, onPick }) {
     <div className="season-grid">
       <p className="season-grid__title">{t("nav.currentSeason")}</p>
       {row(current)}
-      <p className="season-grid__title">{t("nav.pastSeasons")}</p>
-      <div className="season-grid__past">{past.map(row)}</div>
+      {collapsePast ? (
+        <details className="season-grid__fold">
+          <summary className="season-grid__title">{t("nav.pastSeasons")}</summary>
+          <div className="season-grid__past">{past.map(row)}</div>
+        </details>
+      ) : (
+        <>
+          <p className="season-grid__title">{t("nav.pastSeasons")}</p>
+          <div className="season-grid__past">{past.map(row)}</div>
+        </>
+      )}
     </div>
   );
 }
@@ -409,7 +418,7 @@ function Topbar() {
           </NavLink>
         </nav>
         <p className="drawer__heading">{t("nav.championship")}</p>
-        <SeasonGrid raced={raced} onPick={close} />
+        <SeasonGrid raced={raced} onPick={close} collapsePast />
         <p className="drawer__heading">{t("nav.socials")}</p>
         <div className="drawer__socials">
           {SOCIAL_LINKS.map((s) => (

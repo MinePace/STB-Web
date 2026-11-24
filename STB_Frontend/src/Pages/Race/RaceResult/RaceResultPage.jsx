@@ -268,7 +268,7 @@ function RaceResultPage() {
                   <tr>
                     <th>Pos</th>
                     <th className="driver-col">Driver</th>
-                    <th>Team</th>
+                    <th className="team-col">Team</th>
                     {hasAnyTime && <th>Time</th>}
                     <th>Grid</th>
                   </tr>
@@ -300,7 +300,7 @@ function RaceResultPage() {
                         <td className="pos-col">
                           <span
                             className={`pos-badge ${
-                              isDNF ? "dnf" : row.position <= 3 ? `p${row.position}` : ""
+                              isDNF ? "pos-badge--dnf" : row.position <= 3 ? `pos-badge--p${row.position}` : ""
                             }`}
                           >
                             {isDNF ? "DNF" : row.position}

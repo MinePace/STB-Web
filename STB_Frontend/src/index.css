@@ -172,14 +172,34 @@ button:hover {
   font-weight: 700;
   background: var(--elevated);
 }
-.pos-badge.p1 { background: var(--gold); color: #2b1d00; }
-.pos-badge.p2 { background: var(--silver); color: #1b2333; }
-.pos-badge.p3 { background: var(--bronze); color: #2a1406; }
-.pos-badge.dnf { background: rgba(255, 59, 59, 0.15); color: var(--danger); font-size: 12px; }
+.pos-badge--p1 { background: var(--gold); color: #2b1d00; }
+.pos-badge--p2 { background: var(--silver); color: #1b2333; }
+.pos-badge--p3 { background: var(--bronze); color: #2a1406; }
+.pos-badge--dnf { background: rgba(255, 59, 59, 0.15); color: var(--danger); font-size: 12px; }
 
 .racing-stripes {
   background-image: repeating-linear-gradient(115deg, transparent 0 22px, rgba(243, 247, 255, 0.03) 22px 23px);
 }
+
+/* Form fields */
+input,
+select,
+textarea {
+  font-family: inherit;
+  color: var(--fg);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26, 163, 255, 0.25);
+}
+input::placeholder,
+textarea::placeholder { color: var(--muted-fg); opacity: 0.8; }
 
 /* Shown on test (preview) deployments only */
 .test-banner {
