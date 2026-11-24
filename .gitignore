@@ -21,3 +21,9 @@ Data.db
 STB_Frontend/dist/
 STB_Frontend/build/
 node_modules/
+
+# Databases contain personal data: never commit them
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
