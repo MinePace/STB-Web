@@ -2,7 +2,7 @@ import React, { lazy, Suspense } from "react";
 import "./i18n";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import "./App.css"; // global base styles (the old App component was unused)
+import "./allStyles"; // every stylesheet, in a fixed order (see allStyles.js)
 
 const ChampionshipPage = lazy(() => import("./Pages/Championship/ChampionshipPage"));
 const DriverPage = lazy(() => import("./Pages/Driver/DriverPage"));
@@ -23,7 +23,6 @@ const EditSeasonPage = lazy(() => import("./Pages/Admin/EditSeasonPage"));
 const EditTrackPage = lazy(() => import("./Pages/Admin/EditTrackPage"));
 
 import Layout from "./Components/Layout";
-import "./index.css";
 import { IS_TEST_SITE, BLOCK_LIVE_WRITES, API_BASE, installTestSiteGuard, installFreshDataForUsers } from "./config";
 
 installTestSiteGuard();
