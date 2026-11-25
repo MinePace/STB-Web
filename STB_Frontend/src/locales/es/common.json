@@ -275,15 +275,6 @@
         "form": "Forma: últimas 10 carreras",
         "older": "antes",
         "newer": "después",
-        "favorites": "Circuitos favoritos",
-        "favAvg": "media",
-        "favWins": "{{count}} victorias",
-        "favWins_one": "{{count}} victoria",
-        "favWins_other": "{{count}} victorias",
-        "formAvgShort": "media {{n}}",
-        "favRaces": "{{count}} carreras",
-        "favRaces_one": "{{count}} carrera",
-        "favRaces_other": "{{count}} carreras",
-        "favBest": "mejor P{{n}}"
+        "formAvgShort": "media {{n}}"
     }
 }

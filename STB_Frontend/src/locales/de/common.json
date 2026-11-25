@@ -275,15 +275,6 @@
         "form": "Form: letzte 10 Rennen",
         "older": "älter",
         "newer": "neuer",
-        "favorites": "Lieblingsstrecken",
-        "favAvg": "Ø",
-        "favWins": "{{count}} Siege",
-        "favWins_one": "{{count}} Sieg",
-        "favWins_other": "{{count}} Siege",
-        "formAvgShort": "Ø {{n}}",
-        "favRaces": "{{count}} Rennen",
-        "favRaces_one": "{{count}} Rennen",
-        "favRaces_other": "{{count}} Rennen",
-        "favBest": "beste P{{n}}"
+        "formAvgShort": "Ø {{n}}"
     }
 }
