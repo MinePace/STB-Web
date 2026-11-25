@@ -5,7 +5,10 @@ import { jwtDecode } from "jwt-decode";
 import html2canvas from "html2canvas";
 import "./RaceResultPage.css";
 import "@/Components/Links.css";
+import { API_BASE } from "@/config";
 
+import { TEAM_COLORS } from "@/teams";
+import usePageMeta from "@/usePageMeta";
 // helper: convert driver/team object → name string
 const safeName = (entity) =>
   typeof entity === "object" ? entity?.name ?? "Unknown" : entity ?? "Unknown";
@@ -16,6 +19,16 @@ function RaceResultPage() {
   const prefillDriver = searchParams.get("driver");
   const [raceResults, setRaceResults] = useState([]);
   const [race, setRaceData] = useState();
+  const raceTitle = race
+    ? `${race.track?.raceName || race.track?.name || "Race"}${race.sprint === "Yes" ? " Sprint" : ""} – S${race.season} Division ${race.division}`
+    : null;
+  const winner = raceResults.find((r) => r.position === 1)?.driver?.name;
+  usePageMeta(
+    raceTitle,
+    race
+      ? `Round ${race.round} of season ${race.season}, division ${race.division}${winner ? `. Won by ${winner}` : ""}. Full results, fastest lap and position changes.`
+      : null
+  );
   const [fastestLap, setFastestLap] = useState(null);
   const [embedUrl, setEmbedUrl] = useState("");
 
@@ -33,20 +46,6 @@ function RaceResultPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
-
-  // user fetch
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const name = localStorage.getItem("name");
-    if (!token || !name) return;
-
-    fetch(`https://stbleague.fly.dev/api/user/${name}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => data && setUser(data))
-      .catch((err) => console.error("Error fetching user data:", err));
-  }, []);
-
   // YouTube embed parser
   const extractYouTubeEmbed = (url) => {
     try {
@@ -73,7 +72,7 @@ function RaceResultPage() {
     setLoading(true);
     setError(null);
 
-    fetch(`https://stbleaguedata.vercel.app/api/race/${raceId}`)
+    fetch(`${API_BASE}/api/race/${raceId}`)
       .then((res) => {
         if (!res.ok) throw new Error("This Race doesn't exist.");
         return res.json();
@@ -106,29 +105,7 @@ function RaceResultPage() {
       .finally(() => setLoading(false));
   }, [raceId]);
 
-  const teamColors = {
-    "Red Bull": "rgba(59, 73, 149, 1)",
-    "Mercedes": "rgb(109, 230, 205)",
-    "Ferrari": "rgb(231, 0, 0)",
-    "McLaren": "rgb(255, 145, 19)",
-    "Alpine": "rgb(15, 148, 250)",
-    "Alpha Tauri": "rgb(65, 102, 126)",
-    "Aston Martin": "rgb(43, 99, 85)",
-    "Williams": "rgb(1, 90, 255)",
-    "Haas": "rgb(178, 182, 185)",
-    "Renault": "rgb(243, 240, 37)",
-    "Alfa Romeo": "rgb(136, 1, 1)",
-    "Manor": "rgb(12, 211, 247)",
-    "Sauber": "rgb(18, 79, 160)",
-    "Force India": "rgba(246, 185, 43, 1)",
-    "Racing Point": "rgb(255, 130, 234)",
-    "Toro Rosso": "rgb(0, 44, 238)",
-    "RB": "rgb(0, 44, 238)",
-    "KICK": "rgb(25, 225, 52)",
-    "Racing Bulls": "rgba(246, 253, 255, 1)",
-    "Audi": "",
-    "Cadillac": ""
-  };
+  const teamColors = TEAM_COLORS;
 
   async function captureScreenshot({ raceId, season, tier, round }) {
     const table = document.querySelector(".result-table");
@@ -158,7 +135,7 @@ function RaceResultPage() {
 
         try {
           const response = await fetch(
-            `https://stbleaguedata.vercel.app/api/auth/upload-result`,
+            `${API_BASE}/api/auth/upload-result`,
             {
               method: "POST",
               body: formData,
@@ -267,7 +244,7 @@ function RaceResultPage() {
                   <tr>
                     <th>Pos</th>
                     <th className="driver-col">Driver</th>
-                    <th>Team</th>
+                    <th className="team-col">Team</th>
                     {hasAnyTime && <th>Time</th>}
                     <th>Grid</th>
                   </tr>
@@ -296,8 +273,14 @@ function RaceResultPage() {
 
                     return (
                       <tr key={index}>
-                        <td className={isDNF ? "dnf-cell" : ""}>
-                          {isDNF ? "DNF" : row.position}
+                        <td className="pos-col">
+                          <span
+                            className={`pos-badge ${
+                              isDNF ? "pos-badge--dnf" : row.position <= 3 ? `pos-badge--p${row.position}` : ""
+                            }`}
+                          >
+                            {isDNF ? "DNF" : row.position}
+                          </span>
                         </td>
 
                         <td className="driver-col">
@@ -317,15 +300,20 @@ function RaceResultPage() {
                           </Link>
                         </td>
 
-                        <td
-                          className="team-name"
-                          style={{
-                            color:
-                              teamColors[teamName] ??
-                              "white"
-                          }}
-                        >
-                          {teamName}
+                        <td className="team-name">
+                          <span className="team-tag">
+                            <span
+                              className="team-tag__bar"
+                              style={{ backgroundColor: teamColors[teamName] ?? "var(--muted-fg)" }}
+                            />
+                            <img
+                              src={`/team-logos/${teamName}.png`}
+                              alt=""
+                              className="team-tag__logo"
+                              onError={(e) => (e.currentTarget.style.display = "none")}
+                            />
+                            {teamName}
+                          </span>
                         </td>
 
                         {hasAnyTime && (
@@ -358,7 +346,15 @@ function RaceResultPage() {
                           </td>
                         )}
 
-                        <td>{row.qualifying}</td>
+                        <td className="grid-col">
+                          {row.qualifying}
+                          {!isDNF && row.qualifying > 0 && row.qualifying !== row.position && (
+                            <span className={row.qualifying > row.position ? "pos-up" : "pos-down"}>
+                              {row.qualifying > row.position ? "▲" : "▼"}
+                              {Math.abs(row.qualifying - row.position)}
+                            </span>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}

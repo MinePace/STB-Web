@@ -7,21 +7,26 @@
         "saving": "Opslaan...",
         "close": "Sluiten"
     },
-
     "nav": {
         "home": "Home",
         "socials": "Socials",
         "adminHub": "Admin Hub",
         "myDriver": "Mijn Coureur",
         "login": "Inloggen",
-        "logout": "Uitloggen"
+        "logout": "Uitloggen",
+        "championship": "Kampioenschap",
+        "history": "Geschiedenis",
+        "stats": "Statistieken",
+        "currentSeason": "Huidig seizoen",
+        "pastSeasons": "Eerdere seizoenen",
+        "menu": "Menu",
+        "youRaced": "Hier heb je gereden",
+        "claimDriverFirst": "Claim eerst je coureur"
     },
-
     "sidebar": {
         "season": "Seizoen",
         "division": "Divisie"
     },
-
     "home": {
         "welcome": "De thuisbasis van competitief simracen",
         "latest": "Laatste Race",
@@ -34,9 +39,22 @@
             "drivers": "Coureurs",
             "mostWins": "Meeste Winst",
             "mostRaces": "Meeste Races"
+        },
+        "heroTitle": "Lights out voor de",
+        "divisions": "divisies",
+        "nextRace": "Volgende race: {{track}} op {{date}}.",
+        "seasonDone": "Seizoen afgerond: {{rounds}} rondes per divisie. Beleef elke race en elk punt hieronder opnieuw.",
+        "round": "Ronde",
+        "watch": "Bekijk",
+        "fullStandings": "Volledige stand",
+        "noData": "Geen racegegevens beschikbaar.",
+        "community": {
+            "eyebrow": "Community",
+            "title": "Rijd mee",
+            "text": "Race met ons in het officiële F1-spel: wekelijkse league-races, meerdere divisies en livestreams van elke ronde.",
+            "join": "Word lid via Discord"
         }
     },
-
     "championship": {
         "title": "Kampioenschap Overzicht",
         "season": "Seizoen",
@@ -65,9 +83,8 @@
             "posGained": "Meest gewonnen posities",
             "mostDnfs": "Meeste DNFs"
         }
-     },
-
-     "driver": {
+    },
+    "driver": {
         "title": "Coureur Profiel",
         "last5Races": "Laatste 5 Races",
         "lastRace": {
@@ -92,17 +109,15 @@
         "graphs": {
             "startVSFinish": "Start vs Finish",
             "less": "minder",
-            "more": "meer", 
+            "more": "meer",
             "subtitle": "Exclusief DNFs — alleen races waar de coureur is gefinisht",
             "count": "aantal"
         }
-     },
-
-     "flagPicker": {
+    },
+    "flagPicker": {
         "title": "Verandere nationaliteit coureur",
         "select": "Selecteer een land"
-     },
-
+    },
     "loader": {
         "driver": {
             "loading": "Coureur data verzamelen"
@@ -113,7 +128,6 @@
             "loading": "Kampionshap data laden"
         }
     },
-
     "countries": {
         "United States": "Verenigde Staten",
         "Netherlands": "Nederland",
@@ -137,5 +151,8 @@
         "Japan": "Japan",
         "Austria": "Oostenrijk",
         "Turkey": "Turkije"
+    },
+    "footer": {
+        "tagline": "Esports racing kampioenschap"
     }
 }

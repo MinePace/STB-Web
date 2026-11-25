@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "./AddSeasonPage.css";
 import "@/Components/Links.css";
+import { API_BASE } from "@/config";
 
 function AddSeasonPage() {
   const navigate = useNavigate();
@@ -76,7 +77,7 @@ function AddSeasonPage() {
   }, [navigate]);
 
   useEffect(() => {
-    fetch("https://stbleaguedata.vercel.app/api/track")
+    fetch(`${API_BASE}/api/track`)
       .then((r) => r.json())
       .then(setTracks)
       .catch((e) => console.error("Error fetching tracks:", e));
@@ -163,7 +164,7 @@ function AddSeasonPage() {
 
     try {
       const res = await fetch(
-        `https://stbleaguedata.vercel.app/api/race/season/${importSeason}`
+        `${API_BASE}/api/race/season/${importSeason}`
       );
 
       if (!res.ok) {
@@ -320,7 +321,7 @@ function AddSeasonPage() {
     }
 
     for (const p of payloads) {
-      const res = await fetch("https://stbleaguedata.vercel.app/api/race", {
+      const res = await fetch(`${API_BASE}/api/race`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

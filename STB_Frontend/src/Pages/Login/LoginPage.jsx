@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./LoginPage.css";
+import { API_BASE } from "@/config";
 
 function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -26,21 +27,28 @@ function LoginPage() {
     }
   };
 
-  // 🔹 Register
+  // 🔹 Register (accounts are stored in the same database as login)
   const handleRegister = async () => {
-    const response = await fetch("https://stbleague.fly.dev/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password, email }),
-    });
-
-    const data = await response.json();
-    alert(data.message);
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, email }),
+      });
+      const data = await response.json().catch(() => ({}));
+      alert(data.message || (response.ok ? "Registration successful" : "Registration failed"));
+      if (response.ok) {
+        setIsRegistering(false);
+        setPassword("");
+      }
+    } catch {
+      alert("Registration failed. Please try again later.");
+    }
   };
 
   // 🔹 Login
   const handleLogin = async () => {
-    const response = await fetch("https://stbleaguedata.vercel.app/api/auth/login", {
+    const response = await fetch(`${API_BASE}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),

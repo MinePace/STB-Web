@@ -7,8 +7,8 @@
   --points-col-w: 84px;
   --driver-min-w: 120px;
 
-  --header-bg: rgb(0, 76, 169);
-  --row-bg: linear-gradient(to bottom, rgb(0, 90, 199), rgb(0, 50, 110));
+  --header-bg: var(--surface);
+  --row-bg: var(--card);
   --row-hover: rgba(200, 200, 200, 0.6);
   --text: #ffffff;
 
@@ -16,11 +16,7 @@
   --page-bg: transparent;
 
   /* MATCH YOUR EXISTING BLUE THEME */
-  --card-bg: linear-gradient(
-    to bottom,
-    rgb(0, 90, 199),
-    rgb(0, 50, 110)
-  );
+  --card-bg: rgba(19, 42, 92, 0.82);
 
   --card-border: rgba(255,255,255,0.18);
   --soft: rgba(255,255,255,0.18);
@@ -452,7 +448,7 @@
 
 .scrollable-table td:nth-child(2),
 .scrollable-table td:last-child {
-  background-color: #194081;
+  background-color: var(--elevated);
 }
 
 .col-pos { width: var(--pos-col-w); }
@@ -476,7 +472,7 @@
   transition: color .2s;
 }
 .race-link:hover {
-  color: #4caeff;
+  color: var(--primary);
   text-decoration: none;
 }
 
@@ -554,8 +550,8 @@
   --col-pos-width: 40px;
   --col-team-width: 180px;
   --col-points-width: 100px;
-  --constructors-header-bg: rgb(0, 76, 169);
-  --constructors-row-bg: #194081;
+  --constructors-header-bg: var(--surface);
+  --constructors-row-bg: var(--elevated);
   --constructors-text-color: #ffffff;
   --constructors-border-color: rgba(255,255,255,0.2);
   --constructors-hover-bg: rgba(255,255,255,0.15);
@@ -694,7 +690,7 @@
 
 .result-row:hover {
   background: rgba(255,255,255,0.08);
-  color: #4caeff;
+  color: var(--primary);
   letter-spacing: .5px;
   transform: translateY(-1px);
 }

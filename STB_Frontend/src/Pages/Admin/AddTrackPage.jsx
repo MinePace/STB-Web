@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "@/Components/Links.css";
 
+import { API_BASE } from "@/config";
 function AddTrackPage() {
   const [track, setTrack] = useState({ name: "", raceName: "", country: "" });
   const [submitting, setSubmitting] = useState(false);
@@ -42,9 +43,12 @@ function AddTrackPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("https://stbleague.fly.dev/api/race/track", {
+      const response = await fetch(`${API_BASE}/api/track`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
         body: JSON.stringify(track), // includes raceName now
       });
 
@@ -52,6 +56,7 @@ function AddTrackPage() {
         let msg = "Failed to add track. Please try again.";
         try {
           const problem = await response.json();
+          if (problem?.message) msg = problem.message;
           if (problem?.title) msg = problem.title;
           if (problem?.errors) {
             const first = Object.values(problem.errors)[0]?.[0];

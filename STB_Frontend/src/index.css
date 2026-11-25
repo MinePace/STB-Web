@@ -1,84 +1,225 @@
+/* =====================================================================
+   STB League theme (taken over from the STB Racing Hub design)
+   Change colours here, not in the page CSS files.
+   ===================================================================== */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* Navy base */
+  --bg: #0a2350;
+  --surface: #0c2a5e;
+  --card: #132a5c;
+  --elevated: #1c3a75;
+  --border: #25457f;
+
+  /* Text */
+  --fg: #f3f7ff;
+  --muted-fg: #a9bbdc;
+
+  /* Accents */
+  --primary: #1aa3ff;      /* buttons, links, active state */
+  --primary-fg: #04122b;
+  --accent: #ffd21f;       /* yellow: eyebrows, highlights */
+  --danger: #ff3b3b;       /* only for DNF / errors */
+  --success: #5cf07a;
+  --gold: #ffc62e;
+  --silver: #c9d4e6;
+  --bronze: #d9894a;
+
+  --radius: 12px;
+  --gradient-page: radial-gradient(ellipse at top, #143f8a 0%, #0a2350 55%, #071a3d 100%);
+  --gradient-primary: linear-gradient(90deg, #1aa3ff, #3cc4ff);
+  --shadow-panel: 0 12px 32px -18px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 10px 30px -12px rgba(26, 163, 255, 0.6);
+
+  --font-display: "Saira Condensed", "Arial Narrow", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+  --header-h: 64px;
+
+  font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color-scheme: dark;
+  color: var(--fg);
+  background-color: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  color: white;
+  color: var(--fg);
   background: transparent;
   position: relative;
 }
 
 body::before {
   content: "";
-  position: fixed; /* covers entire viewport regardless of scroll */
+  position: fixed;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(to bottom, #007BFF, #002b58);
+  background: var(--gradient-page);
 }
 
-h1 {
-  font-size: 3.2em;
+a {
+  font-weight: 500;
+  color: var(--primary);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--accent);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
   line-height: 1.1;
+}
+h1 {
+  font-size: 3em;
+  font-weight: 800;
+}
+
+/* Times, points and positions line up in columns */
+table,
+td,
+th {
+  font-variant-numeric: tabular-nums;
 }
 
 button {
   border-radius: 8px;
-  border: 1px solid transparent;
+  border: 1px solid var(--border);
   padding: 0.6em 1.2em;
   font-size: 1em;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
-  background-color: #1a1a1a;
+  color: var(--fg);
+  background-color: var(--elevated);
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--primary);
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* ---------- Reusable building blocks ---------- */
+
+/* Card / panel (named stb-panel: the driver page has its own .panel) */
+.stb-panel {
+  background: rgba(19, 42, 92, 0.82);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-panel);
+}
+
+/* Small yellow label above a heading: "SEASON 31 · DIVISION 2" */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.eyebrow::before {
+  content: "";
+  width: 4px;
+  height: 12px;
+  background: var(--primary);
+}
+
+.btn-primary {
+  background: var(--gradient-primary);
+  color: var(--primary-fg);
+  border: 0;
+  box-shadow: var(--shadow-glow);
+}
+
+/* Position badges: gold / silver / bronze / DNF */
+.pos-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  background: var(--elevated);
+}
+.pos-badge--p1 { background: var(--gold); color: #2b1d00; }
+.pos-badge--p2 { background: var(--silver); color: #1b2333; }
+.pos-badge--p3 { background: var(--bronze); color: #2a1406; }
+.pos-badge--dnf { background: rgba(255, 59, 59, 0.15); color: var(--danger); font-size: 12px; }
+
+.racing-stripes {
+  background-image: repeating-linear-gradient(115deg, transparent 0 22px, rgba(243, 247, 255, 0.03) 22px 23px);
+}
+
+/* Form fields */
+input,
+select,
+textarea {
+  font-family: inherit;
+  color: var(--fg);
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26, 163, 255, 0.25);
+}
+input::placeholder,
+textarea::placeholder { color: var(--muted-fg); opacity: 0.8; }
+
+/* Shown on test (preview) deployments only */
+.test-banner {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #facc15;
+  color: #111;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+/* Placeholder while a page's code loads (React.lazy) */
+.page-loading {
+  min-height: 60vh;
 }

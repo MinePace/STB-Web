@@ -3,7 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import "./TrackPage.css";
 import "@/Components/Links.css";
 import DriverLoader from "@/Components/Loaders/DriverLoader";
+import { API_BASE } from "@/config";
 
+import usePageMeta from "@/usePageMeta";
 /* ---------- maps & helpers at module scope ---------- */
 
 const MAP_EXCEPTIONS = {
@@ -66,6 +68,11 @@ function TrackPage() {
   const { trackId } = useParams();
 
   const [trackInfo, setTrackInfo] = useState(null);
+  const trackName = trackInfo?.raceName || trackInfo?.RaceName || trackInfo?.name || trackInfo?.Name;
+  usePageMeta(
+    trackName ? `${trackName} – Circuit` : null,
+    trackName ? `Every STB Racing League race at ${trackName}: winners, results and records.` : null
+  );
   const [trackRaces, setTrackRaces] = useState([]);
 
   const mostWins = useMemo(
@@ -88,7 +95,7 @@ function TrackPage() {
     (async () => {
       try {
         const res = await fetch(
-          `https://stbleaguedata.vercel.app/api/track/${encodeURIComponent(trackId || "")}`
+          `${API_BASE}/api/track/${encodeURIComponent(trackId || "")}`
         );
         if (!res.ok) throw new Error("Failed to fetch track info");
         const data = await res.json();
@@ -103,7 +110,7 @@ function TrackPage() {
     (async () => {
       try {
         const res = await fetch(
-          `https://stbleaguedata.vercel.app/api/track/races/${encodeURIComponent(trackId || "")}`
+          `${API_BASE}/api/track/races/${encodeURIComponent(trackId || "")}`
         );
         if (!res.ok) throw new Error("Failed to fetch track races");
         const races = await res.json();

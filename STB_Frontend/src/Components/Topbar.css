@@ -1,303 +1,357 @@
-.topbar {
-    width: 100%;
-    height: 60px;
-    background-color: #004080; /* Dark blue */
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Space between logo and nav */
-    position: fixed;
-    top: 0;
-    left: 0;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5); /* Voeg een subtiele schaduw toe */
-    z-index: 1000;
-    box-sizing: border-box;
-  }
-  
-  .logo-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start; /* Forces logo to top-left */
-    height: 100%;
-  }
-  
-  .logo {
-    height: 60px; /* Adjust based on your logo size */
-    width: auto; /* Keeps aspect ratio */
-    margin-left: 0; /* Ensures no unintended margin */
-    padding: 0px 10px; /* Adds spacing inside the topbar */
-    margin-top: 3px; /* Aligns logo with top of topbar */
-  }
-  
-  .nav-container {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    flex-grow: 1;
-    padding-right: 10px;
-  }
-  
-  .nav-links {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    list-style: none;
-    margin: 0;
-    white-space: nowrap;
-  }
-  
-  .nav-links li {
-    display: inline-block;
-  }
-  
-  .logout-button {
-    background-color: red;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-    font-size: 14px;
-    font-weight: bold;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-  }
-  
-  .logout-button:hover {
-    background-color: darkred;
-  }
-  
-  /* Social dropdown inside topbar */
-.socialdd { 
-  position: relative; 
-  display: inline-block; 
+/* =====================================================================
+   Site header: sticky top navigation (replaces the old sidebar)
+   ===================================================================== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 35, 80, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
 }
-.socialdd__btn {
-  background-color: #ffffff00;
-  color: #fff;
-  border-radius: 8px;
-  padding: 6px 14px;
+.site-header__stripe {
+  height: 2px;
+  background: var(--primary);
+}
+.site-header__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  height: calc(var(--header-h) - 3px);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ---------- Brand ---------- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fg);
+  flex-shrink: 0;
+}
+.brand:hover { color: var(--fg); }
+.brand__logo {
+  height: 40px;
+  width: auto;
+  filter: drop-shadow(0 0 8px rgba(26, 163, 255, 0.35));
+}
+.brand__text { display: flex; flex-direction: column; line-height: 1; }
+.brand__name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.brand__season {
+  margin-top: 3px;
+  font-size: 10px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--muted-fg);
+}
+
+/* ---------- Links ---------- */
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 16px;
+}
+.header-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  cursor: pointer;
-  transition: color 0.2s ease;
-}
-
-/* Only underline the text, not the caret */
-.socialdd__btn:hover .socialdd__label,
-.socialdd__btn:focus .socialdd__label {
-  color: #ffcc00;
-  text-decoration: underline;
-}
-
-/* Keep caret color unchanged */
-.socialdd__caret {
-  transition: transform .15s ease;
-}
-
-.socialdd__caret.is-open { transform: rotate(180deg); }
-
-.socialdd__menu {
-  position: absolute; right: 0; top: calc(100% + 8px);
-  width: 320px;
-  background: #2774e1f1;
-  border: 1px solid rgba(255,255,255,.1);
-  border-radius: 12px;
-  box-shadow: 0 12px 24px rgba(0,0,0,.35);
-  z-index: 1200;
-  overflow: hidden;
-  animation: sdd-in .16s ease-out;
-}
-@keyframes sdd-in { from {opacity:0; transform: translateY(-6px) scale(.98);} to {opacity:1; transform:none;} }
-
-.socialdd__list > li { display: block; }
-.socialdd__list{
-  display: flex;          /* override nav's flex */
-  flex-direction: column; /* vertical */
-  gap: 8px;
-  list-style: none;
-  margin: 0;
-  padding: 8px;
-}
-.socialdd__item {
-  display:flex; 
-  align-items:center; 
-  gap:10px;
-  padding:10px 12px; 
-  border-radius:10px; 
-  text-decoration:none; 
-  color:#e9eef7;
-}
-.socialdd__item:hover, .socialdd__item:focus {
-  background: rgba(255,255,255,.08);
-  outline: none;
-  color: #ffcc00;
-}
-.socialdd__icon { width:20px; height:20px; object-fit:contain; }
-.socialdd__name { 
-  font-weight:700; 
-  font-size:14px; 
-  flex: 1;
-}
-.socialdd__open { 
-  margin-left:auto; 
-  font-size:12px; 
-  opacity:.8; 
-}
-
-/* Desktop default (hide hamburger) */
-.menu-toggle {
-  display: none;
-}
-
-.langdd {
-  position: relative;
-}
-
-.langdd__btn {
-  color: #fff;
+  padding: 8px 12px;
+  background: none;
+  border: 0;
+  border-radius: 6px;
+  font-family: var(--font-sans);
+  font-size: 13px;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted-fg);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.nav-link:hover {
+  color: var(--fg);
+  border-color: transparent;
+}
+.nav-link.is-active { color: var(--fg); }
+.main-nav .nav-link.is-active::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: -13px;
+  height: 2px;
+  background: var(--primary);
+}
+.nav-link--cta {
+  background: var(--gradient-primary);
+  color: var(--primary-fg);
+  box-shadow: var(--shadow-glow);
+}
+.nav-link--cta:hover,
+.nav-link--cta.is-active { color: var(--primary-fg); }
+.nav-link--quiet { text-transform: none; font-weight: 500; }
+
+.no-driver-message {
+  font-size: 12px;
+  color: var(--muted-fg);
+  padding: 0 8px;
+}
+
+.caret { font-size: 10px; transition: transform 0.15s; }
+.caret.is-open { transform: rotate(180deg); }
+
+/* ---------- Championship dropdown ---------- */
+.champ-menu { position: relative; }
+.champ-menu__panel {
+  text-align: left;
+  position: absolute;
+  top: calc(100% + 12px);
+  left: 0;
+  width: min(560px, 90vw);
+  max-height: min(70vh, 640px);
+  overflow: auto;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.7);
+}
+
+.season-grid__title {
+  margin: 4px 0 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.season-grid__title:not(:first-child) { margin-top: 16px; }
+.season-grid__fold { margin-top: 12px; }
+.season-grid__fold > summary {
+  cursor: pointer;
+  list-style: none;
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
+  justify-content: space-between;
 }
+.season-grid__fold > summary::-webkit-details-marker { display: none; }
+.season-grid__fold > summary::after { content: "▾"; font-size: 12px; transition: transform 0.15s; }
+.season-grid__fold[open] > summary::after { transform: rotate(180deg); }
 
-.langdd__flag {
-  font-size: 18px;
-  line-height: 1;
+.season-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(37, 69, 127, 0.5);
 }
-
-.langdd__caret {
-  transition: transform 0.2s ease;
+.season-row:last-child { border-bottom: 0; }
+.season-row__label {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--fg);
 }
-
-.langdd__caret.is-open {
-  transform: rotate(180deg);
+.season-row.is-raced .season-row__label::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+  border-radius: 50%;
+  background: var(--accent);
 }
+.season-row__divs { display: flex; flex-wrap: wrap; gap: 6px; }
+.div-chip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fg);
+  background: var(--elevated);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.div-chip:hover {
+  color: var(--primary-fg);
+  background: var(--primary);
+}
+.div-chip.is-raced { border-color: var(--accent); }
 
+/* ---------- Socials & language dropdowns ---------- */
+.socialdd,
+.langdd { position: relative; }
+.socialdd__caret,
+.langdd__caret { font-size: 10px; transition: transform 0.15s; }
+.socialdd__caret.is-open,
+.langdd__caret.is-open { transform: rotate(180deg); }
+.langdd__flag { font-size: 16px; line-height: 1; }
+
+.socialdd__menu,
 .langdd__menu {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 12px);
   right: 0;
-  min-width: 170px;
-  background: #2774e1f1;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-  z-index: 1000;
+  min-width: 200px;
   padding: 6px;
-  animation: sdd-in .16s ease-out;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.7);
+  z-index: 10;
 }
-
+.socialdd__menu { left: 0; right: auto; }
+.socialdd__list,
 .langdd__list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-
+.socialdd__item,
 .langdd__item {
-  width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
-  background: transparent;
-  border: none;
-  color: white;
-  padding: 10px 12px;
-  border-radius: 8px;
-  cursor: pointer;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--fg);
+  font-size: 14px;
+  font-weight: 500;
   text-align: left;
 }
+.socialdd__item:hover,
+.socialdd__item:focus,
+.langdd__item:hover,
+.langdd__item:focus {
+  background: var(--elevated);
+  color: var(--fg);
+}
+.socialdd__icon { width: 20px; height: 20px; object-fit: contain; }
+.socialdd__name { flex: 1; }
+.socialdd__open { font-size: 11px; color: var(--muted-fg); }
 
-.langdd__item:hover {
-  background: rgba(255, 255, 255, 0.08);
+/* ---------- Mobile ---------- */
+.menu-toggle {
+  display: none;
+  margin-left: auto;
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.menu-toggle span {
+  display: block;
+  height: 2px;
+  background: var(--fg);
+  border-radius: 2px;
 }
 
-/* Responsive topbar (mobile-friendly) */
-@media (max-width: 700px) {
-  .topbar {
-    flex-wrap: wrap;
-    height: auto;
-    padding: 8px 12px;
-  }
-
-  .logo {
-    height: 45px;
-  }
-
-  /* Hamburger button */
-  .menu-toggle {
-    display: block;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 32px;
-    cursor: pointer;
-    margin-left: auto;
-    z-index: 1100; /* keep above menu */
-  }
-
-  /* Slim right-aligned dropdown */
-  .nav-container {
-    position: absolute;
-    top: 60px; /* directly below topbar */
-    right: 10px;
-    width: 220px; /* slimmer width */
-    background-color: #003366;
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 8px;
-    display: none;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 10px 0;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
-  }
-
-  .nav-container.open {
-    display: flex;
-  }
-
-  .nav-links {
-    flex-direction: column;
-    width: 100%;
-    gap: 6px;
-    text-align: left;
-    padding: 0;
-    margin: 0;
-  }
-
-  .nav-links li {
-    width: 100%;
-  }
-
-  .nav-links a,
-  .logout-button {
-    width: 100%;
-    text-align: left;
-    padding: 8px 14px;
-    display: block;
-    font-size: 15px;
-  }
-
-  .logout-button {
-    margin-top: 6px;
-    align-self: stretch;
-  }
-
-  /* Optional: social dropdown adjusts width inside */
-  .socialdd__menu {
-    position: relative;
-    width: 100%;
-    border-radius: 6px;
-  }
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 12, 30, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 110;
 }
+.drawer-backdrop.is-open { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(340px, 88vw);
+  padding: 20px;
+  overflow-y: auto;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 120;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.drawer.is-open { transform: translateX(0); }
+.drawer__nav { display: flex; flex-direction: column; }
+.drawer__nav .nav-link {
+  justify-content: flex-start;
+  padding: 10px 12px;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+.drawer__nav .nav-link.is-active { border-left-color: var(--primary); }
+.drawer__heading {
+  margin: 12px 0 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.drawer .season-grid__title { color: var(--muted-fg); }
+.drawer .season-row { grid-template-columns: 80px 1fr; }
+.drawer__socials { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.drawer__social {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--elevated);
+  color: var(--fg);
+  font-size: 14px;
+}
+.drawer__social img { width: 18px; height: 18px; object-fit: contain; }
+.drawer__account {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.drawer__account .langdd__menu { top: auto; bottom: calc(100% + 8px); left: 0; right: auto; }
 
+@media (max-width: 1100px) {
+  .main-nav,
+  .header-actions { display: none; }
+  .menu-toggle { display: flex; }
+}
+@media (max-width: 480px) {
+  .site-header__inner { padding: 0 14px; }
+  .brand__logo { height: 34px; }
+}

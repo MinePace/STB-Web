@@ -11,7 +11,8 @@ import {
 } from "recharts";
 import "./HistoryPage.css";
 
-const API_BASE = "https://stbleague.fly.dev/api/raceresult";
+import { API_BASE } from "@/config";
+const RACERESULT_API = `${API_BASE}/api/raceresult`;
 const TOP_N = 15;          // how many drivers to plot
 const STEP_W = 70;         // px reserved per round label (controls spacing)
 
@@ -84,7 +85,7 @@ export default function HistoryPage() {
       setLoading(true);
       setErr("");
       try {
-        const url = `${API_BASE}/seasonprogress/${season}/${division}/race-points?aggregateByRound=${aggregateByRound}`;
+        const url = `${RACERESULT_API}/seasonprogress/${season}/${division}/race-points?aggregateByRound=${aggregateByRound}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         const json = await res.json();

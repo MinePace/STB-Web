@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import "./EditSeasonPage.css";
 import "@/Components/Links.css";
+import { API_BASE } from "@/config";
 
 /**
  * Key changes vs your original:
@@ -64,7 +65,7 @@ function EditSeasonPage() {
 
   // ----- Load seasons -----
   useEffect(() => {
-    fetch("https://stbleaguedata.vercel.app/api/race/seasons")
+    fetch(`${API_BASE}/api/race/seasons`)
       .then((r) => r.json())
       .then(setSeasons)
       .catch((e) => console.error("seasons error:", e));
@@ -77,7 +78,7 @@ function EditSeasonPage() {
     setOriginalRows([]);
 
     if (!selectedSeason) return;
-    fetch(`https://stbleaguedata.vercel.app/api/race/season/${selectedSeason}`)
+    fetch(`${API_BASE}/api/race/season/${selectedSeason}`)
       .then((r) => r.json())
       .then((list) => {
         // normalize + sort by round
@@ -97,9 +98,9 @@ function EditSeasonPage() {
     setLoadingTeamDrivers(true);
 
     Promise.all([
-      fetch(`https://stbleaguedata.vercel.app/api/team/teamdriver/${selectedSeason}/${selectedDivision}`).then((r) => r.json()),
-      fetch(`https://stbleaguedata.vercel.app/api/team`).then((r) => r.json()),
-      fetch(`https://stbleaguedata.vercel.app/api/driver`).then((r) => r.json()),
+      fetch(`${API_BASE}/api/team/teamdriver/${selectedSeason}/${selectedDivision}`).then((r) => r.json()),
+      fetch(`${API_BASE}/api/team`).then((r) => r.json()),
+      fetch(`${API_BASE}/api/driver`).then((r) => r.json()),
     ])
       .then(([teamDriverData, teamList, driverList]) => {
         setTeamDrivers(teamDriverData || []);
@@ -145,7 +146,7 @@ function EditSeasonPage() {
 
     (async () => {
       try {
-        const res = await fetch("https://stbleaguedata.vercel.app/api/track");
+        const res = await fetch(`${API_BASE}/api/track`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
 
@@ -276,7 +277,7 @@ function EditSeasonPage() {
           Date: row.Date || null,
         };
 
-        const res = await fetch("https://stbleaguedata.vercel.app/api/race", {
+        const res = await fetch(`${API_BASE}/api/race`, {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
@@ -301,7 +302,7 @@ function EditSeasonPage() {
 
         const payload = toUpdatePayload(row);
 
-        const res = await fetch(`https://stbleaguedata.vercel.app/api/race/update/${row.Id}`, {
+        const res = await fetch(`${API_BASE}/api/race/update/${row.Id}`, {
           method: "PUT",
           headers: { 
             "Content-Type": "application/json",
@@ -672,7 +673,7 @@ function EditSeasonPage() {
                       };
 
                       const res = await fetch(
-                        "https://stbleaguedata.vercel.app/api/team/teamdriver", // <-- nieuwe endpoint
+                        `${API_BASE}/api/team/teamdriver`, // <-- nieuwe endpoint
                         {
                           method: "POST",
                           headers: { 

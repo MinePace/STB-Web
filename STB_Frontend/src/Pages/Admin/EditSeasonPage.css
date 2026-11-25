@@ -1,7 +1,7 @@
 /* ===== Theme ===== */
 :root {
-  --brand: rgb(0, 76, 169);   /* royal blue, main */
-  --accent: #4caeff;          /* hover/focus */
+  --brand: var(--surface);   /* royal blue, main */
+  --accent: var(--primary);          /* hover/focus */
   --danger: rgb(147, 59, 59); /* red accent */
 
   --bg: #f6f9fe;              /* page background */

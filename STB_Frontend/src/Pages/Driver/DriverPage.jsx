@@ -7,10 +7,18 @@ import DriverLoader from "@/Components/Loaders/DriverLoader";
 import "@/Components/Links.css";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { useTranslation } from "react-i18next";
+import { API_BASE } from "@/config";
 
+import usePageMeta from "@/usePageMeta";
 function DriverPage() {
   const { driverName } = useParams();
   const [driverStats, setDriverStats] = useState(null);
+  usePageMeta(
+    driverName ? `${driverName} – Driver` : null,
+    driverStats
+      ? `${driverName} in the STB Racing League: ${driverStats.races ?? 0} races, ${driverStats.wins ?? 0} wins, ${driverStats.podiums ?? 0} podiums.`
+      : null
+  );
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,45 +26,29 @@ function DriverPage() {
   const [newCountry, setNewCountry] = useState("");
   const [savingCountry, setSavingCountry] = useState(false);
   const [flags, setFlags] = useState([]);
-  const [roleState, setRoleState] = useState("user");
-  const [name, setUsername] = useState("");
-  const [token, setToken] = useState("");
-  
+  // Logged-in user from the token (id, username, role), or null
+  const me = (() => {
+    try {
+      const tk = localStorage.getItem("token");
+      return tk ? jwtDecode(tk) : null;
+    } catch {
+      return null;
+    }
+  })();
+  const authHeaders = () => ({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+  });
+
   const { t } = useTranslation();
 
   useEffect(() => {
-      setToken(localStorage.getItem("token"));
-      let role = "user";
-    
-      if (token) {
-        try {
-          const decoded = jwtDecode(token);
-    
-          role = decoded.role;
-          setRoleState(role);
-  
-          const username = decoded.username
-          setUsername(username);
-        } catch (e) {
-          console.log("JWT decode failed:", e);
-        }
-      }
-    }, []);
-
-  useEffect(() => {
+    // user = the driver claimed by the logged-in user (null = none claimed yet)
     const fetchUser = async () => {
-
-      if (!token || !name) return;
-
+      if (!me?.username) return;
       try {
-        const res = await fetch(`https://stbleaguedata.vercel.app/api/user/${name}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-        }
+        const res = await fetch(`${API_BASE}/api/user/${encodeURIComponent(me.username)}`);
+        setUser(res.ok ? await res.json() : null);
       } catch (err) {
         console.error("Error fetching user data:", err);
       }
@@ -80,7 +72,7 @@ function DriverPage() {
       setError(null);
 
       const res = await fetch(
-        `https://stbleaguedata.vercel.app/api/driver/stats/${driverName}`
+        `${API_BASE}/api/driver/stats/${driverName}`
       );
 
       if (!res.ok) {
@@ -105,23 +97,19 @@ function DriverPage() {
   };
 
   const claimDriver = async () => {
-    if (!user || driverStats?.driverOBJ?.user) return;
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
+    if (!me || driverStats?.driverOBJ?.Username) return;
     try {
-      const response = await fetch(`https://stbleaguedata.vercel.app/api/driver/claim/${driverStats.Driver}`, {
+      const response = await fetch(`${API_BASE}/api/driver/claim/${encodeURIComponent(driverStats.driver)}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: user.username }),
+        headers: authHeaders(),
       });
-
-      if (response.ok) {
-        const updatedDriver = await response.json();
-        setDriverStats(updatedDriver.driver);
-      } else {
-        alert("Failed to claim driver");
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        alert(data.message || "Failed to claim driver");
+        return;
       }
+      await fetchDriverStats();
+      setUser(data.driver ?? true);
     } catch (err) {
       console.error("Error claiming driver:", err);
     }
@@ -146,9 +134,9 @@ function DriverPage() {
       setSavingCountry(true);
       const driverId = driverStats.driverOBJ.Id;
       console.log("Selected driver ID:", driverId, "New country:", newCountry);
-      const res = await fetch(`https://stbleaguedata.vercel.app/api/driver/updateCountry/${driverId}`, {
+      const res = await fetch(`${API_BASE}/api/driver/updateCountry/${driverId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({ country: newCountry }),
       });
 
@@ -754,8 +742,8 @@ function DriverPage() {
             </p>
 
             {!driverStats.driverOBJ?.Username &&
-              user &&
-              !user.driverClaimed && (
+              me &&
+              !user && (
                 <button onClick={claimDriver} className="claim-button">
                   🚀 Claim this Driver
                 </button>
@@ -895,7 +883,8 @@ function DriverPage() {
         </article>
       </div>
 
-      {/* Dark overlay + popup */}
+      {/* Dark overlay + popup (only admins and the driver's own user may change the flag) */}
+      {(me?.role === "Admin" || (me && Number(driverStats?.driverOBJ?.UserId) === Number(me.id))) && (
       <button
         className="floating-button"
         onClick={() => {
@@ -906,6 +895,7 @@ function DriverPage() {
       >
         🌍
       </button>
+      )}
 
       {showPopup && (
         <div

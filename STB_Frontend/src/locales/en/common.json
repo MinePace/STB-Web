@@ -7,21 +7,26 @@
         "saving": "Saving...",
         "close": "Close"
     },
-
     "nav": {
         "home": "Home",
         "socials": "Socials",
         "adminHub": "Admin Hub",
         "myDriver": "My Driver",
         "login": "Login",
-        "logout": "Logout"
+        "logout": "Logout",
+        "championship": "Championship",
+        "history": "History",
+        "stats": "Statistics",
+        "currentSeason": "Current season",
+        "pastSeasons": "Past seasons",
+        "menu": "Menu",
+        "youRaced": "You raced here",
+        "claimDriverFirst": "Claim your driver first"
     },
-
     "sidebar": {
         "season": "Season",
         "division": "Division"
     },
-
     "home": {
         "welcome": "The home of competitive sim racing",
         "latest": "Latest Race",
@@ -34,9 +39,22 @@
             "drivers": "Drivers",
             "mostWins": "Most Wins",
             "mostRaces": "Most Races"
+        },
+        "heroTitle": "Lights out for the",
+        "divisions": "divisions",
+        "nextRace": "Next race: {{track}} on {{date}}.",
+        "seasonDone": "Season complete: {{rounds}} rounds per division. Relive every race and every point below.",
+        "round": "Round",
+        "watch": "Watch",
+        "fullStandings": "Full standings",
+        "noData": "No race data available.",
+        "community": {
+            "eyebrow": "Community",
+            "title": "Join the grid",
+            "text": "Race with us in the official F1 game: weekly league races, multiple divisions and live streams of every round.",
+            "join": "Join on Discord"
         }
     },
-
     "championship": {
         "title": "Championship Overview",
         "season": "Season",
@@ -65,9 +83,8 @@
             "posGained": "Most Positions Gained",
             "mostDnfs": "Most DNFs"
         }
-     },
-
-     "driver": {
+    },
+    "driver": {
         "title": "Driver Profile",
         "last5Races": "Last 5 Races",
         "lastRace": {
@@ -92,17 +109,15 @@
         "graphs": {
             "startVSFinish": "Start vs Finish",
             "less": "less",
-            "more": "more", 
+            "more": "more",
             "subtitle": "DNFs excluded — only races where the driver finished",
             "count": "count"
         }
-     },
-
-     "flagPicker": {
+    },
+    "flagPicker": {
         "title": "Change Driver Nationality",
         "select": "Select a Country"
-     },
-
+    },
     "loader": {
         "driver": {
             "loading": "Gathering driver data"
@@ -113,7 +128,6 @@
             "loading": "Loading Championship data"
         }
     },
-
     "countries": {
         "United States": "United States",
         "Netherlands": "Netherlands",
@@ -137,5 +151,8 @@
         "Japan": "Japan",
         "Austria": "Austria",
         "Turkey": "Turkey"
+    },
+    "footer": {
+        "tagline": "Esports racing championship"
     }
 }

@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 import "./HistoryPage.css";
 import "@/Components/Links.css";
 
+import { API_BASE } from "@/config";
+import usePageMeta from "@/usePageMeta";
 export default function HistoryPage() {
+  usePageMeta("History", "Champions of every STB Racing League season and division.");
   const [seasons, setSeasons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
@@ -14,7 +17,7 @@ export default function HistoryPage() {
       setLoading(true);
       setErr("");
       try {
-        const res = await fetch("https://stbleague.fly.dev/api/history/champions");
+        const res = await fetch(`${API_BASE}/api/history/champions`);
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         const json = await res.json();
         if (alive) setSeasons(Array.isArray(json) ? json : []);
