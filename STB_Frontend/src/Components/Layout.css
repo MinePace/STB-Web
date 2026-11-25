@@ -38,3 +38,9 @@
   width: auto;
   opacity: 0.6;
 }
+
+.site-footer__version {
+  opacity: 0.6;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}

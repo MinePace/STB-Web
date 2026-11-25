@@ -5,7 +5,9 @@ const LIVE_API = "https://stbleaguedata.vercel.app";
 
 export const API_BASE = (import.meta.env.VITE_API_BASE || LIVE_API).replace(/\/$/, "");
 
-/* global __DEPLOY_ENV__ */
+/* global __DEPLOY_ENV__, __APP_VERSION__ */
+export const APP_VERSION = typeof __APP_VERSION__ !== "undefined" ? __APP_VERSION__ : "dev";
+
 export const DEPLOY_ENV = typeof __DEPLOY_ENV__ !== "undefined" ? __DEPLOY_ENV__ : "development";
 
 // Anything that is not the live deployment counts as a test site.

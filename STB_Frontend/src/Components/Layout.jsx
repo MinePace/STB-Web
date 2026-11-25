@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import Topbar from "./Topbar";
 import "./Layout.css";
 
+import { APP_VERSION } from "@/config";
 // The old sidebar (seasons/divisions) now lives in the "Championship" menu of the Topbar.
 // `showSidebar` is still accepted so existing routes keep working.
 // eslint-disable-next-line no-unused-vars
@@ -16,6 +17,7 @@ function Layout({ children, showSidebar }) {
         <footer className="site-footer">
           <img src="/STB3.png" alt="" aria-hidden className="site-footer__logo" loading="lazy" />
           <span>STB League · {t("footer.tagline")}</span>
+          <span className="site-footer__version">v{APP_VERSION}</span>
         </footer>
       </main>
     </div>
