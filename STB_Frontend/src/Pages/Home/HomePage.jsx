@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import "./HomePage.css";
 import { API_BASE } from "@/config";
-import { CURRENT_SEASON } from "@/seasons";
+import { useSeasons } from "@/seasons";
 import { teamColor, teamLogo } from "@/teams";
 
 const DISCORD_URL = "https://discord.gg/jQXYKBbEws";
@@ -93,6 +93,7 @@ function Podium({ entries }) {
 
 function HomePage() {
   const { t, i18n } = useTranslation();
+  const { current: CURRENT_SEASON, latestWithResults } = useSeasons();
 
   const [latest, setLatest] = useState(null);
   const [latestState, setLatestState] = useState("loading");
@@ -140,10 +141,14 @@ function HomePage() {
       )
       .catch(() => setStandings([]));
 
+  }, []);
+
+  useEffect(() => {
+    if (!CURRENT_SEASON) return;
     getJson(`/api/race/season/${CURRENT_SEASON}`)
       .then((data) => setSeasonRaces(Array.isArray(data) ? data : []))
       .catch(() => setSeasonRaces([]));
-  }, []);
+  }, [CURRENT_SEASON]);
 
   // Rotate through the divisions every 5 seconds (pauses on hover).
   useEffect(() => {
@@ -193,7 +198,7 @@ function HomePage() {
             : t("home.welcome")}
         </p>
         <div className="hp-hero__actions">
-          <Link to={`/STB/Championship/${CURRENT_SEASON}/1`} className="hp-btn hp-btn--primary">
+          <Link to={`/STB/Championship/${latestWithResults}/1`} className="hp-btn hp-btn--primary">
             🏆 {t("home.standings")}
           </Link>
           <Link to="/STB/History" className="hp-btn">
@@ -288,7 +293,7 @@ function HomePage() {
           )}
 
           {current && (
-            <Link to={`/STB/Championship/${CURRENT_SEASON}/${current.division}`} className="hp-link">
+            <Link to={`/STB/Championship/${latestWithResults}/${current.division}`} className="hp-link">
               {t("home.fullStandings")} →
             </Link>
           )}

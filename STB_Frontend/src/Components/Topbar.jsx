@@ -5,7 +5,7 @@ import "./Topbar.css";
 import { useShortcut } from "@/Components/ShortCut";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "@/config";
-import { SEASONS, CURRENT_SEASON } from "@/seasons";
+import { useSeasons } from "@/seasons";
 
 function useOutsideClick(ref, handler, when = true) {
   useEffect(() => {
@@ -201,7 +201,8 @@ function useRacedSeasons(username) {
 /** Season -> division picker (replaces the old sidebar). Used in the dropdown and the mobile menu. */
 function SeasonGrid({ raced, onPick, collapsePast = false }) {
   const { t } = useTranslation();
-  const [current, ...past] = SEASONS;
+  const { seasons } = useSeasons();
+  const [current, ...past] = seasons;
   const row = (season) => (
     <div key={season.year} className={`season-row ${raced.has(season.year) ? "is-raced" : ""}`}>
       <span className="season-row__label">
@@ -292,6 +293,7 @@ function Topbar() {
   const { pathname } = useLocation();
   const { t } = useTranslation();
   const raced = useRacedSeasons(username);
+  const { current: currentSeason } = useSeasons();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -366,7 +368,7 @@ function Topbar() {
           <span className="brand__text">
             <span className="brand__name">STB League</span>
             <span className="brand__season">
-              {t("sidebar.season")} {CURRENT_SEASON}
+              {t("sidebar.season")} {currentSeason}
             </span>
           </span>
         </Link>
