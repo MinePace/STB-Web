@@ -221,7 +221,12 @@
   box-shadow: 0 24px 48px -16px rgba(0, 0, 0, 0.7);
   z-index: 10;
 }
-.socialdd__menu { left: 0; right: auto; }
+.socialdd__menu {
+  left: 0;
+  right: auto;
+  width: max-content; /* grow with the content instead of a fixed 200px */
+}
+.langdd__menu { width: max-content; }
 .socialdd__list,
 .langdd__list {
   list-style: none;
@@ -252,7 +257,8 @@
   color: var(--fg);
 }
 .socialdd__icon { width: 20px; height: 20px; object-fit: contain; }
-.socialdd__name { flex: 1; }
+.socialdd__name { flex: 1; white-space: nowrap; }
+.socialdd__open { margin-left: 16px; }
 .socialdd__open { font-size: 11px; color: var(--muted-fg); white-space: nowrap; }
 
 /* ---------- Mobile ---------- */
