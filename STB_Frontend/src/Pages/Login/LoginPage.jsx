@@ -27,16 +27,23 @@ function LoginPage() {
     }
   };
 
-  // 🔹 Register
+  // 🔹 Register (accounts are stored in the same database as login)
   const handleRegister = async () => {
-    const response = await fetch("https://stbleague.fly.dev/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password, email }),
-    });
-
-    const data = await response.json();
-    alert(data.message);
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, email }),
+      });
+      const data = await response.json().catch(() => ({}));
+      alert(data.message || (response.ok ? "Registration successful" : "Registration failed"));
+      if (response.ok) {
+        setIsRegistering(false);
+        setPassword("");
+      }
+    } catch {
+      alert("Registration failed. Please try again later.");
+    }
   };
 
   // 🔹 Login

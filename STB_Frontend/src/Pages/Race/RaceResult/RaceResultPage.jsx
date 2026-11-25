@@ -35,20 +35,6 @@ function RaceResultPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
-
-  // user fetch
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    const name = localStorage.getItem("name");
-    if (!token || !name) return;
-
-    fetch(`https://stbleague.fly.dev/api/user/${name}`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => data && setUser(data))
-      .catch((err) => console.error("Error fetching user data:", err));
-  }, []);
-
   // YouTube embed parser
   const extractYouTubeEmbed = (url) => {
     try {

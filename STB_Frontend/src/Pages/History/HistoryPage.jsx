@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./HistoryPage.css";
 import "@/Components/Links.css";
 
+import { API_BASE } from "@/config";
 export default function HistoryPage() {
   const [seasons, setSeasons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -14,7 +15,7 @@ export default function HistoryPage() {
       setLoading(true);
       setErr("");
       try {
-        const res = await fetch("https://stbleague.fly.dev/api/history/champions");
+        const res = await fetch(`${API_BASE}/api/history/champions`);
         if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
         const json = await res.json();
         if (alive) setSeasons(Array.isArray(json) ? json : []);

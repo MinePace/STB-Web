@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "@/Components/Links.css";
 
+import { API_BASE } from "@/config";
 function EditTrackPage() {
   const [tracks, setTracks] = useState([]);
   const [selectedTrack, setSelectedTrack] = useState(null);
@@ -37,6 +38,27 @@ function EditTrackPage() {
     }
   }, [navigate]);
 
+  // Load all tracks (API returns PascalCase; this page works with camelCase)
+  useEffect(() => {
+    fetch(`${API_BASE}/api/track`)
+      .then((res) => (res.ok ? res.json() : []))
+      .then((rows) =>
+        setTracks(
+          (Array.isArray(rows) ? rows : []).map((r) => ({
+            id: r.Id,
+            name: r.Name,
+            raceName: r.RaceName,
+            country: r.Country,
+            countryCode: r.CountryCode,
+            turns: r.Turns,
+            length: r.Length,
+          }))
+        )
+      )
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
   // Handle track selection
   const handleSelectTrack = (trackId) => {
     const track = tracks.find((t) => t.id === Number(trackId));
@@ -66,10 +88,13 @@ function EditTrackPage() {
     console.log("Saving track:", updatedTrack);
 
     const response = await fetch(
-      `https://stbleague.fly.dev/api/track/update/${selectedTrack.id}`,
+      `${API_BASE}/api/track/${selectedTrack.id}`,
       {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+        },
         body: JSON.stringify(updatedTrack),
       }
     );

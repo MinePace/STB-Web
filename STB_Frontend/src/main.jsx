@@ -2,7 +2,7 @@ import React from "react";
 import "./i18n";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import App from "./App";
+import "./App.css"; // global base styles (the old App component was unused)
 
 import ChampionshipPage from "./Pages/Championship/ChampionshipPage";
 import DriverPage from "./Pages/Driver/DriverPage";
