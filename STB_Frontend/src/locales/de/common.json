@@ -271,6 +271,10 @@
         "notFoundText": "Wir konnten keinen Fahrer namens „{{name}}“ finden.",
         "backHome": "Zurück zur Startseite",
         "viewStats": "Statistiken ansehen",
-        "loadFailed": "Dieser Fahrer konnte nicht geladen werden. Bitte versuche es erneut."
+        "loadFailed": "Dieser Fahrer konnte nicht geladen werden. Bitte versuche es erneut.",
+        "form": "Form: letzte 10 Rennen",
+        "formAvg": "Ø P{{n}}",
+        "older": "älter",
+        "newer": "neuer"
     }
 }

@@ -874,6 +874,21 @@
 .dp-bars__count { font-size: 12px; font-weight: 700; }
 .dp-bars__label { font-size: 11px; color: var(--muted-fg); }
 
+/* Form chart */
+.dp-form__svg { width: 100%; height: auto; display: block; overflow: visible; }
+.dp-form__grid { stroke: rgba(255, 255, 255, 0.07); stroke-width: 1; }
+.dp-form__tick { fill: var(--muted-fg); font-size: 9px; }
+.dp-form__avg { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 4 4; opacity: 0.8; }
+.dp-form__line { fill: none; stroke: var(--primary); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.dp-form__dot { fill: var(--primary); stroke: var(--card); stroke-width: 2; cursor: pointer; }
+.dp-form__dot:hover { stroke: #fff; }
+.dp-form__dot.is-p1 { fill: var(--gold); }
+.dp-form__dot.is-p2 { fill: var(--silver); }
+.dp-form__dot.is-p3 { fill: var(--bronze); }
+.dp-form__dot.is-dnf { fill: var(--danger); }
+.dp-form__foot { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-top: 4px; }
+.dp-form__avg-label { color: var(--accent); font-weight: 700; }
+
 /* Dialog + not found */
 .dp-overlay {
   position: fixed;

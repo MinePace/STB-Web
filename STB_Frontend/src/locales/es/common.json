@@ -271,6 +271,10 @@
         "notFoundText": "No encontramos ningún piloto llamado «{{name}}».",
         "backHome": "Volver al inicio",
         "viewStats": "Ver estadísticas",
-        "loadFailed": "No se pudo cargar este piloto. Inténtalo de nuevo."
+        "loadFailed": "No se pudo cargar este piloto. Inténtalo de nuevo.",
+        "form": "Forma: últimas 10 carreras",
+        "formAvg": "Media P{{n}}",
+        "older": "antes",
+        "newer": "después"
     }
 }

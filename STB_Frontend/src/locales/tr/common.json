@@ -271,6 +271,10 @@
         "notFoundText": "“{{name}}” adında bir pilot bulamadık.",
         "backHome": "Ana sayfaya dön",
         "viewStats": "İstatistiklere bak",
-        "loadFailed": "Bu pilot yüklenemedi. Lütfen tekrar dene."
+        "loadFailed": "Bu pilot yüklenemedi. Lütfen tekrar dene.",
+        "form": "Form: son 10 yarış",
+        "formAvg": "Ort. P{{n}}",
+        "older": "eski",
+        "newer": "yeni"
     }
 }

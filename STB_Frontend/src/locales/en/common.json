@@ -271,6 +271,10 @@
         "notFoundText": "We couldn't find a driver called “{{name}}”.",
         "backHome": "Back to home",
         "viewStats": "View statistics",
-        "loadFailed": "Could not load this driver. Please try again."
+        "loadFailed": "Could not load this driver. Please try again.",
+        "form": "Form: last 10 races",
+        "formAvg": "Avg. P{{n}}",
+        "older": "older",
+        "newer": "newer"
     }
 }

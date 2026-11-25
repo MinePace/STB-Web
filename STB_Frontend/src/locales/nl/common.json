@@ -271,6 +271,10 @@
         "notFoundText": "We konden geen coureur vinden met de naam “{{name}}”.",
         "backHome": "Terug naar home",
         "viewStats": "Bekijk statistieken",
-        "loadFailed": "Deze coureur kon niet geladen worden. Probeer het opnieuw."
+        "loadFailed": "Deze coureur kon niet geladen worden. Probeer het opnieuw.",
+        "form": "Vorm: laatste 10 races",
+        "formAvg": "Gem. P{{n}}",
+        "older": "ouder",
+        "newer": "nieuwer"
     }
 }

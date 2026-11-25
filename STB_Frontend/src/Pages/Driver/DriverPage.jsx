@@ -402,6 +402,59 @@ function PointsFinishes({ races, t }) {
   );
 }
 
+// Form: finishing position in the last 10 races (oldest left, newest right).
+function FormChart({ races, t }) {
+  const last = races.slice(0, 10).reverse();
+  if (!last.length) return <p className="dp-muted">{t("driverPage.noRaces")}</p>;
+  const W = 320, H = 150, padL = 28, padR = 12, padT = 12, padB = 22;
+  const finished = last.filter((r) => !r.dnf && r.pos);
+  const worst = Math.max(10, ...last.map((r) => r.pos || 0));
+  const y = (pos) => padT + ((pos - 1) / (worst - 1)) * (H - padT - padB);
+  const x = (i) => padL + (last.length === 1 ? (W - padL - padR) / 2 : (i * (W - padL - padR)) / (last.length - 1));
+  const avg = finished.length ? finished.reduce((s, r) => s + r.pos, 0) / finished.length : null;
+  // line through finished races only; DNFs break nothing but are drawn as red dots on the bottom edge
+  const path = last
+    .map((r, i) => (r.dnf || !r.pos ? null : `${x(i).toFixed(1)},${y(r.pos).toFixed(1)}`))
+    .filter(Boolean)
+    .join(" ");
+  const ticks = [1, Math.round(worst / 2), worst];
+  return (
+    <div className="dp-form">
+      <svg viewBox={`0 0 ${W} ${H}`} className="dp-form__svg" role="img" aria-label={t("driverPage.form")}>
+        {ticks.map((p) => (
+          <g key={p}>
+            <line x1={padL} x2={W - padR} y1={y(p)} y2={y(p)} className="dp-form__grid" />
+            <text x={padL - 6} y={y(p) + 3} className="dp-form__tick" textAnchor="end">
+              P{p}
+            </text>
+          </g>
+        ))}
+        {avg ? <line x1={padL} x2={W - padR} y1={y(avg)} y2={y(avg)} className="dp-form__avg" /> : null}
+        {path ? <polyline points={path} className="dp-form__line" /> : null}
+        {last.map((r, i) => {
+          const dnf = r.dnf || !r.pos;
+          const cy = dnf ? H - padB : y(r.pos);
+          const cls = dnf ? "is-dnf" : r.pos <= 3 ? `is-p${r.pos}` : "";
+          return (
+            <Link key={r.id} to={raceHref(r.id)}>
+              <circle cx={x(i)} cy={cy} r={dnf ? 5 : 5.5} className={`dp-form__dot ${cls}`}>
+                <title>
+                  {`${r.track}${r.sprint ? " (Sprint)" : ""} · S${r.season} D${r.division} R${r.round}: ${dnf ? "DNF" : `P${r.pos}`}`}
+                </title>
+              </circle>
+            </Link>
+          );
+        })}
+      </svg>
+      <div className="dp-form__foot">
+        <span className="dp-muted">← {t("driverPage.older")}</span>
+        {avg ? <span className="dp-form__avg-label">{t("driverPage.formAvg", { n: avg.toFixed(1) })}</span> : <span />}
+        <span className="dp-muted">{t("driverPage.newer")} →</span>
+      </div>
+    </div>
+  );
+}
+
 function CountryDialog({ current, onClose, onSave, t }) {
   const [flags, setFlags] = useState([]);
   const [value, setValue] = useState(current || "");
@@ -585,6 +638,10 @@ export default function DriverPage() {
           <article className="stb-panel dp-panel">
             <h2 className="dp-section-title">{t("driverPage.pointsFinishes")}</h2>
             <PointsFinishes races={data.races} t={t} />
+          </article>
+          <article className="stb-panel dp-panel">
+            <h2 className="dp-section-title">{t("driverPage.form")}</h2>
+            <FormChart races={data.races} t={t} />
           </article>
         </div>
       </div>
