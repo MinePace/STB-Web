@@ -275,6 +275,14 @@
         "form": "Vorm: laatste 10 races",
         "formAvg": "Gem. P{{n}}",
         "older": "ouder",
-        "newer": "nieuwer"
+        "newer": "nieuwer",
+        "favorites": "Favoriete circuits",
+        "favAvg": "gem.",
+        "favMeta": "{{count}} races · beste P{{best}}",
+        "favMeta_one": "{{count}} race · beste P{{best}}",
+        "favMeta_other": "{{count}} races · beste P{{best}}",
+        "favWins": "{{count}} zeges",
+        "favWins_one": "{{count}} zege",
+        "favWins_other": "{{count}} zeges"
     }
 }

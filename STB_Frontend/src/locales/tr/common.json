@@ -275,6 +275,14 @@
         "form": "Form: son 10 yarış",
         "formAvg": "Ort. P{{n}}",
         "older": "eski",
-        "newer": "yeni"
+        "newer": "yeni",
+        "favorites": "Favori pistler",
+        "favAvg": "ort.",
+        "favMeta": "{{count}} yarış · en iyi P{{best}}",
+        "favMeta_one": "{{count}} yarış · en iyi P{{best}}",
+        "favMeta_other": "{{count}} yarış · en iyi P{{best}}",
+        "favWins": "{{count}} galibiyet",
+        "favWins_one": "{{count}} galibiyet",
+        "favWins_other": "{{count}} galibiyet"
     }
 }

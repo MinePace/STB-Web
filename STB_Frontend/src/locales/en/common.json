@@ -275,6 +275,14 @@
         "form": "Form: last 10 races",
         "formAvg": "Avg. P{{n}}",
         "older": "older",
-        "newer": "newer"
+        "newer": "newer",
+        "favorites": "Favourite circuits",
+        "favAvg": "avg.",
+        "favMeta": "{{count}} races · best P{{best}}",
+        "favMeta_one": "{{count}} race · best P{{best}}",
+        "favMeta_other": "{{count}} races · best P{{best}}",
+        "favWins": "{{count}} wins",
+        "favWins_one": "{{count}} win",
+        "favWins_other": "{{count}} wins"
     }
 }

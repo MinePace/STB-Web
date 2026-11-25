@@ -455,6 +455,71 @@ function FormChart({ races, t }) {
   );
 }
 
+// Favourite circuits: best average finish per circuit (finished races only).
+function FavoriteCircuits({ races, t }) {
+  const byTrack = new Map();
+  for (const r of races) {
+    const key = r.trackId ?? r.track;
+    const e = byTrack.get(key) ?? { id: r.trackId, name: r.track, country: r.trackCountry, races: 0, finishes: [], wins: 0 };
+    e.races++;
+    if (!r.dnf && r.pos) {
+      e.finishes.push(r.pos);
+      if (r.pos === 1) e.wins++;
+    }
+    byTrack.set(key, e);
+  }
+  const min = races.length >= 20 ? 2 : 1; // with a long career, one lucky race shouldn't decide it
+  const list = [...byTrack.values()]
+    .filter((e) => e.finishes.length >= min)
+    .map((e) => ({ ...e, avg: e.finishes.reduce((a, b) => a + b, 0) / e.finishes.length, best: Math.min(...e.finishes) }))
+    .sort((a, b) => a.avg - b.avg || b.races - a.races)
+    .slice(0, 3);
+  if (!list.length) return <p className="dp-muted">{t("driverPage.noRaces")}</p>;
+  return (
+    <ol className="dp-fav">
+      {list.map((e, i) => {
+        const content = (
+          <>
+            <span className={`dp-fav__rank dp-fav__rank--${i + 1}`}>{i + 1}</span>
+            {e.country ? (
+              <img
+                className="dp-fav__flag"
+                src={`/flags/${e.country}.png`}
+                alt=""
+                onError={(ev) => (ev.currentTarget.style.visibility = "hidden")}
+              />
+            ) : (
+              <span className="dp-fav__flag" />
+            )}
+            <span className="dp-fav__name">
+              {e.name}
+              <span className="dp-muted dp-fav__meta">
+                {t("driverPage.favMeta", { count: e.races, best: e.best })}
+                {e.wins ? ` · ${t("driverPage.favWins", { count: e.wins })}` : ""}
+              </span>
+            </span>
+            <span className="dp-fav__avg">
+              P{e.avg.toFixed(1)}
+              <small>{t("driverPage.favAvg")}</small>
+            </span>
+          </>
+        );
+        return (
+          <li key={e.id ?? e.name}>
+            {e.id ? (
+              <Link to={`/STB/Track/${e.id}`} className="dp-fav__row">
+                {content}
+              </Link>
+            ) : (
+              <div className="dp-fav__row">{content}</div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 function CountryDialog({ current, onClose, onSave, t }) {
   const [flags, setFlags] = useState([]);
   const [value, setValue] = useState(current || "");
@@ -642,6 +707,10 @@ export default function DriverPage() {
           <article className="stb-panel dp-panel">
             <h2 className="dp-section-title">{t("driverPage.form")}</h2>
             <FormChart races={data.races} t={t} />
+          </article>
+          <article className="stb-panel dp-panel">
+            <h2 className="dp-section-title">{t("driverPage.favorites")}</h2>
+            <FavoriteCircuits races={data.races} t={t} />
           </article>
         </div>
       </div>
