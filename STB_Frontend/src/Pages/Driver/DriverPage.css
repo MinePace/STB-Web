@@ -615,6 +615,7 @@
    Driver page v2 (dp-*) — theme tokens from index.css
    ===================================================================== */
 .driver-page.dp {
+  text-align: left; /* App.css centres all text by default */
   display: flex;
   flex-direction: column;
   gap: 22px;
