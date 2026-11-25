@@ -1,7 +1,7 @@
 {
   "name": "stb-frontend",
   "private": true,
-  "version": "2.1.0",
+  "version": "2.2.0",
   "type": "module",
   "scripts": {
     "start": "concurrently \"cd backend && dotnet run\" \"cd frontend && npm run dev\"",
