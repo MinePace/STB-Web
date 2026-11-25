@@ -10,6 +10,9 @@ Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar 
 ### Opgelost
 - Socials- en taalmenu: "Open ↗" viel buiten het menu.
 
+### Gewijzigd
+- Taalkeuze toont vlaggen (afbeeldingen) in plaats van "GB"/"NL" — Windows kan geen vlag-emoji tonen.
+
 ## [2.1.0] – 2026-11-25
 
 ### Nieuw

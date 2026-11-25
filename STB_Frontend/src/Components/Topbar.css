@@ -206,7 +206,7 @@
 .langdd__caret { font-size: 10px; transition: transform 0.15s; }
 .socialdd__caret.is-open,
 .langdd__caret.is-open { transform: rotate(180deg); }
-.langdd__flag { font-size: 16px; line-height: 1; }
+.langdd__flag { width: 24px; height: 24px; object-fit: contain; display: block; }
 
 .socialdd__menu,
 .langdd__menu {
