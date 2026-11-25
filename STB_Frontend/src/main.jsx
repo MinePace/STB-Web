@@ -1,32 +1,38 @@
-import React from "react";
+import React, { lazy, Suspense } from "react";
 import "./i18n";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import "./App.css"; // global base styles (the old App component was unused)
 
-import ChampionshipPage from "./Pages/Championship/ChampionshipPage";
-import DriverPage from "./Pages/Driver/DriverPage";
-import RaceResultPage from "./Pages/Race/RaceResult/RaceResultPage";
+const ChampionshipPage = lazy(() => import("./Pages/Championship/ChampionshipPage"));
+const DriverPage = lazy(() => import("./Pages/Driver/DriverPage"));
+const RaceResultPage = lazy(() => import("./Pages/Race/RaceResult/RaceResultPage"));
 import HomePage from "./Pages/Home/HomePage";
-import LoginPage from "./Pages/Login/LoginPage";
-import TrackPage from "./Pages/Track/TrackPage";
-import HistoryPage from "./Pages/History/HistoryPage";
-import StatsPage from "./Pages/Stats/StatsPage";
+const LoginPage = lazy(() => import("./Pages/Login/LoginPage"));
+const TrackPage = lazy(() => import("./Pages/Track/TrackPage"));
+const HistoryPage = lazy(() => import("./Pages/History/HistoryPage"));
+const StatsPage = lazy(() => import("./Pages/Stats/StatsPage"));
 
-import AdminPage from "./Pages/Admin/AdminPage";
+const AdminPage = lazy(() => import("./Pages/Admin/AdminPage"));
 
-import AddRaceResultPage from "./Pages/Admin/AddRaceResultPage";
-import EditRaceResultPage from "./Pages/Admin/EditRaceResultPage";
-import AddTrackPage from "./Pages/Admin/AddTrackPage";
-import AddSeasonPage from "./Pages/Admin/AddSeasonPage";
-import EditSeasonPage from "./Pages/Admin/EditSeasonPage";
-import EditTrackPage from "./Pages/Admin/EditTrackPage";
+const AddRaceResultPage = lazy(() => import("./Pages/Admin/AddRaceResultPage"));
+const EditRaceResultPage = lazy(() => import("./Pages/Admin/EditRaceResultPage"));
+const AddTrackPage = lazy(() => import("./Pages/Admin/AddTrackPage"));
+const AddSeasonPage = lazy(() => import("./Pages/Admin/AddSeasonPage"));
+const EditSeasonPage = lazy(() => import("./Pages/Admin/EditSeasonPage"));
+const EditTrackPage = lazy(() => import("./Pages/Admin/EditTrackPage"));
 
 import Layout from "./Components/Layout";
 import "./index.css";
-import { IS_TEST_SITE, BLOCK_LIVE_WRITES, API_BASE, installTestSiteGuard } from "./config";
+import { IS_TEST_SITE, BLOCK_LIVE_WRITES, API_BASE, installTestSiteGuard, installFreshDataForUsers } from "./config";
 
 installTestSiteGuard();
+installFreshDataForUsers();
+
+// Shown for the split second a page's code is being downloaded.
+function PageLoading() {
+  return <div className="page-loading" aria-busy="true" />;
+}
 
 function TestBanner() {
   if (!IS_TEST_SITE) return null;
@@ -40,6 +46,7 @@ function TestBanner() {
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Router>
     <TestBanner />
+    <Suspense fallback={<PageLoading />}>
     <Routes>
       <Route path="/" element={<Layout showSidebar={true}><HomePage /></Layout>} />
       <Route path="/STB/Championship/:season/:division" element={<Layout showSidebar={true}><ChampionshipPage /></Layout>} />
@@ -59,5 +66,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/STB/Edit/RaceResults" element={<Layout showSidebar={true}><EditRaceResultPage /></Layout>} />
       <Route path="/STB/Edit/Tracks" element={<Layout showSidebar={true}><EditTrackPage /></Layout>} />
     </Routes>
+    </Suspense>
   </Router>
 );

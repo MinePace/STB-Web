@@ -33,3 +33,26 @@ export function installTestSiteGuard() {
     return realFetch(input, init);
   };
 }
+
+// The API caches public data for about a minute. Logged-in users (admins entering
+// results) get a unique query string on every GET, so they always see fresh data.
+export function installFreshDataForUsers() {
+  if (typeof window === "undefined" || window.__stbFresh) return;
+  window.__stbFresh = true;
+  const prevFetch = window.fetch.bind(window);
+  window.fetch = (input, init = {}) => {
+    if (typeof input === "string" && input.startsWith(API_BASE)) {
+      const method = String(init.method || "GET").toUpperCase();
+      let loggedIn = false;
+      try {
+        loggedIn = !!localStorage.getItem("token");
+      } catch {
+        /* storage unavailable */
+      }
+      if (method === "GET" && loggedIn) {
+        input += (input.includes("?") ? "&" : "?") + "_fresh=" + Date.now();
+      }
+    }
+    return prevFetch(input, init);
+  };
+}

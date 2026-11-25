@@ -218,3 +218,8 @@ textarea::placeholder { color: var(--muted-fg); opacity: 0.8; }
   pointer-events: none;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
 }
+
+/* Placeholder while a page's code loads (React.lazy) */
+.page-loading {
+  min-height: 60vh;
+}
