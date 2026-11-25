@@ -5,6 +5,11 @@ Versienummers volgen [Semantic Versioning](https://semver.org/lang/nl/):
 
 Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar `main` (live) met een tag `vX.Y.Z`.
 
+## [Unreleased] (op `dev`)
+
+### Opgelost
+- Socials- en taalmenu: "Open ↗" viel buiten het menu.
+
 ## [2.1.0] – 2026-11-25
 
 ### Nieuw

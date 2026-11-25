@@ -234,6 +234,7 @@
   align-items: center;
   gap: 10px;
   width: 100%;
+  box-sizing: border-box; /* padding inside the 100% width, so rows stay inside the menu */
   padding: 8px 10px;
   border: 0;
   border-radius: 6px;
@@ -252,7 +253,7 @@
 }
 .socialdd__icon { width: 20px; height: 20px; object-fit: contain; }
 .socialdd__name { flex: 1; }
-.socialdd__open { font-size: 11px; color: var(--muted-fg); }
+.socialdd__open { font-size: 11px; color: var(--muted-fg); white-space: nowrap; }
 
 /* ---------- Mobile ---------- */
 .menu-toggle {
