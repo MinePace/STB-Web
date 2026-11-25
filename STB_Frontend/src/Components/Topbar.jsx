@@ -95,6 +95,9 @@ function LanguageDropdown() {
   const languages = [
     { code: "en", label: "English", flag: "/flags/Great%20Britain.png" },
     { code: "nl", label: "Nederlands", flag: "/flags/Netherlands.png" },
+    { code: "de", label: "Deutsch", flag: "/flags/Germany.png" },
+    { code: "tr", label: "Türkçe", flag: "/flags/Turkey.png" },
+    { code: "es", label: "Español", flag: "/flags/Spain.png" },
   ];
 
   const currentLanguage =

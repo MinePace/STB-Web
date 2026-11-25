@@ -13,6 +13,9 @@ Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar 
 ### Gewijzigd
 - Taalkeuze toont vlaggen (afbeeldingen) in plaats van "GB"/"NL" — Windows kan geen vlag-emoji tonen.
 
+### Nieuw
+- Drie nieuwe talen: **Duits**, **Turks** en **Spaans** (alle 156 teksten vertaald; bestanden in `src/locales/de|tr|es/common.json`).
+
 ## [2.1.0] – 2026-11-25
 
 ### Nieuw
