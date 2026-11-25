@@ -430,52 +430,49 @@ export default function AddRaceResults() {
     }))
 
     const url = `${API_BASE}/api/race/raceresult`;
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 15000);
+    const token = localStorage.getItem("token");
+
+    // Saved "all or nothing" by the API. Unknown drivers are only created after confirmation.
+    const send = async (confirmNewDrivers) => {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 20000);
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ results: payload, confirmNewDrivers }),
+          signal: ctrl.signal,
+        });
+        const body = await res.json().catch(() => ({}));
+        return { res, body };
+      } finally {
+        clearTimeout(timer);
+      }
+    };
 
     try {
-      console.log("Submitting results →", { url, payload, selectedRace });
-      const token = localStorage.getItem("token")
+      let { res, body } = await send(false);
 
-      const res = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify(payload),
-        signal: ctrl.signal,
-      });
-
-      const contentType = res.headers.get("content-type") || "";
-      const rawBody = await res.text();
-      const body = contentType.includes("json")
-        ? (() => { try { return JSON.parse(rawBody); } catch { return rawBody; } })()
-        : rawBody;
-
-      if (!res.ok) {
-        // Show as much detail as possible from the server
-        const serverMsg =
-          (body && (body.message || body.error || body.title)) || rawBody || "(empty body)";
-        throw new Error(`HTTP ${res.status} ${res.statusText} — ${serverMsg}`);
+      if (res.status === 409 && body?.needsConfirmation) {
+        const list = (body.unknownDrivers || []).map((n) => `  • ${n}`).join("\n");
+        const ok = window.confirm(
+          `These drivers do not exist in the database yet:\n\n${list}\n\n` +
+            "Create them as new drivers and save the results?\n" +
+            "Choose Cancel to correct the names first (nothing is saved)."
+        );
+        if (!ok) return;
+        ({ res, body } = await send(true));
       }
 
-      console.log("Server OK:", body);
-      alert(body?.message ?? "Results submitted.");
+      if (!res.ok) {
+        throw new Error(body?.message || `HTTP ${res.status}`);
+      }
 
+      alert(body?.message ?? "Results submitted.");
       navigate(`/STB/Race/${selectedRace.Id}`);
-      // … your “advance to next race” logic here …
     } catch (err) {
-      // Network/CORS/abort/JSON errors land here
-      console.error("❌ Error submitting results", {
-        error: err,
-        name: err?.name,
-        message: err?.message,
-        cause: err?.cause,
-      });
-      alert(`Failed to submit: ${err?.message || err}`);
-    } finally {
-      clearTimeout(timer);
+      console.error("Error submitting results", err);
+      alert(`Nothing was saved: ${err?.name === "AbortError" ? "the server did not respond in time" : err?.message || err}`);
     }
   };
 
