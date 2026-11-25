@@ -1,0 +1,208 @@
+{
+    "misc": {
+        "loading": "Cargando...",
+        "season": "Temporada",
+        "division": "División",
+        "save": "Guardar",
+        "saving": "Guardando...",
+        "close": "Cerrar"
+    },
+    "nav": {
+        "home": "Inicio",
+        "socials": "Redes",
+        "adminHub": "Panel de admin",
+        "myDriver": "Mi piloto",
+        "login": "Iniciar sesión",
+        "logout": "Cerrar sesión",
+        "championship": "Campeonato",
+        "history": "Historia",
+        "stats": "Estadísticas",
+        "currentSeason": "Temporada actual",
+        "pastSeasons": "Temporadas anteriores",
+        "menu": "Menú",
+        "youRaced": "Corriste aquí",
+        "claimDriverFirst": "Primero reclama tu piloto"
+    },
+    "sidebar": {
+        "season": "Temporada",
+        "division": "División"
+    },
+    "home": {
+        "welcome": "El hogar del sim racing competitivo",
+        "latest": "Última carrera",
+        "viewDetails": "Ver resultados completos",
+        "standings": "Clasificación del campeonato",
+        "stats": {
+            "title": "Estadísticas de la liga",
+            "seasons": "Temporadas",
+            "races": "Carreras",
+            "drivers": "Pilotos",
+            "mostWins": "Más victorias",
+            "mostRaces": "Más carreras"
+        },
+        "heroTitle": "Se apagan los semáforos para la",
+        "divisions": "divisiones",
+        "nextRace": "Próxima carrera: {{track}} el {{date}}.",
+        "seasonDone": "Temporada terminada: {{rounds}} rondas por división. Revive cada carrera y cada punto aquí abajo.",
+        "round": "Ronda",
+        "watch": "Ver",
+        "fullStandings": "Clasificación completa",
+        "noData": "No hay datos de carreras.",
+        "community": {
+            "eyebrow": "Comunidad",
+            "title": "Únete a la parrilla",
+            "text": "Corre con nosotros en el juego oficial de F1: carreras semanales de liga, varias divisiones y retransmisiones en directo de cada ronda.",
+            "join": "Únete en Discord"
+        }
+    },
+    "championship": {
+        "title": "Resumen del campeonato",
+        "season": "Temporada",
+        "division": "División",
+        "viewConstructors": "Ver constructores",
+        "viewDrivers": "Ver pilotos",
+        "fullStandings": "Clasificación completa",
+        "standings": {
+            "top10": "Top 10",
+            "subtitle": "Clasificación actual tras la ronda",
+            "expand": "Ampliar",
+            "driver": "Piloto",
+            "constructor": "Clasificación de constructores",
+            "team": "Equipo"
+        },
+        "results": {
+            "raceResults": "Resultados de carreras",
+            "allRounds": "Todas las rondas"
+        },
+        "Stats": {
+            "seasonStats": "Estadísticas de la temporada",
+            "subtitle": "Solo carreras principales",
+            "mostWins": "Más victorias",
+            "mostPodiums": "Más podios",
+            "avgQuali": "Mejor media de clasificación",
+            "posGained": "Más posiciones ganadas",
+            "mostDnfs": "Más abandonos"
+        }
+    },
+    "driver": {
+        "title": "Perfil del piloto",
+        "last5Races": "Últimas 5 carreras",
+        "lastRace": {
+            "title": "Última carrera",
+            "driver": "Piloto",
+            "date": "Fecha",
+            "noRace": "Ninguna carrera registrada"
+        },
+        "stats": {
+            "title": "Estadísticas",
+            "totalPoints": "Puntos totales",
+            "wins": "Victorias",
+            "podiums": "Podios",
+            "poles": "Poles",
+            "fastestLaps": "Vueltas rápidas",
+            "dnfs": "Abandonos",
+            "avgFinish": "Posición media",
+            "avgQuali": "Clasif. media",
+            "raceStarts": "Carreras disputadas",
+            "claimedBy": "Reclamado por"
+        },
+        "graphs": {
+            "startVSFinish": "Salida vs llegada",
+            "less": "menos",
+            "more": "más",
+            "subtitle": "Sin abandonos: solo carreras que el piloto terminó",
+            "count": "cantidad"
+        }
+    },
+    "flagPicker": {
+        "title": "Cambiar la nacionalidad del piloto",
+        "select": "Selecciona un país"
+    },
+    "loader": {
+        "driver": {
+            "loading": "Recopilando datos del piloto"
+        },
+        "race": {
+            "season": "Temporada",
+            "division": "Nivel",
+            "loading": "Cargando datos del campeonato"
+        }
+    },
+    "countries": {
+        "United States": "Estados Unidos",
+        "Netherlands": "Países Bajos",
+        "Great Britain": "Gran Bretaña",
+        "Germany": "Alemania",
+        "France": "Francia",
+        "Italy": "Italia",
+        "Spain": "España",
+        "Belgium": "Bélgica",
+        "Abu Dhabi": "Abu Dabi",
+        "Australia": "Australia",
+        "Brazil": "Brasil",
+        "Canada": "Canadá",
+        "China": "China",
+        "Malaysia": "Malasia",
+        "Mexico": "México",
+        "Monaco": "Mónaco",
+        "Russia": "Rusia",
+        "Singapore": "Singapur",
+        "Portugal": "Portugal",
+        "Japan": "Japón",
+        "Austria": "Austria",
+        "Turkey": "Turquía"
+    },
+    "footer": {
+        "tagline": "Campeonato de carreras de esports"
+    },
+    "statsPage": {
+        "eyebrow": "Estadísticas de la liga",
+        "title": "Estadísticas",
+        "scope": "{{races}} carreras · {{drivers}} pilotos",
+        "allTime": "Histórico",
+        "season": "Temporada {{n}}",
+        "allDivisions": "Todas las divisiones",
+        "division": "División {{n}}",
+        "sprints": "Incluir sprints",
+        "awards": "Premios",
+        "leaderboards": "Clasificaciones",
+        "records": "Récords",
+        "minRaces": "Mínimo {{n}} carreras",
+        "noHolder": "Nadie todavía",
+        "loading": "Calculando los números…",
+        "error": "No se pudieron cargar las estadísticas.",
+        "tabs": {
+            "wins": "Victorias",
+            "podiums": "Podios",
+            "poles": "Poles",
+            "fastestLaps": "Vueltas rápidas",
+            "points": "Puntos",
+            "races": "Carreras",
+            "championships": "Títulos",
+            "winRate": "% victorias",
+            "avgFinish": "Posición media"
+        },
+        "records_": {
+            "winStreak": "Racha de victorias más larga",
+            "podiumStreak": "Racha de podios más larga",
+            "seasonWins": "Más victorias en una temporada",
+            "comeback": "Mayor remontada",
+            "lowestWin": "Victoria desde más atrás",
+            "grandSlam": "Más grand slams",
+            "closestTitle": "Lucha por el título más ajustada",
+            "dominantTitle": "Título más dominante"
+        },
+        "awards_": {
+            "comebackKing": "Rey de la remontada",
+            "consistent": "Mr. Regularidad",
+            "badLuck": "Mala suerte",
+            "ironMan": "Iron Man"
+        },
+        "awardInfo": {
+            "comebackKing": "Más posiciones ganadas por carrera de media",
+            "consistent": "Mayor porcentaje de carreras terminadas en los puntos",
+            "badLuck": "Más abandonos",
+            "ironMan": "Más carreras disputadas"
+        }
+    }
+}

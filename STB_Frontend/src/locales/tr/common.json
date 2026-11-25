@@ -1,0 +1,208 @@
+{
+    "misc": {
+        "loading": "Yükleniyor...",
+        "season": "Sezon",
+        "division": "Lig",
+        "save": "Kaydet",
+        "saving": "Kaydediliyor...",
+        "close": "Kapat"
+    },
+    "nav": {
+        "home": "Ana Sayfa",
+        "socials": "Sosyal Medya",
+        "adminHub": "Yönetim Paneli",
+        "myDriver": "Pilotum",
+        "login": "Giriş Yap",
+        "logout": "Çıkış Yap",
+        "championship": "Şampiyona",
+        "history": "Geçmiş",
+        "stats": "İstatistikler",
+        "currentSeason": "Güncel sezon",
+        "pastSeasons": "Geçmiş sezonlar",
+        "menu": "Menü",
+        "youRaced": "Burada yarıştın",
+        "claimDriverFirst": "Önce pilotunu sahiplen"
+    },
+    "sidebar": {
+        "season": "Sezon",
+        "division": "Lig"
+    },
+    "home": {
+        "welcome": "Rekabetçi sim yarışlarının evi",
+        "latest": "Son Yarış",
+        "viewDetails": "Tüm Sonuçları Gör",
+        "standings": "Şampiyona Sıralaması",
+        "stats": {
+            "title": "Lig İstatistikleri",
+            "seasons": "Sezon",
+            "races": "Yarış",
+            "drivers": "Pilot",
+            "mostWins": "En Çok Galibiyet",
+            "mostRaces": "En Çok Yarış"
+        },
+        "heroTitle": "Işıklar sönüyor:",
+        "divisions": "lig",
+        "nextRace": "Sonraki yarış: {{track}}, {{date}}.",
+        "seasonDone": "Sezon tamamlandı: lig başına {{rounds}} yarış. Her yarışı ve her puanı aşağıda yeniden yaşa.",
+        "round": "Yarış",
+        "watch": "İzle",
+        "fullStandings": "Tam sıralama",
+        "noData": "Yarış verisi yok.",
+        "community": {
+            "eyebrow": "Topluluk",
+            "title": "Gridde yerini al",
+            "text": "Resmi F1 oyununda bizimle yarış: haftalık lig yarışları, birden fazla lig ve her yarışın canlı yayını.",
+            "join": "Discord'a katıl"
+        }
+    },
+    "championship": {
+        "title": "Şampiyona Genel Bakış",
+        "season": "Sezon",
+        "division": "Lig",
+        "viewConstructors": "Takımları Göster",
+        "viewDrivers": "Pilotları Göster",
+        "fullStandings": "Tam Sıralama",
+        "standings": {
+            "top10": "İlk 10",
+            "subtitle": "Şu yarıştan sonraki güncel sıralama:",
+            "expand": "Genişlet",
+            "driver": "Pilot",
+            "constructor": "Takımlar Sıralaması",
+            "team": "Takım"
+        },
+        "results": {
+            "raceResults": "Yarış Sonuçları",
+            "allRounds": "Tüm Yarışlar"
+        },
+        "Stats": {
+            "seasonStats": "Sezon İstatistikleri",
+            "subtitle": "Yalnızca ana yarışlar",
+            "mostWins": "En Çok Galibiyet",
+            "mostPodiums": "En Çok Podyum",
+            "avgQuali": "En İyi Ortalama Sıralama Turu",
+            "posGained": "En Çok Kazanılan Pozisyon",
+            "mostDnfs": "En Çok DNF"
+        }
+    },
+    "driver": {
+        "title": "Pilot Profili",
+        "last5Races": "Son 5 Yarış",
+        "lastRace": {
+            "title": "Son Yarış",
+            "driver": "Pilot",
+            "date": "Tarih",
+            "noRace": "Kayıtlı yarış yok"
+        },
+        "stats": {
+            "title": "İstatistikler",
+            "totalPoints": "Toplam Puan",
+            "wins": "Galibiyet",
+            "podiums": "Podyum",
+            "poles": "Pole",
+            "fastestLaps": "En Hızlı Tur",
+            "dnfs": "DNF",
+            "avgFinish": "Ort. Bitiriş",
+            "avgQuali": "Ort. Sıralama",
+            "raceStarts": "Yarış Başlangıcı",
+            "claimedBy": "Sahibi"
+        },
+        "graphs": {
+            "startVSFinish": "Başlangıç ve Bitiş",
+            "less": "az",
+            "more": "çok",
+            "subtitle": "DNF'ler hariç – yalnızca pilotun bitirdiği yarışlar",
+            "count": "sayı"
+        }
+    },
+    "flagPicker": {
+        "title": "Pilotun Uyruğunu Değiştir",
+        "select": "Bir Ülke Seç"
+    },
+    "loader": {
+        "driver": {
+            "loading": "Pilot verileri toplanıyor"
+        },
+        "race": {
+            "season": "Sezon",
+            "division": "Lig",
+            "loading": "Şampiyona verileri yükleniyor"
+        }
+    },
+    "countries": {
+        "United States": "Amerika Birleşik Devletleri",
+        "Netherlands": "Hollanda",
+        "Great Britain": "Büyük Britanya",
+        "Germany": "Almanya",
+        "France": "Fransa",
+        "Italy": "İtalya",
+        "Spain": "İspanya",
+        "Belgium": "Belçika",
+        "Abu Dhabi": "Abu Dabi",
+        "Australia": "Avustralya",
+        "Brazil": "Brezilya",
+        "Canada": "Kanada",
+        "China": "Çin",
+        "Malaysia": "Malezya",
+        "Mexico": "Meksika",
+        "Monaco": "Monako",
+        "Russia": "Rusya",
+        "Singapore": "Singapur",
+        "Portugal": "Portekiz",
+        "Japan": "Japonya",
+        "Austria": "Avusturya",
+        "Turkey": "Türkiye"
+    },
+    "footer": {
+        "tagline": "E-spor yarış şampiyonası"
+    },
+    "statsPage": {
+        "eyebrow": "Lig istatistikleri",
+        "title": "İstatistikler",
+        "scope": "{{races}} yarış · {{drivers}} pilot",
+        "allTime": "Tüm zamanlar",
+        "season": "Sezon {{n}}",
+        "allDivisions": "Tüm ligler",
+        "division": "Lig {{n}}",
+        "sprints": "Sprintleri dahil et",
+        "awards": "Ödüller",
+        "leaderboards": "Liderlik tabloları",
+        "records": "Rekorlar",
+        "minRaces": "En az {{n}} yarış",
+        "noHolder": "Henüz kimse yok",
+        "loading": "Sayılar hesaplanıyor…",
+        "error": "İstatistikler yüklenemedi.",
+        "tabs": {
+            "wins": "Galibiyet",
+            "podiums": "Podyum",
+            "poles": "Pole",
+            "fastestLaps": "En hızlı tur",
+            "points": "Puan",
+            "races": "Yarış",
+            "championships": "Şampiyonluk",
+            "winRate": "Galibiyet %",
+            "avgFinish": "Ort. bitiriş"
+        },
+        "records_": {
+            "winStreak": "En uzun galibiyet serisi",
+            "podiumStreak": "En uzun podyum serisi",
+            "seasonWins": "Bir sezonda en çok galibiyet",
+            "comeback": "En büyük geri dönüş",
+            "lowestWin": "En geriden gelen galibiyet",
+            "grandSlam": "En çok grand slam",
+            "closestTitle": "En çekişmeli şampiyonluk",
+            "dominantTitle": "En baskın şampiyonluk"
+        },
+        "awards_": {
+            "comebackKing": "Geri Dönüş Kralı",
+            "consistent": "İstikrar Abidesi",
+            "badLuck": "Şanssız",
+            "ironMan": "Demir Adam"
+        },
+        "awardInfo": {
+            "comebackKing": "Yarış başına ortalama en çok pozisyon kazanan",
+            "consistent": "En sık puanlarla bitiren",
+            "badLuck": "En çok yarış dışı kalan",
+            "ironMan": "En çok yarışa başlayan"
+        }
+    }
+}

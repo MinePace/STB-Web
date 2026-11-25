@@ -5,6 +5,17 @@ Versienummers volgen [Semantic Versioning](https://semver.org/lang/nl/):
 
 Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar `main` (live) met een tag `vX.Y.Z`.
 
+## [2.2.0] – 2026-11-25
+
+### Opgelost
+- Socials- en taalmenu: "Open ↗" viel buiten het menu.
+
+### Gewijzigd
+- Taalkeuze toont vlaggen (afbeeldingen) in plaats van "GB"/"NL" — Windows kan geen vlag-emoji tonen.
+
+### Nieuw
+- Drie nieuwe talen: **Duits**, **Turks** en **Spaans** (alle 156 teksten vertaald; bestanden in `src/locales/de|tr|es/common.json`).
+
 ## [2.1.0] – 2026-11-25
 
 ### Nieuw

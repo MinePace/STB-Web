@@ -93,8 +93,11 @@ function LanguageDropdown() {
   const { i18n, t } = useTranslation();
 
   const languages = [
-    { code: "en", label: "English", flag: "🇬🇧" },
-    { code: "nl", label: "Nederlands", flag: "🇳🇱" },
+    { code: "en", label: "English", flag: "/flags/Great%20Britain.png" },
+    { code: "nl", label: "Nederlands", flag: "/flags/Netherlands.png" },
+    { code: "de", label: "Deutsch", flag: "/flags/Germany.png" },
+    { code: "tr", label: "Türkçe", flag: "/flags/Turkey.png" },
+    { code: "es", label: "Español", flag: "/flags/Spain.png" },
   ];
 
   const currentLanguage =
@@ -148,7 +151,7 @@ function LanguageDropdown() {
         onClick={() => setOpen((o) => !o)}
         className="langdd__btn nav-link"
       >
-        <span className="langdd__flag">{currentLanguage.flag}</span>
+        <img src={currentLanguage.flag} alt={currentLanguage.label} className="langdd__flag" />
         <span className={`langdd__caret ${open ? "is-open" : ""}`} aria-hidden>
           ▾
         </span>
@@ -166,7 +169,7 @@ function LanguageDropdown() {
                   className="langdd__item"
                   onClick={() => changeLanguage(lang.code)}
                 >
-                  <span className="langdd__flag">{lang.flag}</span>
+                  <img src={lang.flag} alt="" className="langdd__flag" />
                   <span>{lang.label}</span>
                 </button>
               </li>
