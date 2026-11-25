@@ -5,7 +5,7 @@ Versienummers volgen [Semantic Versioning](https://semver.org/lang/nl/):
 
 Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar `main` (live) met een tag `vX.Y.Z`.
 
-## [Unreleased] (op `dev`)
+## [2.3.0] – 2026-11-25
 
 ### Nieuw
 - **Coureurspagina vernieuwd**: kop in de nieuwe stijl (vlag, naam, huidig team, actief sinds, titels, geclaimd door), 12 carrièretegels (o.a. titels, win %, beste finish), laatste race met podium en eigen resultaat, recente races, **tabel per seizoen** met team en eindpositie, start-vs-finish-heatmap, resultatenverdeling, puntenfinishes en een **vorm-grafiek** (laatste 10 races, vaste schaal P1–P20).
