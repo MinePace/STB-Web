@@ -273,16 +273,17 @@
         "viewStats": "İstatistiklere bak",
         "loadFailed": "Bu pilot yüklenemedi. Lütfen tekrar dene.",
         "form": "Form: son 10 yarış",
-        "formAvg": "Ort. P{{n}}",
         "older": "eski",
         "newer": "yeni",
         "favorites": "Favori pistler",
         "favAvg": "ort.",
-        "favMeta": "{{count}} yarış · en iyi P{{best}}",
-        "favMeta_one": "{{count}} yarış · en iyi P{{best}}",
-        "favMeta_other": "{{count}} yarış · en iyi P{{best}}",
         "favWins": "{{count}} galibiyet",
         "favWins_one": "{{count}} galibiyet",
-        "favWins_other": "{{count}} galibiyet"
+        "favWins_other": "{{count}} galibiyet",
+        "formAvgShort": "ort. {{n}}",
+        "favRaces": "{{count}} yarış",
+        "favRaces_one": "{{count}} yarış",
+        "favRaces_other": "{{count}} yarış",
+        "favBest": "en iyi P{{n}}"
     }
 }

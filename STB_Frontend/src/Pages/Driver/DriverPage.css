@@ -887,7 +887,9 @@
 .dp-form__dot.is-p3 { fill: var(--bronze); }
 .dp-form__dot.is-dnf { fill: var(--danger); }
 .dp-form__foot { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-top: 4px; }
-.dp-form__avg-label { color: var(--accent); font-weight: 700; }
+.dp-form__avg-text { fill: var(--accent); font-size: 9px; font-weight: 700; }
+.dp-form__label { fill: var(--fg); font-size: 9px; font-weight: 700; }
+.dp-form__label.is-dnf { fill: var(--danger); }
 
 /* Favourite circuits */
 .dp-fav { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -913,9 +915,6 @@ a.dp-fav__row:hover { background: rgba(26, 163, 255, 0.1); }
   font-weight: 800;
   background: rgba(255, 255, 255, 0.08);
 }
-.dp-fav__rank--1 { background: var(--gold); color: #2b1d00; }
-.dp-fav__rank--2 { background: var(--silver); color: #1b2333; }
-.dp-fav__rank--3 { background: var(--bronze); color: #2a1406; }
 .dp-fav__flag { width: 30px; height: 30px; object-fit: contain; }
 .dp-fav__name { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dp-fav__meta { display: block; font-size: 12px; font-weight: 500; }

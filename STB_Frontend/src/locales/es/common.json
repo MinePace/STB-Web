@@ -273,16 +273,17 @@
         "viewStats": "Ver estadísticas",
         "loadFailed": "No se pudo cargar este piloto. Inténtalo de nuevo.",
         "form": "Forma: últimas 10 carreras",
-        "formAvg": "Media P{{n}}",
         "older": "antes",
         "newer": "después",
         "favorites": "Circuitos favoritos",
         "favAvg": "media",
-        "favMeta": "{{count}} carreras · mejor P{{best}}",
-        "favMeta_one": "{{count}} carrera · mejor P{{best}}",
-        "favMeta_other": "{{count}} carreras · mejor P{{best}}",
         "favWins": "{{count}} victorias",
         "favWins_one": "{{count}} victoria",
-        "favWins_other": "{{count}} victorias"
+        "favWins_other": "{{count}} victorias",
+        "formAvgShort": "media {{n}}",
+        "favRaces": "{{count}} carreras",
+        "favRaces_one": "{{count}} carrera",
+        "favRaces_other": "{{count}} carreras",
+        "favBest": "mejor P{{n}}"
     }
 }

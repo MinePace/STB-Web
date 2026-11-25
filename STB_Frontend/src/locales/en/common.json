@@ -273,16 +273,17 @@
         "viewStats": "View statistics",
         "loadFailed": "Could not load this driver. Please try again.",
         "form": "Form: last 10 races",
-        "formAvg": "Avg. P{{n}}",
         "older": "older",
         "newer": "newer",
         "favorites": "Favourite circuits",
         "favAvg": "avg.",
-        "favMeta": "{{count}} races · best P{{best}}",
-        "favMeta_one": "{{count}} race · best P{{best}}",
-        "favMeta_other": "{{count}} races · best P{{best}}",
         "favWins": "{{count}} wins",
         "favWins_one": "{{count}} win",
-        "favWins_other": "{{count}} wins"
+        "favWins_other": "{{count}} wins",
+        "formAvgShort": "avg {{n}}",
+        "favRaces": "{{count}} races",
+        "favRaces_one": "{{count}} race",
+        "favRaces_other": "{{count}} races",
+        "favBest": "best P{{n}}"
     }
 }

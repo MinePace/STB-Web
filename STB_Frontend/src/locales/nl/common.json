@@ -273,16 +273,17 @@
         "viewStats": "Bekijk statistieken",
         "loadFailed": "Deze coureur kon niet geladen worden. Probeer het opnieuw.",
         "form": "Vorm: laatste 10 races",
-        "formAvg": "Gem. P{{n}}",
         "older": "ouder",
         "newer": "nieuwer",
         "favorites": "Favoriete circuits",
         "favAvg": "gem.",
-        "favMeta": "{{count}} races · beste P{{best}}",
-        "favMeta_one": "{{count}} race · beste P{{best}}",
-        "favMeta_other": "{{count}} races · beste P{{best}}",
         "favWins": "{{count}} zeges",
         "favWins_one": "{{count}} zege",
-        "favWins_other": "{{count}} zeges"
+        "favWins_other": "{{count}} zeges",
+        "formAvgShort": "gem. {{n}}",
+        "favRaces": "{{count}} races",
+        "favRaces_one": "{{count}} race",
+        "favRaces_other": "{{count}} races",
+        "favBest": "beste P{{n}}"
     }
 }

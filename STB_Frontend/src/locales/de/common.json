@@ -273,16 +273,17 @@
         "viewStats": "Statistiken ansehen",
         "loadFailed": "Dieser Fahrer konnte nicht geladen werden. Bitte versuche es erneut.",
         "form": "Form: letzte 10 Rennen",
-        "formAvg": "Ø P{{n}}",
         "older": "älter",
         "newer": "neuer",
         "favorites": "Lieblingsstrecken",
         "favAvg": "Ø",
-        "favMeta": "{{count}} Rennen · beste P{{best}}",
-        "favMeta_one": "{{count}} Rennen · beste P{{best}}",
-        "favMeta_other": "{{count}} Rennen · beste P{{best}}",
         "favWins": "{{count}} Siege",
         "favWins_one": "{{count}} Sieg",
-        "favWins_other": "{{count}} Siege"
+        "favWins_other": "{{count}} Siege",
+        "formAvgShort": "Ø {{n}}",
+        "favRaces": "{{count}} Rennen",
+        "favRaces_one": "{{count}} Rennen",
+        "favRaces_other": "{{count}} Rennen",
+        "favBest": "beste P{{n}}"
     }
 }

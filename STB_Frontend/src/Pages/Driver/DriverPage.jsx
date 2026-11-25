@@ -406,9 +406,10 @@ function PointsFinishes({ races, t }) {
 function FormChart({ races, t }) {
   const last = races.slice(0, 10).reverse();
   if (!last.length) return <p className="dp-muted">{t("driverPage.noRaces")}</p>;
-  const W = 320, H = 150, padL = 28, padR = 12, padT = 12, padB = 22;
+  const W = 320, H = 170, padL = 30, padR = 44, padT = 14, padB = 24;
   const finished = last.filter((r) => !r.dnf && r.pos);
-  const worst = Math.max(10, ...last.map((r) => r.pos || 0));
+  // fixed scale so drivers can be compared; extends only for fields bigger than 20
+  const worst = Math.max(20, ...last.map((r) => r.pos || 0));
   const y = (pos) => padT + ((pos - 1) / (worst - 1)) * (H - padT - padB);
   const x = (i) => padL + (last.length === 1 ? (W - padL - padR) / 2 : (i * (W - padL - padR)) / (last.length - 1));
   const avg = finished.length ? finished.reduce((s, r) => s + r.pos, 0) / finished.length : null;
@@ -417,7 +418,7 @@ function FormChart({ races, t }) {
     .map((r, i) => (r.dnf || !r.pos ? null : `${x(i).toFixed(1)},${y(r.pos).toFixed(1)}`))
     .filter(Boolean)
     .join(" ");
-  const ticks = [1, Math.round(worst / 2), worst];
+  const ticks = [1, 5, 10, 15, 20].filter((p) => p <= worst);
   return (
     <div className="dp-form">
       <svg viewBox={`0 0 ${W} ${H}`} className="dp-form__svg" role="img" aria-label={t("driverPage.form")}>
@@ -429,7 +430,14 @@ function FormChart({ races, t }) {
             </text>
           </g>
         ))}
-        {avg ? <line x1={padL} x2={W - padR} y1={y(avg)} y2={y(avg)} className="dp-form__avg" /> : null}
+        {avg ? (
+          <g>
+            <line x1={padL} x2={W - padR} y1={y(avg)} y2={y(avg)} className="dp-form__avg" />
+            <text x={W - padR + 4} y={y(avg) + 3} className="dp-form__avg-text">
+              {t("driverPage.formAvgShort", { n: avg.toFixed(1) })}
+            </text>
+          </g>
+        ) : null}
         {path ? <polyline points={path} className="dp-form__line" /> : null}
         {last.map((r, i) => {
           const dnf = r.dnf || !r.pos;
@@ -437,6 +445,9 @@ function FormChart({ races, t }) {
           const cls = dnf ? "is-dnf" : r.pos <= 3 ? `is-p${r.pos}` : "";
           return (
             <Link key={r.id} to={raceHref(r.id)}>
+              <text x={x(i)} y={cy - 9} textAnchor="middle" className={`dp-form__label ${dnf ? "is-dnf" : ""}`}>
+                {dnf ? "DNF" : r.pos}
+              </text>
               <circle cx={x(i)} cy={cy} r={dnf ? 5 : 5.5} className={`dp-form__dot ${cls}`}>
                 <title>
                   {`${r.track}${r.sprint ? " (Sprint)" : ""} · S${r.season} D${r.division} R${r.round}: ${dnf ? "DNF" : `P${r.pos}`}`}
@@ -448,7 +459,7 @@ function FormChart({ races, t }) {
       </svg>
       <div className="dp-form__foot">
         <span className="dp-muted">← {t("driverPage.older")}</span>
-        {avg ? <span className="dp-form__avg-label">{t("driverPage.formAvg", { n: avg.toFixed(1) })}</span> : <span />}
+        <span />
         <span className="dp-muted">{t("driverPage.newer")} →</span>
       </div>
     </div>
@@ -468,7 +479,8 @@ function FavoriteCircuits({ races, t }) {
     }
     byTrack.set(key, e);
   }
-  const min = races.length >= 20 ? 2 : 1; // with a long career, one lucky race shouldn't decide it
+  // One lucky race shouldn't decide it: use circuits with 2+ finishes when the driver has any.
+  const min = [...byTrack.values()].some((e) => e.finishes.length >= 2) ? 2 : 1;
   const list = [...byTrack.values()]
     .filter((e) => e.finishes.length >= min)
     .map((e) => ({ ...e, avg: e.finishes.reduce((a, b) => a + b, 0) / e.finishes.length, best: Math.min(...e.finishes) }))
@@ -480,7 +492,7 @@ function FavoriteCircuits({ races, t }) {
       {list.map((e, i) => {
         const content = (
           <>
-            <span className={`dp-fav__rank dp-fav__rank--${i + 1}`}>{i + 1}</span>
+            <span className="dp-fav__rank">{i + 1}</span>
             {e.country ? (
               <img
                 className="dp-fav__flag"
@@ -494,12 +506,13 @@ function FavoriteCircuits({ races, t }) {
             <span className="dp-fav__name">
               {e.name}
               <span className="dp-muted dp-fav__meta">
-                {t("driverPage.favMeta", { count: e.races, best: e.best })}
-                {e.wins ? ` · ${t("driverPage.favWins", { count: e.wins })}` : ""}
+                {t("driverPage.favRaces", { count: e.races })}
+                {" · "}
+                {e.wins ? t("driverPage.favWins", { count: e.wins }) : t("driverPage.favBest", { n: e.best })}
               </span>
             </span>
             <span className="dp-fav__avg">
-              P{e.avg.toFixed(1)}
+              P{e.finishes.length === 1 ? e.avg : e.avg.toFixed(1)}
               <small>{t("driverPage.favAvg")}</small>
             </span>
           </>
