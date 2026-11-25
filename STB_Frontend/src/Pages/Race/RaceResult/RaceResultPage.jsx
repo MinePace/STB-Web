@@ -8,6 +8,7 @@ import "@/Components/Links.css";
 import { API_BASE } from "@/config";
 
 import { TEAM_COLORS } from "@/teams";
+import usePageMeta from "@/usePageMeta";
 // helper: convert driver/team object → name string
 const safeName = (entity) =>
   typeof entity === "object" ? entity?.name ?? "Unknown" : entity ?? "Unknown";
@@ -18,6 +19,16 @@ function RaceResultPage() {
   const prefillDriver = searchParams.get("driver");
   const [raceResults, setRaceResults] = useState([]);
   const [race, setRaceData] = useState();
+  const raceTitle = race
+    ? `${race.track?.raceName || race.track?.name || "Race"}${race.sprint === "Yes" ? " Sprint" : ""} – S${race.season} Division ${race.division}`
+    : null;
+  const winner = raceResults.find((r) => r.position === 1)?.driver?.name;
+  usePageMeta(
+    raceTitle,
+    race
+      ? `Round ${race.round} of season ${race.season}, division ${race.division}${winner ? `. Won by ${winner}` : ""}. Full results, fastest lap and position changes.`
+      : null
+  );
   const [fastestLap, setFastestLap] = useState(null);
   const [embedUrl, setEmbedUrl] = useState("");
 

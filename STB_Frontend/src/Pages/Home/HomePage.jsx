@@ -6,6 +6,7 @@ import { API_BASE } from "@/config";
 import { useSeasons } from "@/seasons";
 import { teamColor, teamLogo } from "@/teams";
 
+import usePageMeta from "@/usePageMeta";
 const DISCORD_URL = "https://discord.gg/jQXYKBbEws";
 const YOUTUBE_URL = "https://www.youtube.com/@stbracingleague";
 const TWITCH_URL = "https://www.twitch.tv/stbleague";
@@ -92,6 +93,7 @@ function Podium({ entries }) {
 // ---------- Page ----------
 
 function HomePage() {
+  usePageMeta(null);
   const { t, i18n } = useTranslation();
   const { current: CURRENT_SEASON, latestWithResults } = useSeasons();
 

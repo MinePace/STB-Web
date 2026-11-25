@@ -9,6 +9,7 @@ import RaceLoader from "@/Components/Loaders/RaceLoader";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "@/config";
 
+import usePageMeta from "@/usePageMeta";
 // helper to safely extract driver/team name
 const safeName = (entity) =>
   typeof entity === "object" ? entity?.name ?? "Unknown" : entity ?? "Unknown";
@@ -17,6 +18,10 @@ const isDNF = (dnf) => dnf === "Yes" || dnf === "DNF" || dnf === true;
 
 function ChampionshipPage() {
   const { season, division } = useParams();
+  usePageMeta(
+    `Standings – Season ${season} Division ${division}`,
+    `Driver and constructor standings of STB Racing League season ${season}, division ${division}.`
+  );
   const [searchParams] = useSearchParams();
   const prefillDriver = searchParams.get("driver");
   const navigate = useNavigate();

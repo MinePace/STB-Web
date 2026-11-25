@@ -5,6 +5,7 @@ import "@/Components/Links.css";
 import DriverLoader from "@/Components/Loaders/DriverLoader";
 import { API_BASE } from "@/config";
 
+import usePageMeta from "@/usePageMeta";
 /* ---------- maps & helpers at module scope ---------- */
 
 const MAP_EXCEPTIONS = {
@@ -67,6 +68,11 @@ function TrackPage() {
   const { trackId } = useParams();
 
   const [trackInfo, setTrackInfo] = useState(null);
+  const trackName = trackInfo?.raceName || trackInfo?.RaceName || trackInfo?.name || trackInfo?.Name;
+  usePageMeta(
+    trackName ? `${trackName} – Circuit` : null,
+    trackName ? `Every STB Racing League race at ${trackName}: winners, results and records.` : null
+  );
   const [trackRaces, setTrackRaces] = useState([]);
 
   const mostWins = useMemo(

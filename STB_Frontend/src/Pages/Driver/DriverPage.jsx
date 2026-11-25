@@ -9,9 +9,16 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGri
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "@/config";
 
+import usePageMeta from "@/usePageMeta";
 function DriverPage() {
   const { driverName } = useParams();
   const [driverStats, setDriverStats] = useState(null);
+  usePageMeta(
+    driverName ? `${driverName} – Driver` : null,
+    driverStats
+      ? `${driverName} in the STB Racing League: ${driverStats.races ?? 0} races, ${driverStats.wins ?? 0} wins, ${driverStats.podiums ?? 0} podiums.`
+      : null
+  );
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

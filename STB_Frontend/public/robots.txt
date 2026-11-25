@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /STB/Add/
+Disallow: /STB/Edit/
+
+Sitemap: https://stbleague.vercel.app/sitemap.xml

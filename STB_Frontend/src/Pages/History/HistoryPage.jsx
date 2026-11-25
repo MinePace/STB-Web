@@ -4,7 +4,9 @@ import "./HistoryPage.css";
 import "@/Components/Links.css";
 
 import { API_BASE } from "@/config";
+import usePageMeta from "@/usePageMeta";
 export default function HistoryPage() {
+  usePageMeta("History", "Champions of every STB Racing League season and division.");
   const [seasons, setSeasons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
