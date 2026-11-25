@@ -5,6 +5,11 @@ Versienummers volgen [Semantic Versioning](https://semver.org/lang/nl/):
 
 Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar `main` (live) met een tag `vX.Y.Z`.
 
+## [Unreleased] (op `dev`)
+
+### Nieuw
+- **Statistiekenpagina**: filter op seizoen, divisie en sprints; awards (Comeback King, Mr. Consistent, Pechvogel, Iron Man); ranglijsten met tabbladen (top 10); records (zegereeks, podiumreeks, meeste zeges in een seizoen, grootste inhaalrace, grand slams, spannendste en meest dominante titel). Filters staan in de URL, dus een gefilterde pagina is te delen.
+
 ## [2.0.0] – 2026-11-25
 
 Eerste genummerde versie. Alles wat hiervoor live stond, telt als 1.x.

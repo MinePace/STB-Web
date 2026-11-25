@@ -154,5 +154,55 @@
     },
     "footer": {
         "tagline": "Esports racing kampioenschap"
+    },
+    "statsPage": {
+        "eyebrow": "Competitiestatistieken",
+        "title": "Statistieken",
+        "scope": "{{races}} races · {{drivers}} coureurs",
+        "allTime": "Aller tijden",
+        "season": "Seizoen {{n}}",
+        "allDivisions": "Alle divisies",
+        "division": "Divisie {{n}}",
+        "sprints": "Sprints meetellen",
+        "awards": "Awards",
+        "leaderboards": "Ranglijsten",
+        "records": "Records",
+        "minRaces": "Minimaal {{n}} races",
+        "noHolder": "Nog niemand",
+        "loading": "Cijfers worden berekend…",
+        "error": "Statistieken konden niet geladen worden.",
+        "tabs": {
+            "wins": "Overwinningen",
+            "podiums": "Podiums",
+            "poles": "Poles",
+            "fastestLaps": "Snelste ronden",
+            "points": "Punten",
+            "races": "Races",
+            "championships": "Titels",
+            "winRate": "Win %",
+            "avgFinish": "Gem. finish"
+        },
+        "records_": {
+            "winStreak": "Langste zegereeks",
+            "podiumStreak": "Langste podiumreeks",
+            "seasonWins": "Meeste zeges in één seizoen",
+            "comeback": "Grootste inhaalrace",
+            "lowestWin": "Zege van het verst naar achteren",
+            "grandSlam": "Meeste grand slams",
+            "closestTitle": "Spannendste titelstrijd",
+            "dominantTitle": "Meest dominante titel"
+        },
+        "awards_": {
+            "comebackKing": "Comeback King",
+            "consistent": "Mr. Consistent",
+            "badLuck": "Pechvogel",
+            "ironMan": "Iron Man"
+        },
+        "awardInfo": {
+            "comebackKing": "Gemiddeld de meeste plekken gewonnen per race",
+            "consistent": "Vaakst in de punten gefinisht",
+            "badLuck": "Meeste uitvallers",
+            "ironMan": "Meeste races gestart"
+        }
     }
 }

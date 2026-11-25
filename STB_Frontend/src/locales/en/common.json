@@ -154,5 +154,55 @@
     },
     "footer": {
         "tagline": "Esports racing championship"
+    },
+    "statsPage": {
+        "eyebrow": "League statistics",
+        "title": "Statistics",
+        "scope": "{{races}} races · {{drivers}} drivers",
+        "allTime": "All-time",
+        "season": "Season {{n}}",
+        "allDivisions": "All divisions",
+        "division": "Division {{n}}",
+        "sprints": "Include sprints",
+        "awards": "Awards",
+        "leaderboards": "Leaderboards",
+        "records": "Records",
+        "minRaces": "Minimum {{n}} races",
+        "noHolder": "Nobody yet",
+        "loading": "Crunching the numbers…",
+        "error": "Could not load statistics.",
+        "tabs": {
+            "wins": "Wins",
+            "podiums": "Podiums",
+            "poles": "Poles",
+            "fastestLaps": "Fastest laps",
+            "points": "Points",
+            "races": "Races",
+            "championships": "Titles",
+            "winRate": "Win %",
+            "avgFinish": "Avg. finish"
+        },
+        "records_": {
+            "winStreak": "Longest win streak",
+            "podiumStreak": "Longest podium streak",
+            "seasonWins": "Most wins in one season",
+            "comeback": "Biggest comeback",
+            "lowestWin": "Win from furthest back",
+            "grandSlam": "Most grand slams",
+            "closestTitle": "Closest title fight",
+            "dominantTitle": "Most dominant title"
+        },
+        "awards_": {
+            "comebackKing": "Comeback King",
+            "consistent": "Mr. Consistent",
+            "badLuck": "Bad Luck",
+            "ironMan": "Iron Man"
+        },
+        "awardInfo": {
+            "comebackKing": "Most places gained per race on average",
+            "consistent": "Highest share of races finished in the points",
+            "badLuck": "Most retirements",
+            "ironMan": "Most races started"
+        }
     }
 }
