@@ -17,6 +17,8 @@ Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar 
 - Ongewijzigde rijen houden hun opgeslagen punten (oudere seizoenen hadden soms andere puntenregels).
 - **Admin-dashboard** (vervangt het Admin Hub): To do (gereden races zonder uitslag, met knop "Add results"), seizoensvoortgang per divisie, laatst ingevoerd (View / Edit / Copy link), komende races (→ kalender bewerken), data-check (mogelijk dubbele coureurs, races zonder YouTube-link, oude races zonder uitslag) en snelle acties.
 - Edit Season opent via `?season=…&division=…`.
+- **Add Track en Edit Track vernieuwd** (nieuwe stijl): alle velden (GP-naam, circuit, land met vlag-controle, landcode, bochten, lengte) en **layout-afbeelding uploaden** (slepen, kiezen of plakken met Ctrl+V; voorbeeld vooraf; verwijderen). Edit Track: zoekbare lijst met vlaggen, 🖼 = eigen afbeelding, opent via `?track=…`.
+- Circuitpagina toont de geüploade layout-afbeelding; zonder upload valt hij terug op de ingebouwde afbeeldingen.
 - **Add Season en Edit Season in de nieuwe stijl**: donkere kaarten, nette tabel, labels bij de velden, gewijzigde races geel gemarkeerd, meldingen in de pagina in plaats van browser-pop-ups.
 
 ### Opgelost

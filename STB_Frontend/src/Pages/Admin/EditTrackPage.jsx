@@ -1,201 +1,201 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "@/Components/Links.css";
-
 import { API_BASE } from "@/config";
-function EditTrackPage() {
-  const [tracks, setTracks] = useState([]);
-  const [selectedTrack, setSelectedTrack] = useState(null);
-  const [editedTrack, setEditedTrack] = useState({
-    name: "",
-    country: "",
-    raceName: "",
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+import TrackForm, { EMPTY_TRACK, authHeader, saveLayout } from "./TrackForm";
+
+const fromRow = (r) => ({
+  id: r.Id,
+  raceName: r.RaceName || "",
+  name: r.Name || "",
+  country: r.Country || "",
+  countryCode: r.CountryCode || "",
+  turns: r.Turns ?? "",
+  length: r.Length ?? "",
+  layoutUrl: r.LayoutUrl || null,
+});
+const FIELDS = ["raceName", "name", "country", "countryCode", "turns", "length"];
+
+export default function EditTrackPage() {
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
+  const selectedId = Number(params.get("track")) || null;
+
+  const [tracks, setTracks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState("");
+  const [form, setForm] = useState(EMPTY_TRACK);
+  const [file, setFile] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [removing, setRemoving] = useState(false);
+  const [notice, setNotice] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    // Geen token? Meteen terug naar home/login
-    if (!token) {
-      navigate("/");
-      return;
-    }
-
     try {
-      const decoded = jwtDecode(token);
-      const role = decoded.role;
-
-      if (role !== "Admin") {
-        navigate("/");
-      }
-    } catch (e) {
-      console.log("JWT decode failed:", e);
+      if (jwtDecode(localStorage.getItem("token") || "").role !== "Admin") navigate("/");
+    } catch {
       navigate("/");
     }
   }, [navigate]);
 
-  // Load all tracks (API returns PascalCase; this page works with camelCase)
-  useEffect(() => {
+  const load = () =>
     fetch(`${API_BASE}/api/track`)
-      .then((res) => (res.ok ? res.json() : []))
-      .then((rows) =>
-        setTracks(
-          (Array.isArray(rows) ? rows : []).map((r) => ({
-            id: r.Id,
-            name: r.Name,
-            raceName: r.RaceName,
-            country: r.Country,
-            countryCode: r.CountryCode,
-            turns: r.Turns,
-            length: r.Length,
-          }))
-        )
-      )
-      .catch((err) => setError(err.message))
+      .then((r) => (r.ok ? r.json() : []))
+      .then((rows) => setTracks((Array.isArray(rows) ? rows : []).map(fromRow)))
+      .catch(() => setNotice({ type: "error", text: "Could not load the tracks." }))
       .finally(() => setLoading(false));
+  useEffect(() => {
+    load();
   }, []);
 
-  // Handle track selection
-  const handleSelectTrack = (trackId) => {
-    const track = tracks.find((t) => t.id === Number(trackId));
-    setSelectedTrack(track);
-    setEditedTrack({
-      raceName: track?.raceName || "",
-      name: track?.name || "",
-      country: track?.country || "",
-      countryCode: track?.countryCode || "",
-      turns: track?.turns || "",
-      length: track?.length || ""
-    }); // Pre-fill input fields
+  const selected = tracks.find((t) => t.id === selectedId) || null;
+  useEffect(() => {
+    setForm(selected ? { ...selected } : EMPTY_TRACK);
+    setFile(null);
+    // only when another track is chosen or the list reloads
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId, tracks]);
+
+  const changed = selected ? FIELDS.some((f) => String(form[f] ?? "") !== String(selected[f] ?? "")) : false;
+  const dirty = changed || !!file;
+
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return [...tracks]
+      .sort((a, b) => a.raceName.localeCompare(b.raceName))
+      .filter((t) => !q || `${t.raceName} ${t.name} ${t.country}`.toLowerCase().includes(q));
+  }, [tracks, query]);
+
+  const choose = (id) => {
+    if (dirty && !window.confirm("Discard your unsaved changes?")) return;
+    setNotice(null);
+    setParams(id ? { track: String(id) } : {});
   };
 
-  // Handle input change
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedTrack((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Save changes
-  const handleSave = async () => {
-    if (!selectedTrack) return;
-
-    const updatedTrack = { ...editedTrack, id: selectedTrack.id }; // ensure id is included
-
-    console.log("Saving track:", updatedTrack);
-
-    const response = await fetch(
-      `${API_BASE}/api/track/${selectedTrack.id}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-        },
-        body: JSON.stringify(updatedTrack),
+  const save = async () => {
+    if (!selected) return;
+    setSaving(true);
+    setNotice(null);
+    const done = [];
+    try {
+      if (changed) {
+        const res = await fetch(`${API_BASE}/api/track/${selected.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", ...authHeader() },
+          body: JSON.stringify(form),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(body.message || `HTTP ${res.status}`);
+        done.push("details saved");
       }
-    );
-
-    if (response.ok) {
-      alert("Track updated successfully!");
-      setTracks((prevTracks) =>
-        prevTracks.map((t) =>
-          t.id === selectedTrack.id ? { ...t, ...updatedTrack } : t
-        )
-      );
-    } else {
-      alert("Failed to update track.");
+      if (file) {
+        const up = await saveLayout(selected.id, file);
+        if (!up.ok) throw new Error(`${done.length ? "Details were saved, but the image was not: " : ""}${up.message}`);
+        done.push("layout image saved");
+      }
+      await load();
+      setNotice({ type: "success", text: `${selected.raceName}: ${done.join(" and ")}.` });
+    } catch (err) {
+      setNotice({ type: "error", text: err.message });
+    } finally {
+      setSaving(false);
     }
   };
 
+  const removeLayout = async () => {
+    if (!selected || !window.confirm("Remove the uploaded image? The track page falls back to the built-in image, if there is one.")) return;
+    setRemoving(true);
+    const res = await saveLayout(selected.id, null);
+    setRemoving(false);
+    if (!res.ok) return setNotice({ type: "error", text: res.message });
+    await load();
+    setNotice({ type: "success", text: res.message });
+  };
+
   return (
-    <div className="edit-track-container">
-      <h1>Edit Track</h1>
+    <div className="ta-page">
+      <header className="ta-hero">
+        <span className="eyebrow">Admin · Tracks</span>
+        <h1>Edit Track</h1>
+        <p className="ta-muted">Change a circuit’s details and its layout image (shown on the track page).</p>
+      </header>
 
-      {loading ? (
-        <p>Loading tracks...</p>
-      ) : error ? (
-        <p className="error-message">{error}</p>
-      ) : (
-        <>
-          {/* Track Selection Dropdown */}
-          <div>
-            <label>Select Track: </label>
-            <select onChange={(e) => handleSelectTrack(e.target.value)}>
-              <option value="">-- Choose a Track --</option>
-              {tracks.map((track) => (
-                <option key={track.id} value={track.id}>
-                  {track.raceName} ({track.name})
-                </option>
-              ))}
-            </select>
-          </div>
+      {notice ? (
+        <div className={`ta-notice ta-notice--${notice.type}`} role={notice.type === "error" ? "alert" : "status"}>
+          {notice.text}
+          <button type="button" onClick={() => setNotice(null)} aria-label="Close">
+            ×
+          </button>
+        </div>
+      ) : null}
 
-          {/* Edit Track Form */}
-          {selectedTrack && (
-            <div className="track-edit-form">
-              <h2>Editing: {selectedTrack.raceName}</h2>
+      <div className="ta-split">
+        <aside className="ta-card ta-list">
+          <input type="search" placeholder="Search track or country…" value={query} onChange={(e) => setQuery(e.target.value)} />
+          {loading ? <p className="ta-muted">Loading…</p> : null}
+          <ul>
+            {shown.map((t) => (
+              <li key={t.id}>
+                <button type="button" className={t.id === selectedId ? "is-active" : ""} onClick={() => choose(t.id)}>
+                  <img src={`/flags/${t.country}.png`} alt="" onError={(e) => (e.currentTarget.style.visibility = "hidden")} />
+                  <span>
+                    <strong>{t.raceName}</strong>
+                    <small className="ta-muted">
+                      {t.name}
+                      {t.layoutUrl ? " · 🖼" : ""}
+                    </small>
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+          <Link to="/STB/Add/Track" className="ta-btn ta-btn--small">
+            + Add track
+          </Link>
+        </aside>
 
-              <label>Race Name:</label>
-              <input
-                type="text"
-                name="raceName"
-                value={editedTrack.raceName}
-                onChange={handleInputChange}
+        <section className="ta-card">
+          {selected ? (
+            <>
+              <div className="ta-card__head">
+                <h2>{selected.raceName}</h2>
+                <Link to={`/STB/Track/${selected.id}`} className="ta-muted ta-link">
+                  View track page ↗
+                </Link>
+              </div>
+              <TrackForm
+                value={form}
+                onChange={setForm}
+                layoutUrl={selected.layoutUrl}
+                file={file}
+                onFile={setFile}
+                onRemoveLayout={removeLayout}
+                removing={removing}
               />
-
-              <label>Track Name:</label>
-              <input
-                type="text"
-                name="name"
-                value={editedTrack.name}
-                onChange={handleInputChange}
-              />
-
-              <label>Country:</label>
-              <input
-                type="text"
-                name="country"
-                value={editedTrack.country}
-                onChange={handleInputChange}
-              />
-
-              <label>Country Code:</label>
-              <input
-                type="text"
-                name="countryCode"
-                value={editedTrack.countryCode || ""}
-                onChange={handleInputChange}
-              />
-
-              <label>Turns:</label>
-              <input
-                type="text"
-                name="turns"
-                value={editedTrack.turns || ""}
-                onChange={handleInputChange}
-              />
-
-              <label>Length:</label>
-              <input
-                type="text"
-                name="length"
-                value={editedTrack.length || ""}
-                onChange={handleInputChange}
-              />
-
-              <button className="submit-button" onClick={handleSave}>
-                Save Changes
-              </button>
-            </div>
+              <div className="ta-actions ta-actions--end">
+                {dirty ? (
+                  <button
+                    type="button"
+                    className="ta-btn"
+                    onClick={() => {
+                      setForm({ ...selected });
+                      setFile(null);
+                    }}
+                  >
+                    Undo
+                  </button>
+                ) : null}
+                <button type="button" className="ta-btn ta-btn--primary" onClick={save} disabled={!dirty || saving}>
+                  {saving ? "Saving…" : "Save changes"}
+                </button>
+              </div>
+            </>
+          ) : (
+            <p className="ta-muted">Choose a track on the left.</p>
           )}
-        </>
-      )}
+        </section>
+      </div>
     </div>
   );
 }
-
-export default EditTrackPage;

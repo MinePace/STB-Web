@@ -6,61 +6,8 @@ import DriverLoader from "@/Components/Loaders/DriverLoader";
 import { API_BASE } from "@/config";
 
 import usePageMeta from "@/usePageMeta";
-/* ---------- maps & helpers at module scope ---------- */
+import { getMapCandidates } from "@/trackMap";
 
-const MAP_EXCEPTIONS = {
-  "United States": {
-    "Circuit of the Americas": "/track_map/United_States_COTA.avif",
-    "Miami": "/track_map/United_States_Miami.avif",
-    "Las Vegas": "/track_map/United_States_Las_Vegas.avif",
-  },
-  Italy: {
-    "Monza": "/track_map/Italy_Monza.avif",
-    "Imola": "/track_map/Italy_Imola.avif",
-  },
-  Malaysia: {
-    "Sepang": "/track_map/Malaysia.png"
-  }
-};
-
-function slugCountry(c) {
-  return encodeURIComponent(String(c).trim().replace(/\s+/g, "_"));
-}
-
-function slugTrack(t) {
-  return encodeURIComponent(String(t).trim().replace(/\s+/g, "_"));
-}
-
-const eqCI = (a, b) => String(a).toLowerCase() === String(b).toLowerCase();
-const incCI = (hay, needle) =>
-  String(hay).toLowerCase().includes(String(needle).toLowerCase());
-
-function getMapCandidates({ Country, Name }) {
-  const out = [];
-
-  if (Country && MAP_EXCEPTIONS[Country]) {
-    const byCountry = MAP_EXCEPTIONS[Country];
-
-    if (byCountry[Name]) out.push(byCountry[Name]);
-    else {
-      const keys = Object.keys(byCountry);
-      const k = keys.find(
-        (key) => eqCI(key, Name) || incCI(Name, key) || incCI(key, Name)
-      );
-      if (k) out.push(byCountry[k]);
-    }
-  }
-
-  if (Country && Name) {
-    out.push(`/track_map/${slugCountry(Country)}_${slugTrack(Name)}.avif`);
-  }
-
-  if (Country) {
-    out.push(`/track_map/${slugCountry(Country)}.avif`);
-  }
-
-  return out;
-}
 
 /* ---------- component ---------- */
 
@@ -137,7 +84,7 @@ function TrackPage() {
 
   const { Name, RaceName, Country, Length, Turns } = trackInfo;
 
-  const mapCandidates = getMapCandidates({ Country, Name });
+  const mapCandidates = getMapCandidates({ Country, Name, LayoutUrl: trackInfo?.LayoutUrl });
   const mapSrc = mapOk && mapCandidates.length ? mapCandidates[mapIdx] : null;
 
   return (
