@@ -129,10 +129,21 @@ html, body {
   border-radius: 2px;
   flex-shrink: 0;
 }
-.team-tag__logo {
+/* Fixed 22×22 box; the image keeps its own proportions inside it.
+   (No object-fit: html2canvas ignores it and would squash wide logos in the screenshot.) */
+.team-tag__logo-box {
   width: 22px;
   height: 22px;
-  object-fit: contain;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.team-tag__logo {
+  width: auto;
+  height: auto;
+  max-width: 22px;
+  max-height: 22px;
 }
 
 /* Grid + places gained/lost */

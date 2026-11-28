@@ -11,6 +11,9 @@ Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar 
 - Racepagina **📸 Screenshot + post to Discord** en kampioenschap **Download + post to Discord**: de afbeelding gaat naar de API, die hem opslaat én zelf in het Discord-kanaal van de tier zet (opnieuw uploaden van dezelfde ronde werkt het bericht bij). Na afloop staat naast de knop of het gelukt is. De website roept de bot niet meer aan op `localhost:3000`, dus het werkt zonder dat de bot op een eigen computer draait.
 - Niet-admins downloaden alleen de afbeelding (er wordt niets meer geüpload).
 
+### Opgelost
+- Teamlogo's werden in de uitslag-screenshot platgedrukt tot een vierkantje (html2canvas negeert `object-fit`). Het logo staat nu in een vast vakje en houdt zijn eigen verhoudingen.
+
 ## [2.5.0] – 2026-11-28
 
 ### Nieuw (admin)

@@ -278,12 +278,14 @@ function RaceResultPage() {
                               className="team-tag__bar"
                               style={{ backgroundColor: teamColors[teamName] ?? "var(--muted-fg)" }}
                             />
-                            <img
-                              src={`/team-logos/${teamName}.png`}
-                              alt=""
-                              className="team-tag__logo"
-                              onError={(e) => (e.currentTarget.style.display = "none")}
-                            />
+                            <span className="team-tag__logo-box">
+                              <img
+                                src={`/team-logos/${teamName}.png`}
+                                alt=""
+                                className="team-tag__logo"
+                                onError={(e) => (e.currentTarget.style.display = "none")}
+                              />
+                            </span>
                             {teamName}
                           </span>
                         </td>
