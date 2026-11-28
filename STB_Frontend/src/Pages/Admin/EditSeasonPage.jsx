@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import React, { useEffect, useMemo, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import "./EditSeasonPage.css";
@@ -14,11 +14,12 @@ import { API_BASE } from "@/config";
  */
 function EditSeasonPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams(); // ?season=32&division=1 (links from the admin dashboard)
 
   // Filters
   const [seasons, setSeasons] = useState([]);
-  const [selectedSeason, setSelectedSeason] = useState("");
-  const [selectedDivision, setSelectedDivision] = useState("");
+  const [selectedSeason, setSelectedSeason] = useState(searchParams.get("season") || "");
+  const [selectedDivision, setSelectedDivision] = useState(searchParams.get("division") || "");
 
   // Data
   const [allRacesForSeason, setAllRacesForSeason] = useState([]);
