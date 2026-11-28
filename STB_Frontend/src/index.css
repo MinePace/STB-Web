@@ -223,3 +223,12 @@ textarea::placeholder { color: var(--muted-fg); opacity: 0.8; }
 .page-loading {
   min-height: 60vh;
 }
+
+/* Status after an admin upload (screenshot → Discord) on race and championship pages */
+.share-status {
+    display: inline-block;
+    margin: 0 0 0 12px;
+    font-size: 0.85rem;
+    color: var(--muted-fg);
+    vertical-align: middle;
+}

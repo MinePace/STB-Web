@@ -6,6 +6,7 @@ import html2canvas from "html2canvas";
 import "./RaceResultPage.css";
 import "@/Components/Links.css";
 import { API_BASE } from "@/config";
+import { discordStatusText } from "@/discordStatus";
 
 import { TEAM_COLORS } from "@/teams";
 import usePageMeta from "@/usePageMeta";
@@ -19,6 +20,7 @@ function RaceResultPage() {
   const prefillDriver = searchParams.get("driver");
   const [raceResults, setRaceResults] = useState([]);
   const [race, setRaceData] = useState();
+  const [shareStatus, setShareStatus] = useState("");
   const raceTitle = race
     ? `${race.track?.raceName || race.track?.name || "Race"}${race.sprint === "Yes" ? " Sprint" : ""} – S${race.season} Division ${race.division}`
     : null;
@@ -125,6 +127,9 @@ function RaceResultPage() {
         link.download = `Race_Results_Round${round}.png`;
         link.click();
 
+        // Only admins upload; the API stores the image and posts it to the tier's Discord channel.
+        if (role !== "Admin") return;
+
         const formData = new FormData();
         formData.append("season", season);
         formData.append("tier", tier);
@@ -133,53 +138,19 @@ function RaceResultPage() {
         formData.append("country", race.track?.country);
         formData.append("circuit", race.track?.name);
 
+        setShareStatus("Uploading…");
         try {
-          const response = await fetch(
-            `${API_BASE}/api/auth/upload-result`,
-            {
-              method: "POST",
-              body: formData,
-              headers: {
-                Authorization: `Bearer ${token}`
-              }
-            }
-          );
-
+          const response = await fetch(`${API_BASE}/api/auth/upload-result`, {
+            method: "POST",
+            body: formData,
+            headers: { Authorization: `Bearer ${token}` },
+          });
           const json = await response.json();
           console.log("📤 Result upload complete:", json);
-
-          // 🔥 IMPORTANT: get Supabase public URL from backend
-          const imageUrl = json?.publicUrl || json?.url || json?.imageUrl;
-
-          if (!imageUrl) {
-            console.warn("⚠️ No image URL returned from backend");
-            return;
-          }
-          if(role === "Admin") {
-            // 🤖 Notify Discord bot
-            try {
-              await fetch("http://localhost:3000/api/notify-new-result", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                  season,
-                  tier,
-                  round,
-                  country: race.track?.country,
-                  circuit: race.track?.name,
-                  imagePath: imageUrl // ✅ FULL URL — NOT local path
-                })
-              });
-
-              console.log("🤖 Race bot notified successfully");
-            } catch (err) {
-              console.error("❌ Failed to notify race bot:", err);
-            }
-          }
+          setShareStatus(discordStatusText(json));
         } catch (err) {
           console.error("Upload error:", err);
+          setShareStatus("❌ Upload failed");
         }
       });
   }
@@ -205,9 +176,10 @@ function RaceResultPage() {
                 className="download-button"
                 onClick={() => captureScreenshot({ season, tier, round })}
               >
-                📸 Save Screenshot
+                {role === "Admin" ? "📸 Screenshot + post to Discord" : "📸 Save Screenshot"}
               </button>
             )}
+            {shareStatus && <span className="share-status">{shareStatus}</span>}
             {role === "Admin" && raceResults.length > 0 && (
               <Link
                 to={`/STB/Edit/RaceResults?race=${race.id}`}

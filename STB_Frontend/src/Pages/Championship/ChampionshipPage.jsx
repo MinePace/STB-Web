@@ -8,6 +8,7 @@ import "@/Components/Links.css";
 import RaceLoader from "@/Components/Loaders/RaceLoader";
 import { useTranslation } from "react-i18next";
 import { API_BASE } from "@/config";
+import { discordStatusText } from "@/discordStatus";
 
 import usePageMeta from "@/usePageMeta";
 // helper to safely extract driver/team name
@@ -46,6 +47,7 @@ function ChampionshipPage() {
   const isLoggedIn = localStorage.getItem("token") !== null;
   const [claimedDriver, setClaimedDriver] = useState(null);
   const [token, setToken] = useState("");
+  const [shareStatus, setShareStatus] = useState("");
 
   let role = "user";
   if (token) {
@@ -438,7 +440,8 @@ function ChampionshipPage() {
     a.click();
     URL.revokeObjectURL(url);
 
-    // Upload to backend
+    // Admins: upload; the API stores the image and posts it to the tier's Discord channel.
+    if (role !== "Admin") return;
     const latestRace = [...races]
       .filter((r) => Array.isArray(r.raceResults) && r.raceResults.length > 0)
       .sort((a, b) => (b.round || 0) - (a.round || 0))[0];
@@ -456,6 +459,7 @@ function ChampionshipPage() {
     formData.append("circuit", circuit);
     formData.append("file", file);
 
+    setShareStatus("Uploading…");
     try {
       const response = await fetch(`${API_BASE}/api/auth/upload-championship`, {
         method: "POST",
@@ -467,32 +471,10 @@ function ChampionshipPage() {
 
       const json = await response.json();
       console.log("🏆 Championship upload complete:", json);
-
-      // Notify Discord bot (admin only)
-      if (role === "Admin") {
-        try {
-          await fetch("http://localhost:3000/api/notify-championship", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              season,
-              tier: division,
-              mode,
-              country,
-              circuit,
-              imagePath: `${json.publicUrl}`,
-            }),
-          });
-          console.log("🤖 Bot notified successfully");
-        } catch (err) {
-          console.error("❌ Failed to notify Discord bot:", err);
-        }
-      }
-      else{
-        console.log("⚠️ Not notifying bot since user is not admin");
-      }
+      setShareStatus(discordStatusText(json));
     } catch (err) {
       console.error("❌ Championship upload failed:", err);
+      setShareStatus("❌ Upload failed");
     }
   };
 
@@ -709,8 +691,9 @@ function ChampionshipPage() {
         >
           <div className="modal-toolbar">
             <button onClick={downloadTableAsImage} className="btn btn-primary">
-              Download Table
+              {role === "Admin" ? "Download + post to Discord" : "Download Table"}
             </button>
+            {shareStatus && <span className="share-status">{shareStatus}</span>}
 
             <button onClick={toggleChampionshipMode} className="btn btn-secondary">
               {mode === "constructors" ? "View Drivers Championship" : "View Constructors Championship"}
