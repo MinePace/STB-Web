@@ -555,8 +555,12 @@ export default function AddRaceResults() {
 
   const raceLabel = (r) =>
     `${r.Tracks?.RaceName ?? r.Name ?? "Race"}${r.Sprint === "Yes" ? " (Sprint)" : ""} · S${r.Season} D${r.Division} R${r.Round}`;
-  const fmtDate = (d) =>
-    d ? new Date(String(d).replace(" ", "T")).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) : "";
+  const fmtDate = (d) => {
+    if (!d) return "";
+    const date = new Date(String(d).replace(" ", "T"));
+    const sameYear = date.getFullYear() === new Date().getFullYear();
+    return date.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short", ...(sameYear ? {} : { year: "numeric" }) });
+  };
   const dueRaces = filteredRaces.filter((r) => r.due);
 
   // ---------- Render ----------
@@ -628,12 +632,21 @@ export default function AddRaceResults() {
         ) : null}
         <select onChange={handleRaceSelect} required value={selectedRace?.Id ?? ""}>
           <option value="">Other race…</option>
-          {filteredRaces.map((r) => (
-            <option key={r.Id} value={r.Id}>
-              {r.due ? "● " : ""}
-              {raceLabel(r)} — {fmtDate(r.Date)}
-            </option>
-          ))}
+          {[
+            ["Waiting for results", filteredRaces.filter((r) => r.due)],
+            ["Upcoming", filteredRaces.filter((r) => !r.due && !r.stale)],
+            ["Older races without results", filteredRaces.filter((r) => r.stale).slice().reverse()],
+          ].map(([label, list]) =>
+            list.length ? (
+              <optgroup key={label} label={`${label} (${list.length})`}>
+                {list.map((r) => (
+                  <option key={r.Id} value={r.Id}>
+                    {raceLabel(r)} — {fmtDate(r.Date)}
+                  </option>
+                ))}
+              </optgroup>
+            ) : null
+          )}
         </select>
       </div>
 
