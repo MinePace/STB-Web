@@ -38,6 +38,37 @@ export default function AdminPage() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(null);
+  const [merge, setMerge] = useState(null); // { group, keepId, name, busy, error }
+  const [notice, setNotice] = useState(null);
+
+  // Default: keep the name used most recently (then: most races).
+  const openMerge = (group) => {
+    const keep = [...group].sort((a, b) => (b.lastSeason ?? 0) - (a.lastSeason ?? 0) || b.races - a.races)[0];
+    setMerge({ group, keepId: keep.id, name: keep.name, busy: false, error: null });
+  };
+
+  const doMerge = async () => {
+    const { group, keepId, name } = merge;
+    setMerge((m) => ({ ...m, busy: true, error: null }));
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/drivers/merge`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        body: JSON.stringify({ keepId, mergeIds: group.map((d) => d.id).filter((id) => id !== keepId), name }),
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(out.message || `HTTP ${res.status}`);
+      setData((d) => ({
+        ...d,
+        checks: { ...d.checks, similarDrivers: d.checks.similarDrivers.filter((g) => g !== group) },
+      }));
+      setNotice(`Merged into “${out.name}” — ${out.movedResults} result${out.movedResults === 1 ? "" : "s"} moved.`);
+      setTimeout(() => setNotice(null), 6000);
+      setMerge(null);
+    } catch (e) {
+      setMerge((m) => ({ ...m, busy: false, error: e.message }));
+    }
+  };
 
   useEffect(() => {
     let role = null;
@@ -211,25 +242,30 @@ export default function AdminPage() {
                 {data.checks.similarDrivers.length ? (
                   <ul className="ad-list ad-list--compact">
                     {data.checks.similarDrivers.map((g, i) => (
-                      <li key={i} className="ad-dupes">
-                        {g.map((d, j) => (
-                          <span key={d.name}>
-                            {j ? <span className="ad-muted"> ↔ </span> : null}
-                            <Link to={`/STB/Driver/${encodeURIComponent(d.name)}`}>{d.name}</Link>
-                            <span className="ad-muted">
-                              {" "}
-                              ({d.races}
-                              {d.claimed ? ", claimed" : ""})
+                      <li key={g.map((d) => d.id).join("-")} className="ad-dupes">
+                        <span className="ad-dupes__names">
+                          {g.map((d, j) => (
+                            <span key={d.id}>
+                              {j ? <span className="ad-muted"> ↔ </span> : null}
+                              <Link to={`/STB/Driver/${encodeURIComponent(d.name)}`}>{d.name}</Link>
+                              <span className="ad-muted">
+                                {" "}
+                                ({d.races}
+                                {d.claimed ? ", claimed" : ""})
+                              </span>
                             </span>
-                          </span>
-                        ))}
+                          ))}
+                        </span>
+                        <button type="button" className="ad-btn ad-btn--small" onClick={() => openMerge(g)}>
+                          Merge
+                        </button>
                       </li>
                     ))}
                   </ul>
                 ) : (
                   <p className="ad-ok">✓ None found</p>
                 )}
-                <p className="ad-muted ad-small">Same name apart from spaces, capitals or a short tag in front (e.g. “STB Maldi” ↔ “Maldi”). Merging drivers comes later.</p>
+                <p className="ad-muted ad-small">Same name apart from spaces, capitals or a short tag in front (e.g. “STB Maldi” ↔ “Maldi”). Check that it really is the same person before merging.</p>
               </div>
               <div>
                 <h3>
@@ -264,6 +300,54 @@ export default function AdminPage() {
               </div>
             </div>
           </Section>
+        </div>
+      ) : null}
+      {notice ? <div className="ad-toast" role="status">{notice}</div> : null}
+
+      {merge ? (
+        <div className="ar-overlay" onClick={() => !merge.busy && setMerge(null)}>
+          <div className="ar-dialog stb-panel ad-merge" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <h2>Merge drivers</h2>
+            <p className="ad-muted">Pick the driver to keep. All results, fastest laps, team seats and claims of the others move to it; the others are removed.</p>
+            <div className="ad-merge__options">
+              {merge.group.map((d) => (
+                <label key={d.id} className={`ad-merge__opt${merge.keepId === d.id ? " is-on" : ""}`}>
+                  <input
+                    type="radio"
+                    name="keep"
+                    checked={merge.keepId === d.id}
+                    onChange={() => setMerge((m) => ({ ...m, keepId: d.id, name: d.name }))}
+                  />
+                  <span className="ad-merge__name">{d.name}</span>
+                  <span className="ad-muted">
+                    {d.races} races{d.lastSeason ? ` · last S${d.lastSeason}` : ""}
+                    {d.claimed ? " · claimed" : ""}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <label className="ad-merge__field">
+              <span>Name after merging</span>
+              <input value={merge.name} onChange={(e) => setMerge((m) => ({ ...m, name: e.target.value }))} />
+            </label>
+            <p className="ad-small">
+              Result: <b>{merge.name.trim() || "?"}</b> with {merge.group.reduce((s, d) => s + d.races, 0)} races. This cannot be undone.
+            </p>
+            {merge.error ? <p className="ad-error">{merge.error}</p> : null}
+            <div className="ar-dialog__actions">
+              <button type="button" className="ar-btn ar-btn--ghost" onClick={() => setMerge(null)} disabled={merge.busy}>
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="ar-btn ar-btn--primary"
+                onClick={doMerge}
+                disabled={merge.busy || !merge.name.trim()}
+              >
+                {merge.busy ? "Merging…" : `Merge ${merge.group.length} into 1`}
+              </button>
+            </div>
+          </div>
         </div>
       ) : null}
     </div>

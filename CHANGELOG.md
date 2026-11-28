@@ -7,6 +7,11 @@ Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar 
 
 ## [Unreleased] (op `dev`)
 
+## [2.5.0] – 2026-11-28
+
+### Nieuw (admin)
+- Dashboard, data-check: knop **Merge** achter elke groep mogelijk dubbele coureurs. Kies welke coureur blijft (standaard de naam die het laatst gebruikt is) en eventueel een nieuwe naam; daarna verdwijnt de groep uit de lijst.
+
 ## [2.4.0] – 2026-11-28
 
 ### Nieuw (admin)
