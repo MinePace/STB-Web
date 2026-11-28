@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "./AddRaceResultPage.css";
 import "@/Components/Links.css";
@@ -28,14 +28,20 @@ export default function AddRaceResults() {
   const prefillRaceId = searchParams.get("race"); // e.g. ?race=224
 
   // Races / selection
-  const [races, setRaces] = useState([]);
-  const [filteredRaces, setFilteredRaces] = useState([]);
+  const [filteredRaces, setFilteredRaces] = useState([]); // races without results (from /api/race/open)
+  const [racesLoading, setRacesLoading] = useState(true);
+  const [notice, setNotice] = useState(null); // { type: "error" | "info", text }
+  const [pendingNew, setPendingNew] = useState(null); // unknown drivers waiting for confirmation
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(null); // { race, message, next }
   const [existingResults, setExistingResults] = useState(new Set());
   const [selectedRace, setSelectedRace] = useState(null);
   const [teamDriverLinks, setTeamDriverLinks] = useState([]);
 
   // Rows to submit
   const [raceResults, setRaceResults] = useState([]);
+  // Something typed that is not saved yet -> warn before leaving or switching race
+  const dirty = !saved && raceResults.some((r) => String(r.driver || "").trim());
 
   // Cells filled from a screenshot (DNF, qualifying, time, fastest lap): key "row:field" -> "auto"
   const [autoFilled, setAutoFilled] = useState({});
@@ -85,49 +91,45 @@ export default function AddRaceResults() {
     }
   }, [navigate]);
 
-  // ---------- Load all races, then know which already have results ----------
+  // ---------- Race selection ----------
+  const selectRace = useCallback(async (race) => {
+    setSelectedRace(race);
+    setSaved(null);
+    setNotice(null);
+    setPendingNew(null);
+    if (!race) return;
+    initResultsForRace(race, setRaceResults);
+    try {
+      const res = await fetch(`${API_BASE}/api/team/teamdriver/${race.Season}/${race.Division}`);
+      if (!res.ok) throw new Error("Failed to fetch team-driver links");
+      setTeamDriverLinks((await res.json()) || []);
+    } catch (err) {
+      console.error("TeamDriver fetch error:", err);
+      setTeamDriverLinks([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Only races without results, oldest first. Opens on ?race=… or on the first race that is due.
   useEffect(() => {
-    fetch(`${API_BASE}/api/race/races`)
-      .then((res) => res.json())
-      .then((allRaces) => {
-        setRaces(allRaces || [])
-
-        return fetch(`${API_BASE}/api/race/raceresult`)
-          .then((res) => res.json())
-          .then((allResults) => {
-            const withResults = new Set(
-              (allResults || []).map((r) => r.RaceId)
-            )
-
-            const available = (allRaces || []).filter(
-              (r) => !withResults.has(r.Id)
-            )
-
-            setFilteredRaces(available)
-
-            if (prefillRaceId) {
-              const targetId = Number(prefillRaceId)
-              const target = available.find(
-                (r) => Number(r.Id) === targetId
-              )
-
-              if (target) {
-                setSelectedRace(target)
-                initResultsForRace(target, setRaceResults)
-
-                fetch(
-                  `${API_BASE}/api/team/teamdriver/${target.Season}/${target.Division}`
-                )
-                  .then((res) => res.json())
-                  .then((data) => setTeamDriverLinks(data || []))
-              }
-            }
-          })
+    setRacesLoading(true);
+    fetch(`${API_BASE}/api/race/open`)
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
+      .then((open) => {
+        const list = Array.isArray(open) ? open : [];
+        setFilteredRaces(list);
+        const target =
+          (prefillRaceId && list.find((r) => Number(r.Id) === Number(prefillRaceId))) ||
+          list.find((r) => r.due) ||
+          null;
+        if (target) selectRace(target);
       })
-      .catch((err) =>
-        console.error("Error fetching races/results:", err)
-      )
-  }, [prefillRaceId])
+      .catch((err) => {
+        console.error("Error fetching open races:", err);
+        setNotice({ type: "error", text: "Could not load the races. Refresh the page to try again." });
+      })
+      .finally(() => setRacesLoading(false));
+  }, [prefillRaceId, selectRace]);
 
   // ---------- Load drivers ----------
   useEffect(() => {
@@ -196,52 +198,11 @@ export default function AddRaceResults() {
     );
   };
 
-  const getNextRaceAfter = (current, remaining) => {
-    if (!current) return null;
-    const sameSeasonDiv = remaining
-      .filter(
-        (r) =>
-          Number(r.season) === Number(current.season) &&
-          String(r.division) === String(current.division) &&
-          Number(r.round) > Number(current.round)
-      )
-      .sort((a, b) => Number(a.round) - Number(b.round));
-
-    if (sameSeasonDiv.length > 0) return sameSeasonDiv[0];
-
-    const resetToFirst = remaining
-      .filter(
-        (r) =>
-          Number(r.season) === Number(current.season) &&
-          String(r.division) === String(current.division)
-      )
-      .sort((a, b) => Number(a.round) - Number(b.round));
-
-    return resetToFirst[0] || null;
-  };
-
   // ---------- UI handlers ----------
-  const handleRaceSelect = async (e) => {
-    const id = e.target.value;
-    const race = filteredRaces.find((r) => String(r.Id) === id);
-    if (!race) {
-      console.error("Race not found:", id);
-      return;
-    }
-    setSelectedRace(race);
-    initResultsForRace(race, setRaceResults);
-
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/team/teamdriver/${race.Season}/${race.Division}`
-      );
-      if (!res.ok) throw new Error("Failed to fetch team-driver links");
-      const data = await res.json();
-      setTeamDriverLinks(data || []);
-    } catch (err) {
-      console.error("TeamDriver fetch error:", err);
-      setTeamDriverLinks([]);
-    }
+  const handleRaceSelect = (e) => {
+    const race = filteredRaces.find((r) => String(r.Id) === e.target.value) || null;
+    if (dirty && !window.confirm("Discard the results you entered for this race?")) return;
+    selectRace(race);
   };
 
   function formatRaceTimeInput(input) {
@@ -411,8 +372,8 @@ export default function AddRaceResults() {
   };
 
   // ---------- Submit ----------
-  const handleSubmit = async () => {
-    if (!selectedRace) return;
+  const handleSubmit = async (confirmNew = false) => {
+    if (!selectedRace || saving) return;
 
     const payload = raceResults.map((r) => ({
       RaceId: selectedRace.Id,
@@ -450,29 +411,35 @@ export default function AddRaceResults() {
       }
     };
 
+    setNotice(null);
+    setSaving(true);
     try {
-      let { res, body } = await send(false);
+      let { res, body } = await send(confirmNew);
 
       if (res.status === 409 && body?.needsConfirmation) {
-        const list = (body.unknownDrivers || []).map((n) => `  • ${n}`).join("\n");
-        const ok = window.confirm(
-          `These drivers do not exist in the database yet:\n\n${list}\n\n` +
-            "Create them as new drivers and save the results?\n" +
-            "Choose Cancel to correct the names first (nothing is saved)."
-        );
-        if (!ok) return;
-        ({ res, body } = await send(true));
+        // Ask in the page (not a browser pop-up); nothing is saved yet.
+        setPendingNew(body.unknownDrivers || []);
+        return;
       }
+      if (!res.ok) throw new Error(body?.message || `HTTP ${res.status}`);
 
-      if (!res.ok) {
-        throw new Error(body?.message || `HTTP ${res.status}`);
-      }
-
-      alert(body?.message ?? "Results submitted.");
-      navigate(`/STB/Race/${selectedRace.Id}`);
+      setPendingNew(null);
+      const remaining = filteredRaces.filter((r) => r.Id !== selectedRace.Id);
+      setFilteredRaces(remaining);
+      setSaved({
+        race: selectedRace,
+        message: body?.message ?? "Results saved.",
+        next: remaining.find((r) => r.due) || null,
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       console.error("Error submitting results", err);
-      alert(`Nothing was saved: ${err?.name === "AbortError" ? "the server did not respond in time" : err?.message || err}`);
+      setNotice({
+        type: "error",
+        text: `Nothing was saved: ${err?.name === "AbortError" ? "the server did not respond in time" : err?.message || err}`,
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -545,26 +512,128 @@ export default function AddRaceResults() {
 
   const autoClass = (i, field) => (autoFilled[`${i}:${field}`] ? " ar-auto" : "");
 
+  // ---------- Leaving with unsaved results ----------
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+
+  // ---------- What still needs checking ----------
+  const status = useMemo(() => {
+    const filled = raceResults.filter((r) => String(r.driver || "").trim());
+    const seen = new Map();
+    const issues = []; // { index, reason }
+    raceResults.forEach((r, i) => {
+      const d = String(r.driver || "").trim();
+      if (!d) return;
+      const key = d.toLowerCase();
+      if (seen.has(key)) issues.push({ index: i, reason: `${d} is listed twice` });
+      seen.set(key, i);
+      if (!driverNames.has(d)) issues.push({ index: i, reason: `${d}: new driver?` });
+      if (!r.team) issues.push({ index: i, reason: `${d}: no team` });
+      else if (!teamByName.has(r.team)) issues.push({ index: i, reason: `${d}: unknown team "${r.team}"` });
+    });
+    const autoRows = new Set(Object.keys(autoFilled).map((k) => Number(k.split(":")[0]))).size;
+    const fastest = raceResults.filter((r) => r.fastestLap).length;
+    return { filled: filled.length, issues, autoRows, fastest };
+  }, [raceResults, driverNames, teamByName, autoFilled]);
+
+  const goToRow = (index) => {
+    const row = document.getElementById(`ar-row-${index}`);
+    if (!row) return;
+    row.scrollIntoView({ behavior: "smooth", block: "center" });
+    row.classList.add("ar-row--flash");
+    setTimeout(() => row.classList.remove("ar-row--flash"), 1400);
+    row.querySelector("input, select")?.focus({ preventScroll: true });
+  };
+  const issueRows = [...new Set(status.issues.map((x) => x.index))];
+
+  const raceLabel = (r) =>
+    `${r.Tracks?.RaceName ?? r.Name ?? "Race"}${r.Sprint === "Yes" ? " (Sprint)" : ""} · S${r.Season} D${r.Division} R${r.Round}`;
+  const fmtDate = (d) =>
+    d ? new Date(String(d).replace(" ", "T")).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }) : "";
+  const dueRaces = filteredRaces.filter((r) => r.due);
+
   // ---------- Render ----------
   return (
     <div className="ar-container">
       <h1>Add Race Results</h1>
 
+      {/* Saved: next steps */}
+      {saved ? (
+        <div className="ar-saved stb-panel" role="status">
+          <div>
+            <span className="eyebrow">Saved ✓</span>
+            <h2>{raceLabel(saved.race)}</h2>
+            <p className="ar-muted">{saved.message}</p>
+          </div>
+          <div className="ar-saved__actions">
+            <Link to={`/STB/Race/${saved.race.Id}`} className="ar-btn ar-btn--ghost">
+              View race
+            </Link>
+            <button
+              type="button"
+              className="ar-btn ar-btn--ghost"
+              onClick={() => {
+                navigator.clipboard?.writeText(`${window.location.origin}/STB/Race/${saved.race.Id}`);
+                setNotice({ type: "info", text: "Link copied — paste it in Discord for the preview." });
+              }}
+            >
+              Copy link
+            </button>
+            {saved.next ? (
+              <button type="button" className="ar-btn ar-btn--primary" onClick={() => { selectRace(saved.next); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                Next: {raceLabel(saved.next)} →
+              </button>
+            ) : (
+              <span className="ar-muted">All races that are due have results 🎉</span>
+            )}
+          </div>
+        </div>
+      ) : null}
+
       {/* Race Selection */}
-      <div className="race-settings">
-        <h2>Select Race</h2>
+      <div className="race-settings stb-panel ar-pick">
+        <div className="ar-pick__head">
+          <h2>Race</h2>
+          {racesLoading ? <span className="ar-muted">Loading races…</span> : null}
+        </div>
+        {dueRaces.length ? (
+          <div className="ar-todo">
+            <span className="ar-todo__label">To do ({dueRaces.length})</span>
+            {dueRaces.slice(0, 8).map((r) => (
+              <button
+                key={r.Id}
+                type="button"
+                className={`ar-todo__chip ${selectedRace?.Id === r.Id ? "is-active" : ""}`}
+                onClick={() => {
+                  if (selectedRace?.Id === r.Id) return;
+                  if (dirty && !window.confirm("Discard the results you entered for this race?")) return;
+                  selectRace(r);
+                }}
+              >
+                <strong>{r.Tracks?.RaceName ?? r.Name}{r.Sprint === "Yes" ? " · Sprint" : ""}</strong>
+                <span>S{r.Season} · D{r.Division} · R{r.Round} · {fmtDate(r.Date)}</span>
+              </button>
+            ))}
+            {dueRaces.length > 8 ? <span className="ar-muted">+{dueRaces.length - 8} more in the list below</span> : null}
+          </div>
+        ) : !racesLoading ? (
+          <p className="ar-muted">No races waiting for results. Pick an upcoming race below if needed.</p>
+        ) : null}
         <select onChange={handleRaceSelect} required value={selectedRace?.Id ?? ""}>
-          <option value="">Select a Race</option>
-          {filteredRaces.length > 0 ? (
-            filteredRaces.map((r) => (
-              <option key={r.Id} value={r.Id}>
-                Season {r.Season}, Round {r.Round}, Div {r.Division} - {r.Tracks?.RaceName ?? r.Name}
-                {r.Sprint === "Yes" ? " (Sprint)" : ""}
-              </option>
-            ))
-          ) : (
-            <option disabled>No races available</option>
-          )}
+          <option value="">Other race…</option>
+          {filteredRaces.map((r) => (
+            <option key={r.Id} value={r.Id}>
+              {r.due ? "● " : ""}
+              {raceLabel(r)} — {fmtDate(r.Date)}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -605,7 +674,7 @@ export default function AddRaceResults() {
           </thead>
           <tbody>
             {raceResults.map((row, i) => (
-              <tr key={i}>
+              <tr key={i} id={`ar-row-${i}`} className={issueRows.includes(i) ? "ar-row--issue" : ""}>
                 <td>{row.position}</td>
 
                 <td>
@@ -711,10 +780,61 @@ export default function AddRaceResults() {
         </table>
       </div>
 
-      {/* Submit Button */}
-      <button onClick={handleSubmit} disabled={!selectedRace} className="submit-button">
-        Submit All Results
-      </button>
+      {/* Status + save (sticky at the bottom) */}
+      {selectedRace && !saved ? (
+        <div className="ar-statusbar stb-panel">
+          <div className="ar-statusbar__info">
+            <strong>{status.filled} drivers</strong>
+            {status.issues.length ? (
+              <button type="button" className="ar-check" onClick={() => goToRow(issueRows[0])} title={status.issues.map((x) => x.reason).join("\n")}>
+                ⚠ {issueRows.length} {issueRows.length === 1 ? "row" : "rows"} to check →
+              </button>
+            ) : status.filled ? (
+              <span className="ar-ok">✓ All drivers and teams recognised</span>
+            ) : (
+              <span className="ar-muted">Paste a screenshot or type the results</span>
+            )}
+            {status.autoRows ? <span className="ar-muted">{status.autoRows} rows from screenshot</span> : null}
+            {status.filled && status.fastest !== 1 ? <span className="ar-warn">Fastest lap: {status.fastest === 0 ? "none ticked" : `${status.fastest} ticked`}</span> : null}
+          </div>
+          <button onClick={() => handleSubmit(false)} disabled={!status.filled || saving} className="ar-btn ar-btn--primary ar-save">
+            {saving ? "Saving…" : "Save results"}
+          </button>
+        </div>
+      ) : null}
+
+      {notice ? (
+        <div className={`ar-notice ar-notice--${notice.type}`} role={notice.type === "error" ? "alert" : "status"}>
+          {notice.text}
+          <button type="button" className="ar-notice__close" onClick={() => setNotice(null)} aria-label="Close">
+            ×
+          </button>
+        </div>
+      ) : null}
+
+      {/* New drivers: confirm in the page */}
+      {pendingNew ? (
+        <div className="ar-overlay" onClick={() => setPendingNew(null)}>
+          <div className="ar-dialog stb-panel" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <h2>New drivers</h2>
+            <p>These drivers are not in the database yet:</p>
+            <ul>
+              {pendingNew.map((n) => (
+                <li key={n}>{n}</li>
+              ))}
+            </ul>
+            <p className="ar-muted">Create them and save the results? Choose “Go back” to fix the spelling first — nothing is saved yet.</p>
+            <div className="ar-dialog__actions">
+              <button type="button" className="ar-btn ar-btn--ghost" onClick={() => setPendingNew(null)}>
+                Go back
+              </button>
+              <button type="button" className="ar-btn ar-btn--primary" onClick={() => handleSubmit(true)} disabled={saving}>
+                {saving ? "Saving…" : `Create ${pendingNew.length} and save`}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

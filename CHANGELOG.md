@@ -7,6 +7,13 @@ Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar 
 
 ## [Unreleased] (op `dev`)
 
+### Nieuw (admin)
+- **Add Results sneller**: opent direct op de eerstvolgende race zonder uitslag; lijst "To do" met alle gereden races zonder uitslag; laadt alleen open races (i.p.v. alle ±9.500 uitslagen).
+- Statusbalk onderaan (blijft in beeld): aantal coureurs, "✓ alles herkend" of "⚠ x rijen controleren" met sprong naar de rij, waarschuwing bij 0 of meerdere snelste ronden.
+- Na opslaan: blijft op de pagina met "Bekijk race", "Kopieer link" en **"Volgende: … →"**.
+- Nieuwe coureurs bevestigen in de pagina (geen browser-pop-up); foutmeldingen in de pagina.
+- Waarschuwing bij weggaan of van race wisselen met niet-opgeslagen invoer.
+
 ### Verbeterd
 - Google: gestructureerde gegevens (naam "STB Racing League", logo, YouTube/Twitch/TikTok/Discord), zodat Google de juiste sitenaam toont in plaats van "Vercel".
 - Vierkante favicons (48/192 px + Apple-icoon); Google toonde het oude, niet-vierkante favicon niet.
