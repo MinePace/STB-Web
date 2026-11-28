@@ -8,6 +8,11 @@ import { API_BASE } from "@/config";
 function AddSeasonPage() {
   const navigate = useNavigate();
 
+  const [notice, setNotice] = useState(null); // in-page message instead of browser pop-ups
+  const notify = (text, type = "error") => {
+    setNotice({ text, type });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const [header, setHeader] = useState({
     game: "",
     season: "",
@@ -122,7 +127,7 @@ function AddSeasonPage() {
   // NEW — apply dates with multiple breaks
   const applyAutoFillDates = () => {
     if (!dateConfig.startDate) {
-      alert("Select a start date");
+      notify("Select a start date");
       return;
     }
 
@@ -158,7 +163,7 @@ function AddSeasonPage() {
 
   // IMPORT TRACKS
   const importRacesFromSeason = async () => {
-    if (!importSeason) return alert("Enter a season");
+    if (!importSeason) return notify("Enter a season");
 
     setIsImporting(true);
 
@@ -175,7 +180,7 @@ function AddSeasonPage() {
       const races = await res.json();
 
       if (!Array.isArray(races) || races.length === 0) {
-        alert("No races found for this season");
+        notify("No races found for this season");
         return;
       }
 
@@ -229,7 +234,7 @@ function AddSeasonPage() {
       const maxRound = Math.max(...roundNumbers);
 
       if (!maxRound || maxRound < 1) {
-        alert("No valid rounds found in this season");
+        notify("No valid rounds found in this season");
         return;
       }
 
@@ -252,10 +257,10 @@ function AddSeasonPage() {
         })
       );
 
-      alert(`Imported races from season ${importSeason}`);
+      notify(`Imported races from season ${importSeason}`, "success");
     } catch (error) {
       console.error("Import failed:", error);
-      alert(error.message || "Import failed");
+      notify(error.message || "Import failed");
     } finally {
       setIsImporting(false);
     }
@@ -263,7 +268,7 @@ function AddSeasonPage() {
 
   const validateHeader = () => {
     if (!header.game || !header.season || !header.division) {
-      alert("Fill Game, Season, Division");
+      notify("Fill Game, Season, Division");
       return false;
     }
     return true;
@@ -271,7 +276,7 @@ function AddSeasonPage() {
 
   const validateRounds = () => {
     for (const r of rounds) {
-      if (!r.trackId) return alert(`Round ${r.round}: select a track.`);
+      if (!r.trackId) return notify(`Round ${r.round}: select a track.`);
     }
     return true;
   };
@@ -333,33 +338,43 @@ function AddSeasonPage() {
       if (!res.ok) {
         const err = await res.json();
         console.error("Failed payload:", p);
-        alert(err.message || "Race toevoegen mislukt");
+        notify(err.message || "Adding a race failed");
         return;
       }
     }
 
-    alert("Season added!");
+    notify("Season added!", "success");
   };
 
   return (
     <div className="add-season-page">
-      <h1>Add Season</h1>
+      <header className="ss-hero">
+        <span className="eyebrow">Admin · Seasons</span>
+        <h1>Add Season</h1>
+        <p className="ss-muted">Create the calendar for a new season and division: tracks, dates and stream links per round.</p>
+      </header>
+
+      {notice ? (
+        <div className={`ss-notice ss-notice--${notice.type}`} role={notice.type === "error" ? "alert" : "status"}>
+          {notice.text}
+          <button type="button" onClick={() => setNotice(null)} aria-label="Close">
+            ×
+          </button>
+        </div>
+      ) : null}
 
       <div className="card">
         <div className="header-grid">
-          <input className="input" name="game" placeholder="Game" value={header.game} onChange={updateHeader}/>
-          <input className="input" name="season" placeholder="Season" value={header.season} onChange={updateHeader}/>
-          <input className="input" name="division" placeholder="Division" value={header.division} onChange={updateHeader}/>
+          <label className="ss-field"><span>Game (e.g. 25)</span><input className="input" name="game" placeholder="Game" value={header.game} onChange={updateHeader}/></label>
+          <label className="ss-field"><span>Season</span><input className="input" name="season" placeholder="Season" value={header.season} onChange={updateHeader}/></label>
+          <label className="ss-field"><span>Division</span><input className="input" name="division" placeholder="Division" value={header.division} onChange={updateHeader}/></label>
 
-          <input className="input" type="number" placeholder="Import season" value={importSeason} onChange={(e)=>setImportSeason(e.target.value)}/>
+          <label className="ss-field"><span>Copy tracks from season</span><input className="input" type="number" placeholder="e.g. 31" value={importSeason} onChange={(e)=>setImportSeason(e.target.value)}/></label>
           <button type="button" className="button-date" onClick={importRacesFromSeason}>
             Import Tracks
           </button>
 
-          <div className="inline-row">
-            <label># Rounds</label>
-            <input className="input" type="number" value={rounds.length} onChange={(e)=>setRoundCount(e.target.value)}/>
-          </div>
+          <label className="ss-field"><span>Number of rounds</span><input className="input" type="number" value={rounds.length} onChange={(e)=>setRoundCount(e.target.value)}/></label>
 
           <button type="button" className="button-date" onClick={()=>setShowDateModal(true)}>
             Auto-fill Weekly Dates
@@ -392,7 +407,7 @@ function AddSeasonPage() {
               onChange={(e)=>setDateConfig(c=>({...c,breakWeeks:e.target.value}))}
             />
 
-            <div style={{marginTop:15,display:"flex",gap:10}}>
+            <div className="ss-modal-actions">
               <button className="submit-button" onClick={applyAutoFillDates}>
                 Apply
               </button>

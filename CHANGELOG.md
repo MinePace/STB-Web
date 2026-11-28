@@ -17,6 +17,10 @@ Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar 
 - Ongewijzigde rijen houden hun opgeslagen punten (oudere seizoenen hadden soms andere puntenregels).
 - **Admin-dashboard** (vervangt het Admin Hub): To do (gereden races zonder uitslag, met knop "Add results"), seizoensvoortgang per divisie, laatst ingevoerd (View / Edit / Copy link), komende races (→ kalender bewerken), data-check (mogelijk dubbele coureurs, races zonder YouTube-link, oude races zonder uitslag) en snelle acties.
 - Edit Season opent via `?season=…&division=…`.
+- **Add Season en Edit Season in de nieuwe stijl**: donkere kaarten, nette tabel, labels bij de velden, gewijzigde races geel gemarkeerd, meldingen in de pagina in plaats van browser-pop-ups.
+
+### Opgelost
+- De opmaak van Edit Season zette kleurvariabelen voor de hele site (licht thema); daardoor had o.a. de kampioenschapspagina de verkeerde tekstkleur. De opmaak geldt nu alleen nog voor de seizoenspagina's.
 
 ### Verbeterd
 - Google: gestructureerde gegevens (naam "STB Racing League", logo, YouTube/Twitch/TikTok/Discord), zodat Google de juiste sitenaam toont in plaats van "Vercel".

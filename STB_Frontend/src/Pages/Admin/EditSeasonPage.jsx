@@ -17,6 +17,11 @@ function EditSeasonPage() {
   const [searchParams] = useSearchParams(); // ?season=32&division=1 (links from the admin dashboard)
 
   // Filters
+  const [notice, setNotice] = useState(null); // in-page message instead of browser pop-ups
+  const notify = (text, type = "error") => {
+    setNotice({ text, type });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const [seasons, setSeasons] = useState([]);
   const [selectedSeason, setSelectedSeason] = useState(searchParams.get("season") || "");
   const [selectedDivision, setSelectedDivision] = useState(searchParams.get("division") || "");
@@ -246,7 +251,7 @@ function EditSeasonPage() {
 
   const saveAll = async () => {
     if (!selectedSeason || !selectedDivision) {
-      alert("Please select Season and Division first.");
+      notify("Please select Season and Division first.");
       return;
     }
 
@@ -254,7 +259,7 @@ function EditSeasonPage() {
     const updates = rows.filter((r, i) => r.Id && JSON.stringify(r) !== JSON.stringify(originalRows[i]));
 
     if (!creates.length && !updates.length) {
-      alert("No changes to save.");
+      notify("No changes to save.");
       return;
     }
 
@@ -325,9 +330,9 @@ function EditSeasonPage() {
 
     if (failures.length) {
       console.error("Some operations failed:", failures);
-      alert(`Saved with errors. Success: ${creates.length + updates.length - failures.length}/${creates.length + updates.length}.`);
+      notify(`Saved with errors. Success: ${creates.length + updates.length - failures.length}/${creates.length + updates.length}.`);
     } else {
-      alert("Season saved successfully!");
+      notify("Season saved successfully!", "success");
       // Refresh originals to the new rows (IDs for new rows would require a refetch if you need them immediately)
       setOriginalRows(rows);
     }
@@ -338,7 +343,20 @@ function EditSeasonPage() {
   // ----- UI -----
   return (
     <div className="add-season-page">
-      <h1>Edit Season</h1>
+      <header className="ss-hero">
+        <span className="eyebrow">Admin · Seasons</span>
+        <h1>Edit Season</h1>
+        <p className="ss-muted">Change the calendar of a season and division, and which drivers drive for which team.</p>
+      </header>
+
+      {notice ? (
+        <div className={`ss-notice ss-notice--${notice.type}`} role={notice.type === "error" ? "alert" : "status"}>
+          {notice.text}
+          <button type="button" onClick={() => setNotice(null)} aria-label="Close">
+            ×
+          </button>
+        </div>
+      ) : null}
 
       {/* Filters card */}
       <div className="card">
@@ -376,10 +394,7 @@ function EditSeasonPage() {
           </select>
 
           <div className="inline-row">
-            <span
-              className="input"
-              style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}
-            >
+            <span className="input ss-count">
               {rows.length ? `${rows.length} rounds` : "—"}
             </span>
           </div>
@@ -406,7 +421,7 @@ function EditSeasonPage() {
 
       {/* Table */}
       {selectedSeason && selectedDivision ? (
-        <div className="table-wrap" style={{ marginTop: 16 }}>
+        <div className="table-wrap">
           <table className="season-table">
             <thead>
               <tr>
@@ -422,7 +437,7 @@ function EditSeasonPage() {
                 const changed = originalRows[idx] && JSON.stringify(r) !== JSON.stringify(originalRows[idx]);
                 return (
                   <React.Fragment key={r.Id ?? `new-${idx}`}>
-                    <tr style={changed ? { boxShadow: "inset 0 0 0 2px var(--accent)" } : undefined}>
+                    <tr className={changed ? "is-changed" : undefined}>
                       <td>
                         <input
                           className="cell-input"
@@ -434,11 +449,11 @@ function EditSeasonPage() {
                       </td>
                       <td>
                         {tracksLoading ? (
-                          <div className="cell-input" style={{ opacity: 0.7 }}>Loading tracks…</div>
+                          <div className="cell-input ss-muted">Loading tracks…</div>
                         ) : tracksError ? (
                           <div
                             className="cell-input"
-                            style={{ borderColor: "var(--danger)", color: "var(--danger)" }}
+                            data-error="true"
                           >
                             Tracks error
                           </div>
@@ -524,7 +539,7 @@ function EditSeasonPage() {
 
               {!rows.length && (
                 <tr>
-                  <td colSpan={5} style={{ padding: 16, color: "var(--text-dim)" }}>
+                  <td colSpan={5} className="ss-muted ss-empty">
                     No races found for this selection.
                   </td>
                 </tr>
@@ -533,15 +548,15 @@ function EditSeasonPage() {
           </table>
         </div>
       ) : (
-        <div className="toast" style={{ background: "var(--muted)" }}>
+        <div className="toast">
           Select a season and division to load races.
         </div>
       )}
 
       {/* ===== TeamDrivers Section ===== */}
       {selectedSeason && selectedDivision && (
-        <div className="card" style={{ marginTop: 24 }}>
-          <h2 style={{ color: "var(--brand)", marginBottom: 10 }}>Teams & Drivers</h2>
+        <div className="card ss-teams">
+          <h2>Teams & Drivers</h2>
 
           {loadingTeamDrivers ? (
             <div className="toast">Loading teams and drivers…</div>
@@ -551,13 +566,6 @@ function EditSeasonPage() {
                 <div
                   key={idx}
                   className="team-card"
-                  style={{
-                    border: "1px dashed var(--border)",
-                    borderRadius: "10px",
-                    padding: "12px",
-                    marginBottom: "12px",
-                    background: "var(--muted)",
-                  }}
                 >
                   {/* Select Team */}
                   <select
@@ -648,8 +656,7 @@ function EditSeasonPage() {
 
               {/* Save Assignments */}
               <button
-                className="submit-button"
-                style={{ marginTop: 16 }}
+                className="submit-button ss-save-teams"
                 disabled={savingTeamDrivers}
                 onClick={async () => {
                   setSavingTeamDrivers(true);
@@ -697,8 +704,8 @@ function EditSeasonPage() {
                   setSavingTeamDrivers(false);
 
                   if (errors.length)
-                    alert("Some errors occurred:\n" + errors.join("\n"));
-                  else alert("Team assignments saved successfully!");
+                    notify("Some errors occurred:\n" + errors.join("\n"));
+                  else notify("Team assignments saved successfully!", "success");
                 }}
               >
                 {savingTeamDrivers ? "Saving…" : "Save Assignments"}
