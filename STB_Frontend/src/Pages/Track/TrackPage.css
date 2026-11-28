@@ -1,293 +1,188 @@
-/* ----- Container ----- */
-.tp-container {
-  max-width: 1300px;
-  margin: 2rem auto;
-  padding: 1.25rem;
-  border-radius: 16px;
-  background: linear-gradient(180deg, #2e66ff0d, #2e66ff1f);
-  border: 3px solid rgba(33, 36, 80, 0.304);
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
-  color: #eef3ff;
+/* =====================================================================
+   Track page (tk-*) — same look as the driver page, theme tokens from index.css
+   ===================================================================== */
+.tk-page {
+  max-width: 1200px;
+  margin: 32px auto 64px;
+  padding: 0 20px;
+  text-align: left; /* App.css centres all text by default */
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  box-sizing: border-box;
 }
+.tk-page *,
+.tk-page *::before,
+.tk-page *::after { box-sizing: border-box; }
 
-/* ----- HERO (left main, right map) ----- */
-.tp-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 520px; /* map on the right */
-  gap: 18px;
-  align-items: start;
-}
-.tp-hero-aside { align-self: start; }
+.tk-muted { color: var(--muted-fg); }
 
-@media (max-width: 1000px) {
-  .tp-hero { grid-template-columns: 1fr; }
-}
-
-/* ----- Header ----- */
-.tp-header {
-  text-align: center;
-  padding: 0.1rem 0 0;
-}
-.tp-flag {
-  width: 56px;
-  height: 36px;
-  object-fit: cover;
-  display: inline-block;
-  border-radius: 3px;
-  background: #00000088;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
-}
-.tp-title {
-  margin: 0.5rem 0 0;
-  font-size: 2.6rem;
+.tk-section-title {
+  font-family: var(--font-display);
   font-weight: 800;
-  color: #fff;
-  letter-spacing: 0.3px;
-}
-.tp-subtitle {
-  margin-top: 0.25rem;
-  font-style: italic;
-  color: #b8c6ff;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0 0 12px;
 }
 
-/* ----- Stats ----- */
-.tp-stats {
+/* Hero: name on the left, layout on the right */
+.tk-hero {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin: 1rem 0 1.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 380px);
+  align-items: center;
+  gap: 24px;
+  padding: 26px 28px;
 }
-.tp-stat {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
-  padding: 14px 16px;
-  text-align: center;
+.tk-hero__main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tk-hero__name { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.tk-flag { width: 46px; height: 46px; object-fit: contain; flex: none; }
+.tk-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(36px, 6vw, 62px);
+  line-height: 0.95;
+  text-transform: uppercase;
+  margin: 0;
+  overflow-wrap: anywhere;
 }
-.tp-stat-value {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #fff;
-}
-.tp-stat-label {
-  margin-top: 4px;
-  font-size: 0.8rem;
-  color: #cbd4ff;
+.tk-sub { margin: 0; font-size: 18px; font-weight: 600; color: var(--muted-fg); }
+.tk-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.tk-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted-fg);
+  font-size: 13px;
+  font-weight: 600;
 }
 
-/* ----- Map card (right) ----- */
-.tp-map-card {
-  position: sticky;
-  top: 18px; /* sticks while scrolling */
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  padding: 10px;
-  min-height: 260px;
+.tk-map {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-.tp-map {
-  width: 100%;
-  height: auto;
-  display: block;
-  object-fit: contain;
+  min-height: 180px;
+  padding: 14px;
   border-radius: 10px;
+  background: rgba(4, 18, 43, 0.35);
+  border: 1px solid var(--border);
 }
-.tp-map-fallback {
-  color: #b8c6ff;
-  font-style: italic;
+.tk-map img {
+  display: block;
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
 }
+.tk-map__empty { font-size: 14px; }
 
-/* ----- Section ----- */
-.tp-section { margin-top: 1.25rem; }
-.tp-section-title {
-  text-align: center;
-  font-size: 1.35rem;
-  font-weight: 800;
-  color: #fff;
-  margin-bottom: 0.75rem;
-}
-
-/* ----- Rounds (2 columns) ----- */
-.tp-rounds {
+/* Stat tiles */
+.tk-tiles {
   display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.tk-tile { display: flex; flex-direction: column; gap: 2px; padding: 14px 16px; min-width: 0; }
+.tk-tile__value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 34px;
+  line-height: 1.05;
+}
+.tk-tile__sub {
+  font-weight: 700;
+  color: var(--fg);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tk-tile__sub:hover { color: var(--primary); }
+.tk-tile__label {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+}
+
+/* Race cards */
+.tk-races {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 14px;
 }
-.tp-rounds-2 {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-@media (max-width: 1450px) {
-  .tp-rounds-2 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-@media (max-width: 1175px) {
-  .tp-rounds-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 700px) {
-  .tp-rounds-2 { grid-template-columns: 1fr; }
-}
-
-/* ----- Round card ----- */
-.tp-round-card {
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 14px;
-  padding: 14px;
-}
-.tp-round-meta {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-  flex-wrap: wrap;
-}
-.tp-round-title { font-weight: 700; color: #fff; }
-.tp-round-sub {
-  color: #cbd4ff;
-  font-size: 0.9rem;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.tp-badge {
-  font-size: 0.7rem;
-  padding: 3px 8px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.08);
-  color: #e9efff;
-}
-.tp-badge-sprint {
-  border-color: rgba(255, 193, 7, 0.4);
-  background: rgba(255, 193, 7, 0.12);
-  color: #ffe28b;
-}
-
-
-/* ----- Results table ----- */
-.tp-results {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  overflow: hidden;
-}
-.tp-results-head,
-.tp-result-row {
-  display: grid;
-  grid-template-columns: 64px 1fr 80px;
-  align-items: center;
-}
-.tp-results-head {
-  background: rgba(255, 255, 255, 0.06);
-  color: #dfe6ff;
-  font-weight: 600;
-  font-size: 0.85rem;
-}
-.tp-results-body .tp-result-row {
-  padding: 5px 8px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-.tp-right { text-align: right; }
-
-.tp-driver {
-  color: #ffffff;
-}
-
-.tp-driver:hover {
-  color: var(--primary);
-  font-weight: bold;
+.tk-race { display: flex; flex-direction: column; gap: 12px; padding: 16px 18px; }
+.tk-race__head > div { display: flex; flex-direction: column; gap: 2px; }
+.tk-race__where {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--fg);
   text-decoration: none;
 }
-
-/* ----- Show more ----- */
-.tp-showmore {
-  display: inline-block; /* or block if you want full width */
-  margin-top: 10px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: transparent;
-  color: #e9efff;
-  padding: 1px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  text-decoration: none; /* remove underline */
-  text-align: center; /* center the text */
-  transition: background-color 0.2s, color 0.2s;
-}
-
-.tp-showmore:hover {
-  background: rgba(255,255,255,0.06);
-  color: var(--primary);
-  text-decoration: none;
-  transition: color 0.2s, background-color 0.2s;
-}
-
-.tp-showmore:focus {
-  outline: 2px solid rgba(255,255,255,0.35);
-  outline-offset: 2px;
-}
-
-/* ----- Position + medals ----- */
-.tp-pos { font-weight: 700; color: #e8edff; }
-.tp-medal { 
-  border-radius: 999px; 
-  padding: 2px 10px; 
-  text-align: center; 
-}
-.tp-medal-1 { background: linear-gradient(180deg, #ffef9e, #ffd452); color: #1f1700; border: #ffd452}
-.tp-medal-2 { background: linear-gradient(180deg, #f0f3f9, #d9e1f0); color: #20232a; border: #d9e1f0}
-.tp-medal-3 { background: linear-gradient(180deg, #ffd2a6, #ffa85a); color: #241200; border: #ffa85a}
-.tp-medal-dnf { background: linear-gradient(180deg, #ffa6a6, #ff5a5a); color: #241200; border: #ff5a5a}
-
-/* ----- Tags ----- */
-.tp-tag {
+.tk-race__where:hover { color: var(--primary); }
+.tk-race__head .tk-muted { font-size: 13px; }
+.tk-tag {
   display: inline-block;
-  min-width: 36px;
-  text-align: center;
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  color: #fff;
+  margin-left: 8px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(255, 210, 31, 0.15);
+  color: var(--accent);
+  vertical-align: middle;
+}
+
+.tk-podium { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.tk-podium li {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.tk-podium__name {
   font-weight: 600;
+  color: var(--fg);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.tp-tag-dnf {
-  background: rgba(239, 68, 68, 0.15);
-  border-color: rgba(239, 68, 68, 0.4);
-  color: #ffb3b3;
-}
+.tk-podium__name:hover { color: var(--primary); }
+.tk-podium__pts { font-size: 13px; color: var(--muted-fg); font-variant-numeric: tabular-nums; }
 
-/* ----- Utility states ----- */
-.tp-spinner,
-.tp-error,
-.tp-empty {
-  margin: 2rem auto;
-  text-align: center;
-  color: #e9efff;
+.tk-race__more {
+  margin-top: auto;
+  align-self: flex-start;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  text-decoration: none;
 }
-.tp-error { color: #ffd5d5; }
+.tk-race__more:hover { text-decoration: underline; }
 
-/* ----- Winner Stat ----- */
-.tp-stat-label {
-  display: block;
-  margin-bottom: 4px;
-  color: #cbd4ff;
+/* Not found */
+.tk-notfound { padding: 26px 28px; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.tk-btn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  color: var(--fg);
+  font-weight: 700;
+  text-decoration: none;
 }
-.tp-stat-winner {
-  display: block;
-}
-.tp-stat-winner:hover {
-  transform: none;
-  letter-spacing: normal;
-  background: transparent;
-}
+.tk-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-
-/* ----- Responsive tweaks ----- */
-@media (max-width: 640px) {
-  .tp-stats { grid-template-columns: 1fr; }
-  .tp-results-head, .tp-result-row { grid-template-columns: 56px 1fr 64px; }
+/* Responsive */
+@media (max-width: 960px) {
+  .tk-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
-@media (max-width: 1150px) {
-  .tp-stats { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+@media (max-width: 720px) {
+  .tk-hero { grid-template-columns: 1fr; padding: 20px; }
+  .tk-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tk-races { grid-template-columns: 1fr; }
 }

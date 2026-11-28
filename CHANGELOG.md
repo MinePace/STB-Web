@@ -27,6 +27,7 @@ Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar 
 ### Verbeterd
 - Google: gestructureerde gegevens (naam "STB Racing League", logo, YouTube/Twitch/TikTok/Discord), zodat Google de juiste sitenaam toont in plaats van "Vercel".
 - Vierkante favicons (48/192 px + Apple-icoon); Google toonde het oude, niet-vierkante favicon niet.
+- **Circuitpagina in de nieuwe stijl** (zoals de coureurspagina): grote kop met vlag en layout-afbeelding, statistiek-tegels (lengte, bochten, verreden races, verschillende winnaars, meeste overwinningen), races als kaarten met podium-badges; alle teksten in de 5 talen; datums in de gekozen taal.
 - Homepage-kop noemt de volledige naam: "… STB Racing League".
 - Google Search Console-verificatiebestand toegevoegd.
 

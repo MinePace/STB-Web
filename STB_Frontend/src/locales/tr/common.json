@@ -276,5 +276,28 @@
         "older": "eski",
         "newer": "yeni",
         "formAvgShort": "ort. {{n}}"
+    },
+    "trackPage": {
+        "eyebrow": "Pist",
+        "notFound": "Pist bulunamadı",
+        "backHome": "Ana sayfaya dön",
+        "noMap": "Pist düzeni yok",
+        "stats": "İstatistikler",
+        "racesHere": "Bu pistteki yarışlar",
+        "noRaces": "Burada henüz yarış yapılmadı.",
+        "noResult": "Henüz sonuç girilmedi.",
+        "where": "Sezon {{s}} · Lig {{d}} · Tur {{r}}",
+        "sprint": "Sprint",
+        "pts": "puan",
+        "fullResult": "Tüm sonuç",
+        "turnsCount": "{{count}} viraj",
+        "since": "{{n}}. sezondan beri",
+        "tiles": {
+            "length": "Pist uzunluğu",
+            "turns": "Viraj",
+            "races": "Yapılan yarış",
+            "winners": "Farklı kazanan",
+            "mostWins": "En çok galibiyet"
+        }
     }
 }

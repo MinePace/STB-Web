@@ -1,5 +1,6 @@
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import "./TrackPage.css";
 import "@/Components/Links.css";
 import DriverLoader from "@/Components/Loaders/DriverLoader";
@@ -13,6 +14,7 @@ import { getMapCandidates } from "@/trackMap";
 
 function TrackPage() {
   const { trackId } = useParams();
+  const { t, i18n } = useTranslation();
 
   const [trackInfo, setTrackInfo] = useState(null);
   const trackName = trackInfo?.raceName || trackInfo?.RaceName || trackInfo?.name || trackInfo?.Name;
@@ -34,7 +36,6 @@ function TrackPage() {
 
   const [mapOk, setMapOk] = useState(true);
   const [mapIdx, setMapIdx] = useState(0);
-  const [expanded] = useState({});
 
   useEffect(() => {
     let abort = false;
@@ -80,161 +81,145 @@ function TrackPage() {
   const loading = loadingInfo || loadingRaces;
 
   if (loading) return <DriverLoader />;
-  if (!trackInfo) return <div className="tp-error">❌ {errorInfo || "Track not found."}</div>;
+  if (!trackInfo)
+    return (
+      <div className="tk-page">
+        <div className="stb-panel tk-notfound">
+          <span className="eyebrow">{t("trackPage.eyebrow")}</span>
+          <h1 className="tk-title">{t("trackPage.notFound")}</h1>
+          <p className="tk-muted">{errorInfo || ""}</p>
+          <Link to="/" className="tk-btn">
+            {t("trackPage.backHome")}
+          </Link>
+        </div>
+      </div>
+    );
 
   const { Name, RaceName, Country, Length, Turns } = trackInfo;
 
   const mapCandidates = getMapCandidates({ Country, Name, LayoutUrl: trackInfo?.LayoutUrl });
   const mapSrc = mapOk && mapCandidates.length ? mapCandidates[mapIdx] : null;
 
+  const sorted = trackRaces.slice().sort(compareBySeasonRound);
+  const winnerOf = (r) => (r.RaceResults || []).find((x) => x?.Position === 1 && !isDNF(x))?.Drivers?.Name;
+  const winners = new Set(sorted.map(winnerOf).filter(Boolean));
+  const firstSeason = sorted.length ? Math.min(...sorted.map((r) => Number(r.Season)).filter((n) => !isNaN(n))) : null;
+
+  const tiles = [
+    ["length", formatLength(Length)],
+    ["turns", Turns ?? "—"],
+    ["races", trackRaces.length],
+    ["winners", winners.size || "—"],
+    ["mostWins", mostWins?.Count ?? "—", mostWins?.Name],
+  ];
+
   return (
-    <div className="tp-container">
+    <div className="tk-page">
       {/* HERO */}
-      <div className="tp-hero">
-        <div className="tp-hero-main">
-          <header className="tp-header">
-            {Country && (
-              <img
-                src={`/flags/${Country}.png`}
-                alt={`${Country} flag`}
-                className="tp-flag"
-              />
-            )}
-            <h1 className="tp-title">{Name}</h1>
-            <p className="tp-subtitle">
-              {[RaceName, Country].filter(Boolean).join(" · ") || "—"}
-            </p>
-          </header>
-
-          <section className="tp-stats">
-            <div className="tp-stat">
-              <div className="tp-stat-value">{formatLength(Length)}</div>
-              <div className="tp-stat-label">Track Length</div>
-            </div>
-
-            <div className="tp-stat">
-              <div className="tp-stat-value">{Turns ?? "—"}</div>
-              <div className="tp-stat-label">Turns</div>
-            </div>
-
-            <div className="tp-stat">
-              <div className="tp-stat-value">{trackRaces.length}</div>
-              <div className="tp-stat-label">Events at Track</div>
-            </div>
-
-            <div className="tp-stat">
-              <div className="tp-stat-value">{mostWins?.Count ?? "—"}</div>
-              <div className="tp-stat-sub">
-                <span className="tp-stat-label">Most wins:</span>
-                {mostWins?.Name && (
-                  <Link
-                    to={`/STB/Driver/${encodeURIComponent(mostWins.Name)}`}
-                    className="primary-link tp-stat-winner"
-                  >
-                    {mostWins.Name}
-                  </Link>
-                )}
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <aside className="tp-hero-aside">
-          <div className="tp-map-card">
-            {mapSrc && mapOk ? (
-              <img
-                src={mapSrc}
-                alt={`${Country} track map`}
-                className="tp-map"
-                loading="lazy"
-                onError={() => {
-                  setMapIdx((i) => {
-                    const next = i + 1;
-                    if (next < mapCandidates.length) return next;
-                    setMapOk(false);
-                    return i;
-                  });
-                }}
-              />
-            ) : (
-              <div className="tp-map-fallback">No map available</div>
-            )}
+      <header className="tk-hero stb-panel racing-stripes">
+        <div className="tk-hero__main">
+          <span className="eyebrow">
+            {t("trackPage.eyebrow")}
+            {Country ? ` · ${t(`countries.${Country}`, Country)}` : ""}
+          </span>
+          <div className="tk-hero__name">
+            {Country ? <img src={`/flags/${Country}.png`} alt={Country} className="tk-flag" /> : null}
+            <h1 className="tk-title">{Name}</h1>
           </div>
-        </aside>
-      </div>
+          {RaceName ? <p className="tk-sub">{RaceName}</p> : null}
+          <div className="tk-chips">
+            {Length != null ? <span className="tk-chip">{formatLength(Length)}</span> : null}
+            {Turns != null ? <span className="tk-chip">{t("trackPage.turnsCount", { count: Turns })}</span> : null}
+            {firstSeason ? <span className="tk-chip">{t("trackPage.since", { n: firstSeason })}</span> : null}
+          </div>
+        </div>
+        <div className="tk-map">
+          {mapSrc && mapOk ? (
+            <img
+              src={mapSrc}
+              alt={`${Name} layout`}
+              loading="lazy"
+              onError={() => {
+                setMapIdx((i) => {
+                  const next = i + 1;
+                  if (next < mapCandidates.length) return next;
+                  setMapOk(false);
+                  return i;
+                });
+              }}
+            />
+          ) : (
+            <div className="tk-map__empty tk-muted">{t("trackPage.noMap")}</div>
+          )}
+        </div>
+      </header>
 
-      {/* EVENTS & RESULTS */}
-      <section className="tp-section">
-        <h2 className="tp-section-title">Events & Results</h2>
+      {/* STATS */}
+      <section>
+        <h2 className="tk-section-title">{t("trackPage.stats")}</h2>
+        <div className="tk-tiles">
+          {tiles.map(([key, value, sub]) => (
+            <div key={key} className="stb-panel tk-tile">
+              <span className="tk-tile__value">{value}</span>
+              {sub ? (
+                <Link to={`/STB/Driver/${encodeURIComponent(sub)}`} className="tk-tile__sub">
+                  {sub}
+                </Link>
+              ) : null}
+              <span className="tk-tile__label">{t(`trackPage.tiles.${key}`)}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
-        {trackRaces.length === 0 ? (
-          <div className="tp-empty">No events found.</div>
+      {/* RACES */}
+      <section>
+        <h2 className="tk-section-title">{t("trackPage.racesHere")}</h2>
+        {errorRaces ? <p className="tk-muted">{errorRaces}</p> : null}
+        {sorted.length === 0 ? (
+          <p className="tk-muted">{t("trackPage.noRaces")}</p>
         ) : (
-          <div className="tp-rounds tp-rounds-2">
-            {trackRaces
-              .slice()
-              .sort(compareBySeasonRound)
-              .map((r) => {
-                const results = (r.RaceResults ?? [])
-                  .slice()
-                  .sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
-
-                const visible = results.slice(0, 3);
-
-                return (
-                  <article className="tp-round-card" key={r.Id}>
-                    <div className="tp-round-meta">
-                      <div className="tp-round-title">{r.Name}</div>
-                      <div className="tp-round-sub">
-                        Season {r.Season} · Tier {r.Division} · Round {r.Round}
-                        {r.Date ? ` - ${formatDate(r.Date)}` : ""}
-                        {r.Sprint === "Yes" && (
-                          <span className="tp-badge tp-badge-sprint">Sprint</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="tp-results">
-                      <div className="tp-results-head">
-                        <div>Pos</div>
-                        <div>Driver</div>
-                        <div className="tp-right">Pts</div>
-                      </div>
-
-                      <div className="tp-results-body">
-                        {visible.map((res, i) => (
-                          <div className="tp-result-row" key={i}>
-                            <div className={`tp-pos ${medalClass(res.Position)}`}>
-                              {posLabel(res)}
-                            </div>
-
-                            <Link
-                              to={`/STB/Driver/${encodeURIComponent(res.Drivers?.Name ?? "")}`}
-                              className="primary-link"
-                            >
-                              {res.Drivers?.Name ?? "Unknown"}
-                            </Link>
-
-                            <div className="tp-right">
-                              {isDNF(res) ? (
-                                <span className="tp-tag tp-tag-dnf">DNF</span>
-                              ) : (
-                                <span className="tp-tag">{res.Points ?? 0}</span>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {results.length > 3 && (
-                      <Link to={`/STB/Race/${r.Id}`} className="tp-showmore">
-                        View Race Result
+          <div className="tk-races">
+            {sorted.map((r) => {
+              const results = (r.RaceResults ?? []).slice().sort((a, b) => toPosSortKey(a) - toPosSortKey(b));
+              return (
+                <article className="stb-panel tk-race" key={r.Id}>
+                  <header className="tk-race__head">
+                    <div>
+                      <Link to={`/STB/Championship/${r.Season}/${r.Division}`} className="tk-race__where">
+                        {t("trackPage.where", { s: r.Season, d: r.Division, r: r.Round })}
                       </Link>
-                    )}
-                  </article>
-                );
-              })}
+                      <span className="tk-muted">
+                        {r.Date ? formatDate(r.Date, i18n.language) : ""}
+                        {r.Sprint === "Yes" ? <span className="tk-tag">{t("trackPage.sprint")}</span> : null}
+                      </span>
+                    </div>
+                  </header>
+                  {results.length ? (
+                    <ol className="tk-podium">
+                      {results.slice(0, 3).map((res, i) => (
+                        <li key={i}>
+                          <span className={`pos-badge ${isDNF(res) ? "pos-badge--dnf" : res.Position <= 3 ? `pos-badge--p${res.Position}` : ""}`}>
+                            {isDNF(res) ? "DNF" : posLabel(res)}
+                          </span>
+                          <Link to={`/STB/Driver/${encodeURIComponent(res.Drivers?.Name ?? "")}`} className="tk-podium__name">
+                            {res.Drivers?.Name ?? "?"}
+                          </Link>
+                          <span className="tk-podium__pts">
+                            {isDNF(res) ? "" : `${res.Points ?? 0} ${t("trackPage.pts")}`}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <p className="tk-muted">{t("trackPage.noResult")}</p>
+                  )}
+                  <Link to={`/STB/Race/${r.Id}`} className="tk-race__more">
+                    {t("trackPage.fullResult")} →
+                  </Link>
+                </article>
+              );
+            })}
           </div>
         )}
       </section>
@@ -249,9 +234,9 @@ function formatLength(val) {
   return `${Number(val).toFixed(3)} km`;
 }
 
-function formatDate(d) {
+function formatDate(d, lang) {
   try {
-    return new Date(d).toLocaleDateString(undefined, {
+    return new Date(String(d).replace(" ", "T")).toLocaleDateString(lang, {
       year: "numeric",
       month: "short",
       day: "2-digit",
@@ -274,13 +259,6 @@ function toPosSortKey(res) {
   return typeof res?.Position === "number"
     ? res.Position
     : Number.POSITIVE_INFINITY;
-}
-
-function medalClass(position) {
-  if (position === 1) return "tp-medal tp-medal-1";
-  if (position === 2) return "tp-medal tp-medal-2";
-  if (position === 3) return "tp-medal tp-medal-3";
-  return "";
 }
 
 function compareBySeasonRound(a, b) {
