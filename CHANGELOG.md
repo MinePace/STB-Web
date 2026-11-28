@@ -13,6 +13,8 @@ Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar 
 - Na opslaan: blijft op de pagina met "Bekijk race", "Kopieer link" en **"Volgende: … →"**.
 - Nieuwe coureurs bevestigen in de pagina (geen browser-pop-up); foutmeldingen in de pagina.
 - Waarschuwing bij weggaan of van race wisselen met niet-opgeslagen invoer.
+- **Edit Results vernieuwd**: race kiezen via "Latest"-knoppen of zoeken (circuit, S31, D2…); coureur met aanvulling + groen/rood; team-keuzelijst; ↑ ↓ om te verplaatsen met ▲/▼ t.o.v. de oude positie; coureur toevoegen/verwijderen; snelste ronde aan te passen; **straffen**: seconden invullen → "Re-order by time" zet de volgorde op tijd + straf, punten en tijdsverschillen rekenen mee; overzicht van alle wijzigingen (ook punten) vóór opslaan; alles-of-niets opslaan; "Undo all".
+- Ongewijzigde rijen houden hun opgeslagen punten (oudere seizoenen hadden soms andere puntenregels).
 
 ### Verbeterd
 - Google: gestructureerde gegevens (naam "STB Racing League", logo, YouTube/Twitch/TikTok/Discord), zodat Google de juiste sitenaam toont in plaats van "Vercel".

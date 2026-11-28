@@ -1,46 +1,46 @@
-.edit-race-results-container {
-    text-align: center;
-    color: white;
-  }
-  
-  .race-results-table {
-    width: 90%;
-    margin: 20px auto;
-    border-collapse: collapse;
-  }
-  
-  .race-results-table th, .race-results-table td {
-    padding: 8px;
-    border: 1px solid white;
-    text-align: center;
-    white-space: nowrap;
-  }
-  
-  .compact-input, .compact-select {
-    width: 80px;
-    text-align: center;
-  }
-  
-  .cancel-btn {
-    background-color: red;
-    color: white;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-  }
+/* Edit Race Results (shares the ar-* building blocks from AddRaceResultPage.css) */
+.er-page { text-align: left; }
+.er-view { margin-left: auto; text-decoration: none; }
+.er-view:hover { color: var(--primary); }
+.er-search { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.er-search input { flex: 1; min-width: 200px; }
+.er-search select { flex: 2; min-width: 260px; margin-top: 0; }
 
-  .delete-btn {
-    background-color: rgb(200, 50, 50);
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    margin-left: 5px;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  
-  .delete-btn:hover {
-    background-color: rgb(180, 30, 30);
-  }
-  
-  
+.er-table-wrap { padding: 16px 18px; overflow-x: auto; }
+.er-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.er-head h2 { margin: 0; }
+.er-head__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.er-hint { margin: 6px 0 10px; }
+
+.er-table { width: 100%; margin: 0; }
+.er-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted-fg); padding: 6px; white-space: nowrap; }
+.er-table td { padding: 4px 6px; vertical-align: middle; text-align: left; white-space: nowrap; }
+.er-table tr.er-new td { background: rgba(26, 163, 255, 0.07); }
+.er-pos { min-width: 62px; }
+.er-pos strong { font-family: "Saira Condensed", sans-serif; font-size: 18px; }
+.er-up, .er-down { display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 700; }
+.er-up { color: #4ade80; }
+.er-down { color: #ff7b7b; }
+.er-move { display: flex; gap: 2px; }
+.er-move button, .er-del {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+.er-move button:disabled { opacity: 0.3; cursor: default; }
+.er-move button:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.er-del:hover { border-color: var(--danger); color: var(--danger); }
+.er-small { width: 70px; padding: 8px; border-radius: 4px; }
+.er-pen { border-color: #ffb400 !important; color: #ffd27a; font-weight: 700; }
+.er-adj { font-variant-numeric: tabular-nums; color: var(--muted-fg); min-width: 80px; }
+.er-pts { font-weight: 800; color: var(--accent); text-align: right; min-width: 32px; }
+.er-link { background: none; border: 0; color: var(--muted-fg); text-decoration: underline; cursor: pointer; margin-top: 8px; padding: 0; }
+.er-actions { display: flex; gap: 10px; }
+.er-changes { max-height: 260px; overflow: auto; margin: 6px 0 10px; padding-left: 20px; font-weight: 600; }
+.er-changes--pts { font-weight: 500; color: var(--muted-fg); }
