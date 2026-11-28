@@ -5,6 +5,14 @@ Versienummers volgen [Semantic Versioning](https://semver.org/lang/nl/):
 
 Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar `main` (live) met een tag `vX.Y.Z`.
 
+## [Unreleased] (op `dev`)
+
+### Verbeterd
+- Google: gestructureerde gegevens (naam "STB Racing League", logo, YouTube/Twitch/TikTok/Discord), zodat Google de juiste sitenaam toont in plaats van "Vercel".
+- Vierkante favicons (48/192 px + Apple-icoon); Google toonde het oude, niet-vierkante favicon niet.
+- Homepage-kop noemt de volledige naam: "… STB Racing League".
+- Google Search Console-verificatiebestand toegevoegd.
+
 ## [2.3.0] – 2026-11-25
 
 ### Nieuw
