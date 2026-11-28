@@ -1,115 +1,109 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "@/Components/Links.css";
-
 import { API_BASE } from "@/config";
-function AddTrackPage() {
-  const [track, setTrack] = useState({ name: "", raceName: "", country: "" });
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
+import TrackForm, { EMPTY_TRACK, authHeader, saveLayout } from "./TrackForm";
+
+export default function AddTrackPage() {
   const navigate = useNavigate();
+  const [track, setTrack] = useState(EMPTY_TRACK);
+  const [file, setFile] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState(null);
+  const [added, setAdded] = useState(null); // { id, name, layoutProblem }
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-
-    // Geen token? Meteen terug naar home/login
-    if (!token) {
-      navigate("/");
-      return;
-    }
-
     try {
-      const decoded = jwtDecode(token);
-      const role = decoded.role;
-
-      if (role !== "Admin") {
-        navigate("/");
-      }
-    } catch (e) {
-      console.log("JWT decode failed:", e);
+      if (jwtDecode(localStorage.getItem("token") || "").role !== "Admin") navigate("/");
+    } catch {
       navigate("/");
     }
   }, [navigate]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setTrack((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSubmitting(true);
-
+    setSaving(true);
+    setNotice(null);
     try {
-      const response = await fetch(`${API_BASE}/api/track`, {
+      const res = await fetch(`${API_BASE}/api/track`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
-        },
-        body: JSON.stringify(track), // includes raceName now
+        headers: { "Content-Type": "application/json", ...authHeader() },
+        body: JSON.stringify(track),
       });
-
-      if (!response.ok) {
-        let msg = "Failed to add track. Please try again.";
-        try {
-          const problem = await response.json();
-          if (problem?.message) msg = problem.message;
-          if (problem?.title) msg = problem.title;
-          if (problem?.errors) {
-            const first = Object.values(problem.errors)[0]?.[0];
-            if (first) msg = first;
-          }
-        } catch {}
-        throw new Error(msg);
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.message || `HTTP ${res.status}`);
+      const id = body.track?.Id;
+      let layoutProblem = null;
+      if (file && id) {
+        const up = await saveLayout(id, file);
+        if (!up.ok) layoutProblem = up.message;
       }
-
-      alert("Track added successfully!");
-      setTrack({ name: "", raceName: "", country: "" });
+      setAdded({ id, name: body.track?.RaceName || track.raceName, layoutProblem });
+      setTrack(EMPTY_TRACK);
+      setFile(null);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
-      setError(err.message);
+      setNotice({ type: "error", text: `The track was not added: ${err.message}` });
     } finally {
-      setSubmitting(false);
+      setSaving(false);
     }
   };
 
   return (
-    <div className="add-track-page">
-      <h1>Add Track</h1>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="name"
-          placeholder="Circuit Name"
-          value={track.name}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="text"
-          name="raceName"
-          placeholder="Grand Prix name (e.g., Austrian Grand Prix)"
-          value={track.raceName}
-          onChange={handleInputChange}
-          required
-        />
-        <input
-          type="text"
-          name="country"
-          placeholder="Country"
-          value={track.country}
-          onChange={handleInputChange}
-          required
-        />
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={submitting} className="submit-button">
-          {submitting ? "Saving..." : "Add Track"}
-        </button>
-      </form>
+    <div className="ta-page">
+      <header className="ta-hero">
+        <span className="eyebrow">Admin · Tracks</span>
+        <h1>Add Track</h1>
+        <p className="ta-muted">A new circuit for the calendar. The layout image is shown on the track page.</p>
+      </header>
+
+      {added ? (
+        <div className="ta-card ta-done">
+          <div>
+            <strong>✓ {added.name} added</strong>
+            {added.layoutProblem ? <p className="ta-error">The layout image was not saved: {added.layoutProblem}. Add it in Edit Track.</p> : null}
+          </div>
+          <div className="ta-actions">
+            {added.id ? (
+              <>
+                <Link to={`/STB/Track/${added.id}`} className="ta-btn">
+                  View track page
+                </Link>
+                <Link to={`/STB/Edit/Tracks?track=${added.id}`} className="ta-btn">
+                  Edit
+                </Link>
+              </>
+            ) : null}
+            <button type="button" className="ta-btn" onClick={() => setAdded(null)}>
+              Add another
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {notice ? (
+        <div className={`ta-notice ta-notice--${notice.type}`} role="alert">
+          {notice.text}
+          <button type="button" onClick={() => setNotice(null)} aria-label="Close">
+            ×
+          </button>
+        </div>
+      ) : null}
+
+      {!added ? (
+        <form className="ta-card" onSubmit={submit}>
+          <TrackForm value={track} onChange={setTrack} layoutUrl={null} file={file} onFile={setFile} />
+          <div className="ta-actions ta-actions--end">
+            <Link to="/admin" className="ta-btn">
+              Cancel
+            </Link>
+            <button type="submit" className="ta-btn ta-btn--primary" disabled={saving}>
+              {saving ? "Saving…" : "Add track"}
+            </button>
+          </div>
+        </form>
+      ) : null}
     </div>
   );
 }
-
-export default AddTrackPage;

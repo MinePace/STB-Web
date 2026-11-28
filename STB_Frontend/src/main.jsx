@@ -58,7 +58,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       <Route path="/login" element={<Layout showSidebar={true}><LoginPage /></Layout>} />
       
       <Route path="/STB/Add/RaceResults" element={<Layout showSidebar={true}><AddRaceResultPage /></Layout>} />
-      <Route path="/STB/Add/Track" element={<AddTrackPage />} />
+      <Route path="/STB/Add/Track" element={<Layout showSidebar={true}><AddTrackPage /></Layout>} />
       <Route path="/STB/Add/Season" element={<Layout showSidebar={true}><AddSeasonPage /></Layout>} />
 
       <Route path="/STB/Edit/Season" element={<Layout showSidebar={true}><EditSeasonPage /></Layout>} />

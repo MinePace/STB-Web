@@ -1,58 +1,110 @@
-.admin-container {
-  padding: 40px;
-  color: white;
+/* Admin dashboard */
+.ad-page { max-width: 1200px; margin: 28px auto 64px; padding: 0 20px; text-align: left; display: flex; flex-direction: column; gap: 20px; }
+.ad-hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; }
+.ad-hero h1 {
+  font-family: "Saira Condensed", sans-serif;
+  font-weight: 900;
+  font-size: clamp(36px, 6vw, 54px);
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 4px 0;
 }
+.ad-muted { color: var(--muted-fg); font-size: 13px; }
+.ad-small { margin-top: 8px; }
+.ad-ok { color: #4ade80; font-weight: 700; margin: 4px 0; }
+.ad-error { color: #ffb3b3; background: rgba(255, 59, 59, 0.12); border: 1px solid rgba(255, 59, 59, 0.45); border-radius: 10px; padding: 10px 14px; }
 
-.admin-title {
-  font-size: 42px;
-  margin-bottom: 6px;
-}
-
-.admin-subtitle {
-  opacity: 0.8;
-  margin-bottom: 25px;
-}
-
-/* Compact panel */
-.admin-panel {
-  max-width: 420px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-/* Per categorie rij */
-.admin-row {
-  display: flex;
+.ad-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.ad-actions__group { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border: 1px solid var(--border); border-radius: 12px; }
+.ad-btn {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.12);
+  gap: 6px;
+  padding: 9px 14px;
   border-radius: 10px;
-  padding: 12px 16px;
-}
-
-/* Section label (RESULTS / TRACKS / SEASONS) */
-.admin-section {
-  font-weight: 600;
-  letter-spacing: 1px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  font-weight: 700;
   font-size: 14px;
-  opacity: 0.9;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ad-btn:hover { border-color: var(--primary); color: var(--primary); }
+.ad-btn--primary { background: var(--primary); border-color: var(--primary); color: var(--primary-fg, #04122b); }
+.ad-btn--primary:hover { filter: brightness(1.1); color: var(--primary-fg, #04122b); }
+.ad-btn--small { padding: 5px 10px; font-size: 13px; border-radius: 8px; }
+
+.ad-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.ad-card { padding: 18px 20px; }
+.ad-wide { grid-column: 1 / -1; }
+.ad-card__head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; }
+.ad-card h2, .ad-card h3 {
+  font-family: "Saira Condensed", sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+.ad-card h2 { font-size: 22px; display: flex; align-items: center; gap: 8px; }
+.ad-card h3 { font-size: 16px; margin: 6px 0; display: flex; align-items: center; gap: 6px; }
+.ad-count {
+  font-family: Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--fg);
 }
 
-/* Knoppen rechts */
+.ad-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ad-list--compact { gap: 4px; font-size: 14px; }
+.ad-list a { color: var(--fg); text-decoration: none; }
+.ad-list a:hover { color: var(--primary); }
+.ad-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.ad-row > div:first-child { display: flex; flex-direction: column; min-width: 0; }
+.ad-row strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ad-row__actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+
+.ad-season + .ad-season { margin-top: 12px; }
+.ad-progress {
+  display: grid;
+  grid-template-columns: 34px 1fr 52px;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 4px;
+  border-radius: 8px;
+  color: var(--fg);
+  text-decoration: none;
+}
+.ad-progress:hover { background: rgba(255, 255, 255, 0.04); }
+.ad-progress__label { font-weight: 800; }
+.ad-progress__bar { height: 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); overflow: hidden; }
+.ad-progress__bar span { display: block; height: 100%; background: var(--primary); border-radius: 999px; }
+.ad-progress__bar span.is-done { background: #4ade80; }
+.ad-progress__num { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted-fg); font-size: 13px; }
+
+.ad-checks { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 20px; }
+.ad-dupes { line-height: 1.5; }
+
+@media (max-width: 900px) {
+  .ad-grid, .ad-checks { grid-template-columns: 1fr; }
+  .ad-row { flex-direction: column; align-items: flex-start; }
+  .ad-row__actions { justify-content: flex-start; }
+}
+
+/* still used by the race page ("Add Race Results" button) */
 .admin-actions {
   display: flex;
   gap: 10px;
-}
-
-.admin-action:hover {
-  background: rgba(255,255,255,0.15);
-  transform: translateY(-1px);
-}
-
-/* Icoon grootte */
-.icon {
-  font-size: 14px;
 }

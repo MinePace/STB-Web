@@ -276,5 +276,28 @@
         "older": "antes",
         "newer": "después",
         "formAvgShort": "media {{n}}"
+    },
+    "trackPage": {
+        "eyebrow": "Circuito",
+        "notFound": "Circuito no encontrado",
+        "backHome": "Volver al inicio",
+        "noMap": "Trazado no disponible",
+        "stats": "Estadísticas",
+        "racesHere": "Carreras en este circuito",
+        "noRaces": "Aún no se ha corrido aquí.",
+        "noResult": "Aún no hay resultados.",
+        "where": "Temporada {{s}} · División {{d}} · Ronda {{r}}",
+        "sprint": "Sprint",
+        "pts": "pts",
+        "fullResult": "Resultado completo",
+        "turnsCount": "{{count}} curvas",
+        "since": "Desde la temporada {{n}}",
+        "tiles": {
+            "length": "Longitud",
+            "turns": "Curvas",
+            "races": "Carreras disputadas",
+            "winners": "Ganadores distintos",
+            "mostWins": "Más victorias"
+        }
     }
 }

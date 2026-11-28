@@ -2,7 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/Favicon.png" />
+    <!-- square icons: Google only shows a favicon in search results when it is square (multiple of 48px) -->
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#0a2350" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -11,10 +14,43 @@
     <title>STB Racing League</title>
     <meta name="description" content="Results, standings and driver stats of the STB Racing League — online F1 races, live on stream." />
     <meta property="og:site_name" content="STB Racing League" />
+    <meta name="application-name" content="STB Racing League" />
+    <meta name="apple-mobile-web-app-title" content="STB Racing League" />
     <meta property="og:title" content="STB Racing League" />
     <meta property="og:description" content="Results, standings and driver stats of the STB Racing League — online F1 races, live on stream." />
     <meta property="og:image" content="https://stbleaguedata.vercel.app/api/og" />
     <meta name="twitter:card" content="summary_large_image" />
+    <!-- Structured data: tells Google the site's name (instead of "Vercel") and the official channels -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebSite",
+            "@id": "https://stbleague.vercel.app/#website",
+            "name": "STB Racing League",
+            "alternateName": ["STB League", "STB"],
+            "url": "https://stbleague.vercel.app/",
+            "publisher": { "@id": "https://stbleague.vercel.app/#organization" }
+          },
+          {
+            "@type": "SportsOrganization",
+            "@id": "https://stbleague.vercel.app/#organization",
+            "name": "STB Racing League",
+            "alternateName": "STB League",
+            "url": "https://stbleague.vercel.app/",
+            "logo": "https://stbleague.vercel.app/favicon-192.png",
+            "sport": "Sim racing",
+            "sameAs": [
+              "https://www.youtube.com/@stbracingleague",
+              "https://www.twitch.tv/stbleague",
+              "https://www.tiktok.com/@stbracingleague",
+              "https://discord.gg/jQXYKBbEws"
+            ]
+          }
+        ]
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

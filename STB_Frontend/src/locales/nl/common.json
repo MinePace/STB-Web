@@ -276,5 +276,28 @@
         "older": "ouder",
         "newer": "nieuwer",
         "formAvgShort": "gem. {{n}}"
+    },
+    "trackPage": {
+        "eyebrow": "Circuit",
+        "notFound": "Circuit niet gevonden",
+        "backHome": "Terug naar home",
+        "noMap": "Geen layout beschikbaar",
+        "stats": "Statistieken",
+        "racesHere": "Races op dit circuit",
+        "noRaces": "Hier is nog niet geracet.",
+        "noResult": "Nog geen uitslag ingevoerd.",
+        "where": "Seizoen {{s}} · Divisie {{d}} · Ronde {{r}}",
+        "sprint": "Sprint",
+        "pts": "ptn",
+        "fullResult": "Volledige uitslag",
+        "turnsCount": "{{count}} bochten",
+        "since": "Sinds seizoen {{n}}",
+        "tiles": {
+            "length": "Lengte",
+            "turns": "Bochten",
+            "races": "Verreden races",
+            "winners": "Verschillende winnaars",
+            "mostWins": "Meeste overwinningen"
+        }
     }
 }

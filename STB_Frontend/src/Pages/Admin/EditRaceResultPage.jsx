@@ -1,956 +1,628 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "./EditRaceResultPage.css";
+import "./AddRaceResultPage.css";
 import "@/Components/Links.css";
 import { API_BASE } from "@/config";
 
-function EditRaceResults() {
-  const {
-    season: paramSeason,
-    round: paramRound,
-    division: paramDivision,
-    type,
-  } = useParams();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const raceIdFromQuery = searchParams.get("race");
+// ---------- points ----------
+const MAIN_RACE_POINTS = [25, 18, 15, 12, 10, 8, 6, 4, 2, 1];
+const SPRINT_RACE_POINTS = [8, 7, 6, 5, 4, 3, 2, 1];
+const isSprint = (race) => race?.sprint === "Yes" || race?.Sprint === "Yes";
+const pointsFor = (index, row, race, fastest) => {
+  if (row.dnf === "Yes") return 0;
+  const table = isSprint(race) ? SPRINT_RACE_POINTS : MAIN_RACE_POINTS;
+  const base = table[index] || 0;
+  const season = Number(race?.season ?? race?.Season);
+  const bonus = fastest && index < 10 && !isSprint(race) && season >= 15 && season <= 28 ? 1 : 0;
+  return base + bonus;
+};
 
-  const [seasons, setSeasons] = useState([]);
-  const [selectedSeason, setSelectedSeason] = useState(paramSeason || "");
-  const [races, setRaces] = useState([]);
-  const [selectedRaceId, setSelectedRace] = useState(
-    raceIdFromQuery || paramRound || ""
-  );
-  const [selectedDivision, setSelectedDivision] = useState(paramDivision || "");
-  const [FastestLap, setFastestLap] = useState(""); // driver name (display only)
-  const [raceResults, setRaceResults] = useState([]);
-  const [editedResults, setEditedResults] = useState({});
-  const [originalPointsByPosition, setOriginalPointsByPosition] = useState({});
-  const [token, setToken] = useState("");
-
-  // Only admins allowed
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    setToken(token || "");
-
-    // Geen token? Meteen terug naar home/login
-    if (!token) {
-      navigate("/");
-      return;
-    }
-
-    try {
-      const decoded = jwtDecode(token);
-      const role = decoded.role;
-
-      if (role !== "Admin") {
-        navigate("/");
-      }
-    } catch (e) {
-      console.log("JWT decode failed:", e);
-      navigate("/");
-    }
-  }, [navigate]);
-
-  // Sync URL params → state
-  useEffect(() => {
-    if (paramSeason !== undefined) setSelectedSeason(paramSeason || "");
-    if (paramDivision !== undefined) setSelectedDivision(paramDivision || "");
-
-    if (raceIdFromQuery) {
-      setSelectedRace(raceIdFromQuery);
-    } else if (paramRound !== undefined) {
-      setSelectedRace(paramRound || "");
-    }
-  }, [paramSeason, paramDivision, paramRound, raceIdFromQuery]);
-
-  // Load seasons
-  useEffect(() => {
-    fetch(`${API_BASE}/api/race/seasons`)
-      .then((res) => res.json())
-      .then((data) => (Array.isArray(data) ? setSeasons(data) : setSeasons([])))
-      .catch((err) => console.error("Error fetching seasons:", err));
-  }, []);
-
-  // Load races for a season
-  useEffect(() => {
-    if (selectedSeason) {
-      fetch(`${API_BASE}/api/race/season/${selectedSeason}`)
-        .then((res) => res.json())
-        .then((data) => setRaces(Array.isArray(data) ? data : []))
-        .catch((err) => console.error("Error fetching races:", err));
-    } else {
-      setRaces([]);
-    }
-  }, [selectedSeason]);
-
-  // Clear race when division changes
-  useEffect(() => {
-    if (!raceIdFromQuery) {
-      setSelectedRace("");
-    }
-  }, [selectedDivision, raceIdFromQuery]);
-
-  // Helper: when we load race results, also build the original points map
-  const hydrateRaceResults = (raceObj) => {
-    const results =
-      raceObj?.raceResults ??
-      raceObj?.RaceResults ??
-      raceObj?.results ??
-      [];
-
-    const sorted = [...results].sort(
-      (a, b) => (a.position ?? a.Position ?? 0) - (b.position ?? b.Position ?? 0)
-    );
-
-    setRaceResults(sorted);
-
-    const map = {};
-    sorted.forEach((row) => {
-      const position = row.position ?? row.Position;
-
-      if (position != null) {
-        map[position] = row.points ?? row.Points ?? 0;
-      }
-    });
-
-    setOriginalPointsByPosition(map);
-  };
-
-  // Load race + results (with driver/team objects)
-  useEffect(() => {
-    if (!selectedRaceId) {
-      setRaceResults([]);
-      setOriginalPointsByPosition({});
-      return;
-    }
-
-    fetch(`${API_BASE}/api/race/${selectedRaceId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Race API response:", data);
-
-        const raceObj = data?.race ?? data;
-        const flObj = data?.fastestLap ?? raceObj?.fastestLap ?? null;
-
-        const season = raceObj?.Season ?? raceObj?.season;
-        const division = raceObj?.Division ?? raceObj?.division;
-
-        if (season !== undefined && season !== null) {
-          setSelectedSeason(String(season));
-        }
-
-        if (division !== undefined && division !== null) {
-          setSelectedDivision(String(division));
-        }
-
-        hydrateRaceResults(raceObj);
-
-        if (flObj) {
-          const name =
-            flObj?.driver?.name ??
-            flObj?.driverName ??
-            flObj?.name ??
-            (typeof flObj === "string" ? flObj : "");
-
-          setFastestLap(name || "");
-        } else {
-          setFastestLap("");
-        }
-      })
-      .catch((err) => console.error("Error fetching race results:", err));
-  }, [selectedRaceId]);
-
-  function applyPenaltyToTime(timeValue, penaltySeconds) {
-    if (!timeValue) return null;
-
-    const time = String(timeValue).trim();
-    const penalty = Number(penaltySeconds || 0);
-
-    const isFullTime = /^\d+:\d{2}\.\d{3}$/.test(time); // 39:21.797
-    const isGapTime = /^\d+\.\d{3}$/.test(time); // 7.410
-
-    if (!isFullTime && !isGapTime) {
-      return time; // 1 Lap, 2 Laps, DNF etc.
-    }
-
-    let totalMs = 0;
-
-    if (isFullTime) {
-      const [minutesPart, secondsPart] = time.split(":");
-      const [seconds, milliseconds] = secondsPart.split(".");
-
-      totalMs =
-        Number(minutesPart) * 60 * 1000 +
-        Number(seconds) * 1000 +
-        Number(milliseconds);
-    } else {
-      const [seconds, milliseconds] = time.split(".");
-
-      totalMs = Number(seconds) * 1000 + Number(milliseconds);
-    }
-
-    totalMs += penalty * 1000;
-
-    if (totalMs < 0) totalMs = 0;
-
-    const minutes = Math.floor(totalMs / 60000);
-    const seconds = Math.floor((totalMs % 60000) / 1000);
-    const milliseconds = totalMs % 1000;
-
-    if (isFullTime || minutes > 0) {
-      return `${minutes}:${String(seconds).padStart(2, "0")}.${String(milliseconds).padStart(3, "0")}`;
-    }
-
-    return `${seconds}.${String(milliseconds).padStart(3, "0")}`;
+// ---------- race times ("46:48.780" for the winner, "1.165" gaps for the rest, "+1 Lap" etc.) ----------
+const FULL = /^\d+:\d{2}\.\d{3}$/;
+const GAP = /^\+?\d+\.\d{3}$/;
+function toMs(t) {
+  const s = String(t || "").trim().replace(/^\+/, "");
+  if (FULL.test(s)) {
+    const [m, rest] = s.split(":");
+    const [sec, ms] = rest.split(".");
+    return Number(m) * 60000 + Number(sec) * 1000 + Number(ms);
   }
+  if (/^\d+\.\d{3}$/.test(s)) {
+    const [sec, ms] = s.split(".");
+    return Number(sec) * 1000 + Number(ms);
+  }
+  return null;
+}
+const fmtFull = (ms) => {
+  const t = Math.max(0, Math.round(ms));
+  return `${Math.floor(t / 60000)}:${String(Math.floor((t % 60000) / 1000)).padStart(2, "0")}.${String(t % 1000).padStart(3, "0")}`;
+};
+const fmtGap = (ms) => {
+  const t = Math.max(0, Math.round(ms));
+  return t >= 60000 ? fmtFull(t) : `${Math.floor(t / 1000)}.${String(t % 1000).padStart(3, "0")}`;
+};
 
+/** Absolute race time per row (ms, including penalty) or null when the time is not a time ("+1 Lap", empty). */
+function absoluteTimes(rows) {
+  const winnerFull = rows.map((r) => String(r.time || "").trim()).find((t) => FULL.test(t));
+  const base = winnerFull ? toMs(winnerFull) : 0;
+  return rows.map((r) => {
+    if (r.dnf === "Yes") return null;
+    const raw = String(r.time || "").trim();
+    const ms = toMs(raw);
+    if (ms === null) return null;
+    return (FULL.test(raw) ? ms : base + ms) + (Number(r.penalty) || 0) * 1000;
+  });
+}
 
+/** Time shown/saved including penalties: leader as full time, others as gap to the (new) leader. */
+function adjustedTimes(rows) {
+  const abs = absoluteTimes(rows);
+  const leader = abs.find((x) => x !== null);
+  return rows.map((r, i) => {
+    if (abs[i] === null) return String(r.time || "");
+    return i === abs.indexOf(leader) ? fmtFull(abs[i]) : fmtGap(abs[i] - leader);
+  });
+}
 
-  function parseRaceTimeToMs(timeValue) {
-    if (!timeValue) return null;
+let keySeq = 0;
+const newKey = () => `k${++keySeq}`;
 
-    const time = String(timeValue).trim().replace("+", "");
-
-    // Full time: 44:43.927
-    if (/^\d+:\d{2}\.\d{3}$/.test(time)) {
-      const [minPart, rest] = time.split(":");
-      const [secPart, msPart] = rest.split(".");
-
-      return (
-        Number(minPart) * 60 * 1000 +
-        Number(secPart) * 1000 +
-        Number(msPart)
-      );
-    }
-
-    // Gap: 0.161 / 2.851 / 21.103
-    if (/^\d+\.\d{3}$/.test(time)) {
-      const [secPart, msPart] = time.split(".");
-      return Number(secPart) * 1000 + Number(msPart);
-    }
-
+function readMe() {
+  try {
+    const tk = localStorage.getItem("token");
+    return tk ? jwtDecode(tk) : null;
+  } catch {
     return null;
   }
+}
 
-  function formatFullTime(msValue) {
-    const totalMs = Math.max(0, Math.round(msValue));
+export default function EditRaceResults() {
+  const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
+  const raceId = params.get("race") || "";
 
-    const minutes = Math.floor(totalMs / 60000);
-    const seconds = Math.floor((totalMs % 60000) / 1000);
-    const ms = totalMs % 1000;
+  const [races, setRaces] = useState([]); // races that have results
+  const [query, setQuery] = useState("");
+  const [race, setRace] = useState(null);
+  const [original, setOriginal] = useState([]); // rows as loaded
+  const [rows, setRows] = useState([]);
+  const [fastest, setFastest] = useState(""); // row key with the fastest lap
+  const [drivers, setDrivers] = useState([]);
+  const [teams, setTeams] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState(null);
+  const [review, setReview] = useState(false);
+  const [pendingNew, setPendingNew] = useState(null);
+  const [saving, setSaving] = useState(false);
 
-    return `${minutes}:${String(seconds).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
-  }
+  // ---------- admin only ----------
+  useEffect(() => {
+    if (readMe()?.role !== "Admin") navigate("/");
+  }, [navigate]);
 
-  function formatGapTime(msValue) {
-    const totalMs = Math.max(0, Math.round(msValue));
+  // ---------- lists ----------
+  useEffect(() => {
+    Promise.all([
+      fetch(`${API_BASE}/api/race/races`).then((r) => r.json()),
+      fetch(`${API_BASE}/api/race/open`).then((r) => r.json()),
+    ])
+      .then(([all, open]) => {
+        const openIds = new Set((Array.isArray(open) ? open : []).map((r) => r.Id));
+        const withResults = (Array.isArray(all) ? all : [])
+          .filter((r) => !openIds.has(r.Id))
+          .sort((a, b) => String(b.Date || "").localeCompare(String(a.Date || "")) || b.Id - a.Id);
+        setRaces(withResults);
+      })
+      .catch(() => setNotice({ type: "error", text: "Could not load the list of races." }));
+    fetch(`${API_BASE}/api/driver`)
+      .then((r) => r.json())
+      .then((d) => setDrivers(Array.isArray(d) ? d : []))
+      .catch(() => {});
+    fetch(`${API_BASE}/api/team`)
+      .then((r) => r.json())
+      .then((d) => setTeams(Array.isArray(d) ? d : Array.isArray(d?.data) ? d.data : []))
+      .catch(() => {});
+  }, []);
 
-    const minutes = Math.floor(totalMs / 60000);
-    const seconds = Math.floor((totalMs % 60000) / 1000);
-    const ms = totalMs % 1000;
+  const driverNames = useMemo(() => new Set(drivers.map((d) => d.Name)), [drivers]);
+  const teamNames = useMemo(() => new Set(teams.map((t) => t.Name)), [teams]);
 
-    if (minutes > 0) {
-      return `${minutes}:${String(seconds).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
-    }
-
-    return `${seconds}.${String(ms).padStart(3, "0")}`;
-  }
-
-  function calculateTimePenaltyMap(rows, editedResults) {
-    if (!rows || rows.length === 0) return {};
-
-    const orderedRows = [...rows].sort(
-      (a, b) => (a.position ?? a.Position ?? 0) - (b.position ?? b.Position ?? 0)
-    );
-
-    const map = {};
-
-    // Zoek de rij met een echte volledige racetijd, bijvoorbeeld 45:05.639
-    // Dit blijft de vaste referentie, ook als deze rij niet meer P1 is.
-    const referenceRow = orderedRows.find((row) => {
-      const edited = editedResults[row.id] || {};
-      const rawTime = edited.time ?? row.time ?? row.Time ?? "";
-
-      return /^\d+:\d{2}\.\d{3}$/.test(String(rawTime).trim().replace(/^\+/, ""));
-    });
-
-    // Als er nergens een echte racetijd is, dan kunnen we alleen losse gaps + penalty tonen
-    if (!referenceRow) {
-      orderedRows.forEach((row) => {
-        const edited = editedResults[row.id] || {};
-        const rawTime = edited.time ?? row.time ?? row.Time ?? "";
-        const penalty = Number(edited.penalty ?? row.penalty ?? row.Penalty ?? 0);
-
-        const parsedMs = parseRaceTimeToMs(rawTime);
-
-        if (parsedMs === null) {
-          map[row.id] = rawTime;
-        } else {
-          map[row.id] = formatGapTime(parsedMs + penalty * 1000);
-        }
-      });
-
-      return map;
-    }
-
-    const referenceEdited = editedResults[referenceRow.id] || {};
-    const referenceRawTime =
-      referenceEdited.time ?? referenceRow.time ?? referenceRow.Time ?? "";
-
-    const referenceMs = parseRaceTimeToMs(referenceRawTime);
-
-    if (referenceMs === null) return {};
-
-    const absoluteById = {};
-
-    orderedRows.forEach((row) => {
-      const edited = editedResults[row.id] || {};
-      const rawTime = edited.time ?? row.time ?? row.Time ?? "";
-      const penalty = Number(edited.penalty ?? row.penalty ?? row.Penalty ?? 0);
-
-      const parsedMs = parseRaceTimeToMs(rawTime);
-
-      if (parsedMs === null) {
-        absoluteById[row.id] = null;
-        return;
-      }
-
-      const isFullRaceTime = /^\d+:\d{2}\.\d{3}$/.test(
-        String(rawTime).trim().replace(/^\+/, "")
-      );
-
-      absoluteById[row.id] = isFullRaceTime
-        ? parsedMs + penalty * 1000
-        : referenceMs + parsedMs + penalty * 1000;
-    });
-
-    // De huidige P1 na drag/drop
-    const currentLeader = orderedRows[0];
-    const currentLeaderMs = absoluteById[currentLeader.id];
-
-    if (currentLeaderMs === null || currentLeaderMs === undefined) return {};
-
-    orderedRows.forEach((row, index) => {
-      const absoluteMs = absoluteById[row.id];
-      const edited = editedResults[row.id] || {};
-
-      if (absoluteMs === null || absoluteMs === undefined) {
-        map[row.id] = edited.time ?? row.time ?? row.Time ?? "";
-        return;
-      }
-
-      if (index === 0) {
-        map[row.id] = formatFullTime(absoluteMs);
-      } else {
-        map[row.id] = formatGapTime(absoluteMs - currentLeaderMs);
-      }
-    });
-
-    return map;
-  }
-
-  /** Generic field change */
-  const handleInputChange = (id, field, value) => {
-    setEditedResults((prev) => {
-      const base = raceResults.find((r) => r.id === id) || {};
-      const existing = prev[id] || {};
-      const updated = { ...existing, [field]: value };
-
-      // Recompute pos_Change when pos or quali changes
-      const position =
-        field === "position" ? value : existing.position ?? base.position;
-      const qualifying =
-        field === "qualifying" ? value : existing.qualifying ?? base.qualifying;
-
-      if (
-        position !== null &&
-        position !== undefined &&
-        qualifying !== null &&
-        qualifying !== undefined
-      ) {
-        updated.pos_Change = qualifying - position;
-      }
-
-      return { ...prev, [id]: updated };
-    });
-  };
-
-  /** Save ONE row */
-  const handleSave = async (id) => {
-    const base = raceResults.find((r) => r.id === id);
-    const updated = editedResults[id] || {};
-    if (!base && !updated) return;
-
-    // Flatten driver/team names for DTO
-    const driverName =
-      updated.driver ??
-      base?.driver?.name ??
-      (typeof base?.driver === "string" ? base.driver : "");
-    const teamName =
-      updated.team ??
-      base?.team?.name ??
-      (typeof base?.team === "string" ? base.team : "");
-
-    const timePenaltyMap = calculateTimePenaltyMap(raceResults, editedResults);
-
-    const dto = {
-      Position: updated.position ?? base.position,
-      Driver: driverName,
-      Team: teamName,
-      Points: updated.points ?? base.points,
-      DNF: updated.dnf ?? base.dnf,
-      Qualifying: updated.qualifying ?? base.qualifying,
-      Pos_Change: updated.pos_Change ?? base.pos_Change,
-      Time: updated.time ?? base.time,
-      Penalty: updated.penalty ?? base.penalty ?? 0,
-      TimePenalty: timePenaltyMap[id] ?? updated.time ?? base.time,
-    };
-
-    console.log("Saving DTO:", dto);
-    const resp = await fetch(
-      `${API_BASE}/api/race/raceresult/update/${id}`,
-      {
-        method: "PUT",
-        headers: { 
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-         },
-        body: JSON.stringify(dto),
-      }
-    );
-
-    alert(
-      resp.ok ? "Race result updated successfully!" : "Failed to update result."
-    );
-  };
-
-  /** Save ALL edited rows */
-  const handleSaveAll = async () => {
-    const editedIds = Object.keys(editedResults);
-    if (editedIds.length === 0) {
-      alert("No changes to save.");
+  // ---------- load one race ----------
+  const loadRace = useCallback(async (id) => {
+    if (!id) {
+      setRace(null);
+      setRows([]);
+      setOriginal([]);
       return;
     }
-
-    if (!window.confirm("Are you sure you want to save all edited results?"))
-      return;
-
-    const timePenaltyMap = calculateTimePenaltyMap(raceResults, editedResults);
-
-    const updates = editedIds
-      .map((idStr) => {
-        const id = parseInt(idStr, 10);
-        const base = raceResults.find((r) => r.id === id);
-        const updated = editedResults[idStr] || {};
-        if (!base && !updated) return null;
-
-        const driverName =
-          updated.driver ??
-          base?.driver?.name ??
-          (typeof base?.driver === "string" ? base.driver : "");
-        const teamName =
-          updated.team ??
-          base?.team?.name ??
-          (typeof base?.team === "string" ? base.team : "");
-
-        const dto = {
-          Position: updated.position ?? base.position,
-          Driver: driverName,
-          Team: teamName,
-          Points: updated.points ?? base.points,
-          DNF: updated.dnf ?? base.dnf,
-          Qualifying: updated.qualifying ?? base.qualifying,
-          Pos_Change: updated.pos_Change ?? base.pos_Change,
-          Time: updated.time ?? base.time,
-          Penalty: updated.penalty ?? base.penalty,
-          TimePenalty: timePenaltyMap[id] ?? updated.time ?? base.time,
-        };
-
-        return fetch(`${API_BASE}/api/race/raceresult/update/${id}`, {
-          method: "PUT",
-          headers: { 
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify(dto),
-        }).then((res) => ({
-          id,
-          success: res.ok,
+    setLoading(true);
+    setNotice(null);
+    try {
+      const res = await fetch(`${API_BASE}/api/race/${id}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { race: r, fastestLap } = await res.json();
+      const loaded = [...(r.raceResults || [])]
+        .sort((a, b) => (a.position ?? 99) - (b.position ?? 99))
+        .map((x) => ({
+          key: newKey(),
+          id: x.id,
+          origPos: x.position,
+          driver: x.driver?.name ?? "",
+          team: x.team?.name ?? "",
+          dnf: x.dnf === "Yes" || x.dnf === "DNF" ? "Yes" : "No",
+          qualifying: x.qualifying || "",
+          time: x.time ?? "",
+          penalty: Number(x.penalty) || 0,
+          storedPoints: Number(x.points) || 0,
+          storedDnf: x.dnf === "Yes" || x.dnf === "DNF" ? "Yes" : "No",
+          storedFastest: !!fastestLap?.driver?.name && x.driver?.name === fastestLap.driver.name,
         }));
-      })
-      .filter(Boolean);
-
-    const results = await Promise.all(updates);
-    const failed = results.filter((r) => !r.success);
-
-    if (failed.length > 0) {
-      alert(`⚠️ ${failed.length} result(s) failed to save.`);
-    } else {
-      alert("✅ All race results saved successfully!");
+      setRace(r);
+      setOriginal(loaded);
+      setRows(loaded);
+      const fl = loaded.find((x) => x.driver && x.driver === fastestLap?.driver?.name);
+      setFastest(fl?.key ?? "");
+    } catch {
+      setNotice({ type: "error", text: "Could not load this race." });
+    } finally {
+      setLoading(false);
     }
+  }, []);
 
-    // Clear edits & refetch fresh data (and refresh original points map)
-    setEditedResults({});
-    fetch(`${API_BASE}/api/race/${selectedRaceId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const raceObj = data?.race ?? data;
-        hydrateRaceResults(raceObj);
-      })
-      .catch((err) => console.error("Error refreshing data:", err));
-  };
+  useEffect(() => {
+    loadRace(raceId);
+  }, [raceId, loadRace]);
 
-  /** Delete one row */
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this result?")) return;
-    const resp = await fetch(
-      `${API_BASE}/api/race/raceresult/delete/${id}`,
-      { 
-        method: "DELETE",
-        headers: { 
-          "Authorization": `Bearer ${token}`
-         }, 
-      }
-    );
-    if (resp.ok) {
-      alert("Race result deleted successfully!");
-      setRaceResults((prev) => prev.filter((r) => r.id !== id));
-      setEditedResults((prev) => {
-        const { [id]: _, ...rest } = prev;
-        return rest;
-      });
-    } else {
-      alert("Failed to delete result.");
-    }
-  };
+  // ---------- derived ----------
+  const timesAdj = useMemo(() => adjustedTimes(rows), [rows]);
+  const fastestIndex = rows.findIndex((r) => r.key === fastest);
+  // Unchanged rows keep their stored points (older seasons used other points rules);
+  // a row that moved, changed DNF or fastest lap gets points from the table.
+  const computed = rows.map((r, i) => ({
+    ...r,
+    position: i + 1,
+    points:
+      r.id && r.origPos === i + 1 && r.dnf === r.storedDnf && (i === fastestIndex) === r.storedFastest
+        ? r.storedPoints
+        : pointsFor(i, r, race, i === fastestIndex),
+    timeAdj: timesAdj[i],
+    posChange: r.qualifying ? Number(r.qualifying) - (i + 1) : 0,
+  }));
 
-  /**
-   * Drag & drop reorder
-   * - We NEVER recompute points from a fixed scoring table.
-   * - Instead, we preserve the original points distribution per position:
-   *   position 1 keeps its DB points, position 2 keeps its DB points, etc.
-   * - After reordering, drivers inherit the points of the position they move to.
-   */
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const updated = [...raceResults];
-    const [movedRow] = updated.splice(result.source.index, 1);
-    updated.splice(result.destination.index, 0, movedRow);
-
-    updated.forEach((row, i) => {
-      const newPos = i + 1;
-      row.position = newPos;
-
-      // Preserve DB points per position
-      if (Object.prototype.hasOwnProperty.call(originalPointsByPosition, newPos)) {
-        row.points = originalPointsByPosition[newPos];
-      }
-
-      const quali =
-        row.qualifying !== null && row.qualifying !== undefined
-          ? row.qualifying
-          : newPos;
-      row.pos_Change = quali - newPos;
+  const changes = useMemo(() => {
+    const list = [];
+    const origByKey = new Map(original.map((o, i) => [o.key, { ...o, pos: i + 1 }]));
+    const nowKeys = new Set(rows.map((r) => r.key));
+    rows.forEach((r, i) => {
+      const o = origByKey.get(r.key);
+      const name = r.driver || "(empty row)";
+      if (!o) return list.push(`Added ${name} at P${i + 1}`);
+      if (o.pos !== i + 1) list.push(`${name}: P${o.pos} → P${i + 1}`);
+      if (o.driver !== r.driver) list.push(`P${i + 1}: driver ${o.driver} → ${r.driver}`);
+      if (o.team !== r.team) list.push(`${name}: team ${o.team || "–"} → ${r.team || "–"}`);
+      if (o.dnf !== r.dnf) list.push(`${name}: ${r.dnf === "Yes" ? "now DNF" : "no longer DNF"}`);
+      if (String(o.qualifying) !== String(r.qualifying)) list.push(`${name}: grid ${o.qualifying || "–"} → ${r.qualifying || "–"}`);
+      if (String(o.time) !== String(r.time)) list.push(`${name}: time ${o.time || "–"} → ${r.time || "–"}`);
+      if ((Number(o.penalty) || 0) !== (Number(r.penalty) || 0)) list.push(`${name}: penalty ${o.penalty || 0}s → ${r.penalty || 0}s`);
     });
+    original.forEach((o) => {
+      if (!nowKeys.has(o.key)) list.push(`Removed ${o.driver}`);
+    });
+    return list;
+  }, [rows, original]);
 
-    setRaceResults(updated);
+  const [loadedFastest, setLoadedFastest] = useState("");
+  useEffect(() => {
+    if (original.length) setLoadedFastest(fastest);
+    // remember the fastest lap as loaded (only when a race is loaded)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [original]);
+  const allChanges = loadedFastest !== fastest
+    ? [...changes, `Fastest lap → ${rows.find((r) => r.key === fastest)?.driver || "none"}`]
+    : changes;
+  const pointChanges = computed
+    .filter((r) => r.id && r.points !== r.storedPoints)
+    .map((r) => `${r.driver}: ${r.storedPoints} → ${r.points} pts`);
+  const dirty = allChanges.length > 0;
 
-    // Mirror to editedResults (only fields affected by reorder)
-    setEditedResults((prev) => {
-      const next = { ...prev };
-      updated.forEach((row) => {
-        next[row.id] = {
-          ...(next[row.id] || {}),
-          position: row.position,
-          points: row.points,
-          pos_Change: row.pos_Change,
-        };
-      });
+  const issues = computed
+    .map((r, i) => {
+      if (!r.driver.trim()) return { i, reason: "empty driver" };
+      if (!driverNames.has(r.driver.trim())) return { i, reason: `${r.driver}: new driver?` };
+      if (!teamNames.has(r.team)) return { i, reason: `${r.driver}: ${r.team ? `unknown team "${r.team}"` : "no team"}` };
+      return null;
+    })
+    .filter(Boolean);
+  const dupes = new Set(
+    rows.map((r) => r.driver.trim().toLowerCase()).filter((n, i, a) => n && a.indexOf(n) !== i)
+  );
+
+  // ---------- leaving with unsaved changes ----------
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [dirty]);
+
+  // ---------- edits ----------
+  const update = (key, field, value) => setRows((rs) => rs.map((r) => (r.key === key ? { ...r, [field]: value } : r)));
+  const move = (index, delta) =>
+    setRows((rs) => {
+      const j = index + delta;
+      if (j < 0 || j >= rs.length) return rs;
+      const next = [...rs];
+      [next[index], next[j]] = [next[j], next[index]];
       return next;
     });
+  const remove = (key) => {
+    setRows((rs) => rs.filter((r) => r.key !== key));
+    if (fastest === key) setFastest("");
+  };
+  const addRow = () =>
+    setRows((rs) => [
+      ...rs,
+      { key: newKey(), id: null, origPos: null, driver: "", team: "", dnf: "No", qualifying: "", time: "", penalty: 0, storedPoints: 0, storedDnf: "No", storedFastest: false },
+    ]);
+
+  // Re-order by race time including penalties: timed finishers first, then the rest (e.g. "+1 Lap"), DNFs last.
+  const applyPenalties = () =>
+    setRows((rs) => {
+      const abs = absoluteTimes(rs);
+      const timed = rs.map((r, i) => ({ r, t: abs[i] })).filter((x) => x.t !== null).sort((a, b) => a.t - b.t).map((x) => x.r);
+      const untimed = rs.filter((r, i) => abs[i] === null && r.dnf !== "Yes");
+      const dnf = rs.filter((r) => r.dnf === "Yes");
+      return [...timed, ...untimed, ...dnf];
+    });
+  const hasPenalties = rows.some((r) => Number(r.penalty));
+  const outOfOrder = useMemo(() => {
+    const abs = absoluteTimes(rows);
+    let last = -1;
+    for (const t of abs) {
+      if (t === null) continue;
+      if (t < last) return true;
+      last = t;
+    }
+    return false;
+  }, [rows]);
+
+  const switchRace = (id) => {
+    if (dirty && !window.confirm("Discard your unsaved changes?")) return;
+    setParams(id ? { race: String(id) } : {});
   };
 
-  /** Derived lists */
-  const uniqueDivisions = useMemo(() => {
-    const set = new Set(
-      races
-        .filter(
-          (r) => !selectedSeason || String(r.Season) === String(selectedSeason)
-        )
-        .map((r) => r.Division)
-        .filter((v) => v !== undefined && v !== null)
-    );
-    return Array.from(set).sort(
-      (a, b) => a - b || String(a).localeCompare(String(b))
-    );
-  }, [races, selectedSeason]);
+  // ---------- save ----------
+  const save = async (confirmNewDrivers = false) => {
+    setSaving(true);
+    setNotice(null);
+    try {
+      const payload = computed.map((r) => ({
+        Id: r.id,
+        Position: r.position,
+        Driver: r.driver.trim(),
+        Team: r.team,
+        Points: r.points,
+        DNF: r.dnf,
+        Qualifying: r.qualifying ? parseInt(r.qualifying, 10) : 0,
+        Pos_Change: r.posChange,
+        FastestLap: r.key === fastest,
+        Time: String(r.time || "").trim(),
+        Penalty: Number(r.penalty) || 0,
+        TimePenalty: r.timeAdj,
+      }));
+      const res = await fetch(`${API_BASE}/api/race/${race.id}/results`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
+        body: JSON.stringify({ results: payload, confirmNewDrivers }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (res.status === 409 && body?.needsConfirmation) {
+        setReview(false);
+        setPendingNew(body.unknownDrivers || []);
+        return;
+      }
+      if (!res.ok) throw new Error(body?.message || `HTTP ${res.status}`);
+      setReview(false);
+      setPendingNew(null);
+      await loadRace(race.id);
+      setNotice({ type: "success", text: body.message || "Saved." });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      setNotice({ type: "error", text: `Nothing was saved: ${err.message || err}` });
+    } finally {
+      setSaving(false);
+    }
+  };
 
-  const filteredRaces = useMemo(() => {
-    return races
-      .filter(
-        (r) => !selectedSeason || String(r.Season) === String(selectedSeason)
-      )
-      .filter(
-        (r) =>
-          !selectedDivision || String(r.Division) === String(selectedDivision)
-      );
-  }, [races, selectedSeason, selectedDivision]);
+  // ---------- render helpers ----------
+  const label = (r) =>
+    `${r.Tracks?.RaceName ?? "Race"}${r.Sprint === "Yes" ? " (Sprint)" : ""} · S${r.Season} D${r.Division} R${r.Round}`;
+  const shown = races.filter((r) => !query.trim() || label(r).toLowerCase().includes(query.trim().toLowerCase()));
+  const recent = races.slice(0, 6);
+  const goTo = (i) => {
+    const el = document.getElementById(`er-row-${i}`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.add("ar-row--flash");
+    setTimeout(() => el.classList.remove("ar-row--flash"), 1400);
+  };
 
   return (
-    <div className="edit-race-results-container">
+    <div className="ar-container er-page">
       <h1>Edit Race Results</h1>
 
-      {/* Season Selection */}
-      <div>
-        <label>Select Season: </label>
-        <select
-          value={selectedSeason}
-          onChange={(e) => setSelectedSeason(e.target.value)}
-        >
-          <option value="">-- Select Season --</option>
-          {seasons.length > 0 ? (
-            seasons.map((s) => (
-              <option key={s} value={s}>
-                Season {s}
-              </option>
-            ))
-          ) : (
-            <option disabled>No seasons available</option>
-          )}
-        </select>
-      </div>
-
-      {/* Division Selection */}
-      {selectedSeason && (
-        <div>
-          <label>Select Division / Tier: </label>
-          <select
-            value={selectedDivision}
-            onChange={(e) => setSelectedDivision(e.target.value)}
-          >
-            <option value="">-- All Divisions --</option>
-            {uniqueDivisions.length > 0 ? (
-              uniqueDivisions.map((d) => (
-                <option key={d} value={d}>
-                  T{d}
-                </option>
-              ))
-            ) : (
-              <option disabled>No divisions available</option>
-            )}
-          </select>
+      {/* Race picker */}
+      <div className="stb-panel ar-pick">
+        <div className="ar-pick__head">
+          <h2>Race</h2>
+          {race ? (
+            <Link to={`/STB/Race/${race.id}`} className="ar-muted er-view">
+              View race page ↗
+            </Link>
+          ) : null}
         </div>
-      )}
-
-      {/* Race Selection */}
-      {selectedSeason && (
-        <div>
-          <label>Select Race: </label>
-          <select
-            value={selectedRaceId}
-            onChange={(e) => setSelectedRace(e.target.value)}
-          >
-            <option value="">-- Select Race --</option>
-            {filteredRaces.map((r) => (
+        <div className="ar-todo">
+          <span className="ar-todo__label">Latest</span>
+          {recent.map((r) => (
+            <button
+              key={r.Id}
+              type="button"
+              className={`ar-todo__chip ${String(race?.id) === String(r.Id) ? "is-active" : ""}`}
+              onClick={() => switchRace(r.Id)}
+            >
+              <strong>
+                {r.Tracks?.RaceName ?? "Race"}
+                {r.Sprint === "Yes" ? " · Sprint" : ""}
+              </strong>
+              <span>
+                S{r.Season} · D{r.Division} · R{r.Round}
+              </span>
+            </button>
+          ))}
+        </div>
+        <div className="er-search">
+          <input type="search" placeholder="Search: track, S31, D2…" value={query} onChange={(e) => setQuery(e.target.value)} />
+          <select value={raceId} onChange={(e) => switchRace(e.target.value)}>
+            <option value="">{shown.length} races — choose…</option>
+            {shown.map((r) => (
               <option key={r.Id} value={r.Id}>
-                Round: {r.Round} - T{r.Division}
+                {label(r)}
               </option>
             ))}
-            {filteredRaces.length === 0 && (
-              <option disabled>No races for this selection</option>
-            )}
           </select>
         </div>
-      )}
+      </div>
 
-      {/* Results Table */}
-      {selectedSeason && selectedRaceId && (
+      {notice ? (
+        <div className={`ar-notice ar-notice--${notice.type === "success" ? "info" : notice.type}`} role="status">
+          {notice.type === "success" ? "✓ " : ""}
+          {notice.text}
+          <button type="button" className="ar-notice__close" onClick={() => setNotice(null)} aria-label="Close">
+            ×
+          </button>
+        </div>
+      ) : null}
+
+      {loading ? <p className="ar-muted">Loading race…</p> : null}
+
+      {race && !loading ? (
         <>
-          <h2>
-            Race Results{type ? ` - ${type}` : ""} • Id {selectedRaceId} • Season{" "}
-            {selectedSeason}
-          </h2>
-
-          {FastestLap && (
-            <p style={{ fontSize: 14, marginBottom: 8 }}>
-              Fastest Lap: <strong>{FastestLap}</strong> (points already baked
-              into the table if applicable)
+          <div className="stb-panel er-table-wrap">
+            <div className="er-head">
+              <h2>
+                {race.track?.raceName ?? "Race"}
+                {isSprint(race) ? " · Sprint" : ""} <span className="ar-muted">S{race.season} · D{race.division} · R{race.round}</span>
+              </h2>
+              <div className="er-head__actions">
+                {hasPenalties || outOfOrder ? (
+                  <button type="button" className="ar-btn ar-btn--ghost" onClick={applyPenalties} title="Sort finishers by race time including penalties">
+                    ⏱ Re-order by time {hasPenalties ? "+ penalties" : ""}
+                  </button>
+                ) : null}
+                <button type="button" className="ar-btn ar-btn--ghost" onClick={addRow}>
+                  + Add driver
+                </button>
+              </div>
+            </div>
+            <p className="ar-muted er-hint">
+              Penalty: enter seconds (e.g. 5), then “Re-order by time”. Points follow the position automatically. Use ↑ ↓ to move a driver.
             </p>
-          )}
 
-          {raceResults.length === 0 ? (
-            <p style={{ color: "red", fontWeight: "bold" }}>
-              There are no results for this race
-            </p>
-          ) : (
-            <>
-              <table className="race-results-table">
-                <thead>
-                  <tr>
-                    <th style={{ width: 32 }} />
-                    <th>Pos</th>
-                    <th>Driver</th>
-                    <th>Team</th>
-                    <th>Pts</th>
-                    <th>DNF</th>
-                    <th>Quali</th>
-                    <th>Pos Δ</th>
-                    <th>Time</th>
-                    <th>Penalty</th>
-                    <th>Time + Penalty</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
+            <table className="results-table er-table">
+              <thead>
+                <tr>
+                  <th>Pos</th>
+                  <th />
+                  <th>Driver</th>
+                  <th>Team</th>
+                  <th>DNF</th>
+                  <th>Grid</th>
+                  <th>Time</th>
+                  <th>Penalty (s)</th>
+                  <th>Time + pen.</th>
+                  <th>FL</th>
+                  <th>Pts</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {computed.map((r, i) => {
+                  const moved = r.origPos && r.origPos !== r.position ? r.origPos - r.position : 0;
+                  const issue = issues.some((x) => x.i === i) || dupes.has(r.driver.trim().toLowerCase());
+                  return (
+                    <tr key={r.key} id={`er-row-${i}`} className={`${issue ? "ar-row--issue" : ""} ${r.id ? "" : "er-new"}`}>
+                      <td className="er-pos">
+                        <strong>P{r.position}</strong>
+                        {moved ? <span className={moved > 0 ? "er-up" : "er-down"}>{moved > 0 ? `▲${moved}` : `▼${-moved}`}</span> : null}
+                      </td>
+                      <td className="er-move">
+                        <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move up">
+                          ↑
+                        </button>
+                        <button type="button" onClick={() => move(i, 1)} disabled={i === rows.length - 1} aria-label="Move down">
+                          ↓
+                        </button>
+                      </td>
+                      <td>
+                        <input
+                          list="er-drivers"
+                          value={r.driver}
+                          onChange={(e) => update(r.key, "driver", e.target.value)}
+                          className={"ar-driver-input" + (r.driver.trim() ? (driverNames.has(r.driver.trim()) ? " ar-db-ok" : " ar-db-missing") : "")}
+                          placeholder="Driver"
+                        />
+                      </td>
+                      <td>
+                        <select
+                          value={r.team}
+                          onChange={(e) => update(r.key, "team", e.target.value)}
+                          className={"ar-team-input" + (r.team ? (teamNames.has(r.team) ? " ar-db-ok" : " ar-db-missing") : "")}
+                        >
+                          <option value="">Team…</option>
+                          {r.team && !teamNames.has(r.team) ? <option value={r.team}>{r.team} (unknown)</option> : null}
+                          {[...teams]
+                            .sort((a, b) => a.Name.localeCompare(b.Name))
+                            .map((t) => (
+                              <option key={t.Id} value={t.Name}>
+                                {t.Name}
+                              </option>
+                            ))}
+                        </select>
+                      </td>
+                      <td>
+                        <select value={r.dnf} onChange={(e) => update(r.key, "dnf", e.target.value)} className="ar-dnf-select">
+                          <option value="No">No</option>
+                          <option value="Yes">Yes</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input type="number" min="1" value={r.qualifying} onChange={(e) => update(r.key, "qualifying", e.target.value)} className="er-small" />
+                      </td>
+                      <td>
+                        <input value={r.time} onChange={(e) => update(r.key, "time", e.target.value)} className="ar-time-input" placeholder="1.234" />
+                      </td>
+                      <td>
+                        <input
+                          type="number"
+                          step="1"
+                          value={r.penalty || ""}
+                          placeholder="0"
+                          onChange={(e) => update(r.key, "penalty", Number(e.target.value) || 0)}
+                          className={`er-small ${Number(r.penalty) ? "er-pen" : ""}`}
+                        />
+                      </td>
+                      <td className="er-adj">{r.dnf === "Yes" ? "DNF" : r.timeAdj || "–"}</td>
+                      <td>
+                        <input type="radio" name="fastest" checked={fastest === r.key} onChange={() => setFastest(r.key)} aria-label="Fastest lap" />
+                      </td>
+                      <td className="er-pts">{r.points}</td>
+                      <td>
+                        <button type="button" className="er-del" onClick={() => remove(r.key)} aria-label={`Remove ${r.driver}`}>
+                          ×
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            <datalist id="er-drivers">
+              {drivers.map((d) => (
+                <option key={d.Id ?? d.Name} value={d.Name} />
+              ))}
+            </datalist>
+            {fastest ? (
+              <button type="button" className="er-link" onClick={() => setFastest("")}>
+                Clear fastest lap
+              </button>
+            ) : null}
+          </div>
 
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="raceResults">
-                    {(provided) => (
-                      <tbody
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                      >
-                        {raceResults.map((result, index) => {
-                          const driverName =
-                            editedResults[result.id]?.driver ??
-                            result.driver?.name ??
-                            (typeof result.driver === "string"
-                              ? result.driver
-                              : "") ??
-                            "";
-                          const teamName =
-                            editedResults[result.id]?.team ??
-                            result.team?.name ??
-                            (typeof result.team === "string"
-                              ? result.team
-                              : "") ??
-                            "";
-
-                          return (
-                            <Draggable
-                              key={result.id}
-                              draggableId={String(result.id)}
-                              index={index}
-                            >
-                              {(prov) => (
-                                <tr
-                                  ref={prov.innerRef}
-                                  {...prov.draggableProps}
-                                >
-                                  <td
-                                    {...prov.dragHandleProps}
-                                    style={{ cursor: "grab" }}
-                                  >
-                                    ⠿
-                                  </td>
-
-                                  <td>{result.position}</td>
-
-                                  <td>
-                                    <input
-                                      type="text"
-                                      className="compact-input"
-                                      value={driverName}
-                                      onChange={(e) =>
-                                        handleInputChange(
-                                          result.id,
-                                          "driver",
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </td>
-
-                                  <td>
-                                    <input
-                                      type="text"
-                                      className="compact-input"
-                                      value={teamName}
-                                      onChange={(e) =>
-                                        handleInputChange(
-                                          result.id,
-                                          "team",
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </td>
-
-                                  <td>
-                                    <input
-                                      type="number"
-                                      className="compact-input"
-                                      step="0.5"
-                                      value={
-                                        editedResults[result.id]?.points ??
-                                        result.points ??
-                                        0
-                                      }
-                                      onChange={(e) => {
-                                        const v =
-                                          e.target.value === ""
-                                            ? ""
-                                            : Number(e.target.value);
-                                        handleInputChange(
-                                          result.id,
-                                          "points",
-                                          v
-                                        );
-                                      }}
-                                    />
-                                  </td>
-
-                                  <td>
-                                    <select
-                                      className="compact-select"
-                                      value={
-                                        editedResults[result.id]?.dnf ??
-                                        result.dnf ??
-                                        "No"
-                                      }
-                                      onChange={(e) =>
-                                        handleInputChange(
-                                          result.id,
-                                          "dnf",
-                                          e.target.value
-                                        )
-                                      }
-                                    >
-                                      <option value="No">No</option>
-                                      <option value="Yes">Yes</option>
-                                      <option value="DNF">DNF</option>
-                                    </select>
-                                  </td>
-
-                                  <td>
-                                    <input
-                                      type="number"
-                                      className="compact-input"
-                                      value={
-                                        editedResults[result.id]
-                                          ?.qualifying ??
-                                        result.qualifying ??
-                                        ""
-                                      }
-                                      onChange={(e) => {
-                                        const v =
-                                          e.target.value === ""
-                                            ? ""
-                                            : Number(e.target.value);
-                                        handleInputChange(
-                                          result.id,
-                                          "qualifying",
-                                          v
-                                        );
-                                      }}
-                                    />
-                                  </td>
-
-                                  <td>
-                                    {editedResults[result.id]?.pos_Change ??
-                                      result.pos_Change ??
-                                      ""}
-                                  </td>
-
-                                  <td>
-                                    <input
-                                      type="text"
-                                      className="compact-input"
-                                      value={
-                                        editedResults[result.id]?.time ??
-                                        result.time ??
-                                        ""
-                                      }
-                                      onChange={(e) =>
-                                        handleInputChange(
-                                          result.id,
-                                          "time",
-                                          e.target.value
-                                        )
-                                      }
-                                    />
-                                  </td>
-
-                                  <td>
-                                    <input
-                                      type="number"
-                                      className="compact-input"
-                                      value={
-                                        editedResults[result.id]?.penalty ??
-                                        result.penalty ??
-                                        0
-                                      }
-                                      step="1"
-                                      onChange={(e) => {
-                                        let v = e.target.value;
-                                        if (v === "") v = "";
-                                        else if (/^-?\d+$/.test(v))
-                                          v = parseInt(v, 10);
-                                        else return;
-                                        handleInputChange(
-                                          result.id,
-                                          "penalty",
-                                          v
-                                        );
-                                      }}
-                                    />
-                                  </td>
-
-                                  <td>
-                                    {
-                                      calculateTimePenaltyMap(raceResults, editedResults)[result.id] ?? ""
-                                    }
-                                  </td>
-
-                                  <td>
-                                    <button
-                                      className="submit-button"
-                                      onClick={() => handleSave(result.id)}
-                                    >
-                                      Save
-                                    </button>
-                                    <button
-                                      className="delete-btn"
-                                      onClick={() =>
-                                        handleDelete(result.id)
-                                      }
-                                    >
-                                      Delete
-                                    </button>
-                                  </td>
-                                </tr>
-                              )}
-                            </Draggable>
-                          );
-                        })}
-                        {provided.placeholder}
-                      </tbody>
-                    )}
-                  </Droppable>
-                </DragDropContext>
-              </table>
-            </>
-          )}
-
-          <div style={{ marginTop: "20px" }}>
-            <button
-              className="submit-button"
-              style={{ marginRight: "10px" }}
-              onClick={handleSaveAll}
-            >
-              💾 Save All
-            </button>
-            <button className="cancel-btn" onClick={() => navigate(-1)}>
-              Cancel
-            </button>
+          {/* status bar */}
+          <div className="ar-statusbar stb-panel">
+            <div className="ar-statusbar__info">
+              {dirty ? <strong>{allChanges.length} change{allChanges.length === 1 ? "" : "s"}</strong> : <span className="ar-muted">No changes</span>}
+              {issues.length || dupes.size ? (
+                <button type="button" className="ar-check" onClick={() => goTo(issues[0]?.i ?? 0)} title={issues.map((x) => x.reason).join("\n")}>
+                  ⚠ {issues.length + dupes.size} to check →
+                </button>
+              ) : null}
+              {outOfOrder ? <span className="ar-warn">Times are not in order — use “Re-order by time”?</span> : null}
+            </div>
+            <div className="er-actions">
+              {dirty ? (
+                <button type="button" className="ar-btn ar-btn--ghost" onClick={() => loadRace(race.id)} disabled={saving}>
+                  Undo all
+                </button>
+              ) : null}
+              <button type="button" className="ar-btn ar-btn--primary ar-save" disabled={!dirty || saving || dupes.size > 0} onClick={() => setReview(true)}>
+                Review & save
+              </button>
+            </div>
           </div>
         </>
-      )}
+      ) : null}
+
+      {/* review dialog */}
+      {review ? (
+        <div className="ar-overlay" onClick={() => setReview(false)}>
+          <div className="ar-dialog stb-panel" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <h2>Save these changes?</h2>
+            <ul className="er-changes">
+              {allChanges.map((c, i) => (
+                <li key={i}>{c}</li>
+              ))}
+            </ul>
+            {pointChanges.length ? (
+              <>
+                <p className="ar-muted">Points change:</p>
+                <ul className="er-changes er-changes--pts">
+                  {pointChanges.map((c, i) => (
+                    <li key={i}>{c}</li>
+                  ))}
+                </ul>
+              </>
+            ) : null}
+            <p className="ar-muted">Points and time gaps are recalculated from the new order. Everything is saved together — or nothing.</p>
+            <div className="ar-dialog__actions">
+              <button type="button" className="ar-btn ar-btn--ghost" onClick={() => setReview(false)}>
+                Go back
+              </button>
+              <button type="button" className="ar-btn ar-btn--primary" onClick={() => save(false)} disabled={saving}>
+                {saving ? "Saving…" : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {pendingNew ? (
+        <div className="ar-overlay" onClick={() => setPendingNew(null)}>
+          <div className="ar-dialog stb-panel" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <h2>New drivers</h2>
+            <p>These drivers are not in the database yet:</p>
+            <ul>
+              {pendingNew.map((n) => (
+                <li key={n}>{n}</li>
+              ))}
+            </ul>
+            <div className="ar-dialog__actions">
+              <button type="button" className="ar-btn ar-btn--ghost" onClick={() => setPendingNew(null)}>
+                Go back
+              </button>
+              <button type="button" className="ar-btn ar-btn--primary" onClick={() => save(true)} disabled={saving}>
+                {saving ? "Saving…" : `Create ${pendingNew.length} and save`}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
-
-export default EditRaceResults;

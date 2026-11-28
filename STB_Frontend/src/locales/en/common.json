@@ -276,5 +276,28 @@
         "older": "older",
         "newer": "newer",
         "formAvgShort": "avg {{n}}"
+    },
+    "trackPage": {
+        "eyebrow": "Circuit",
+        "notFound": "Track not found",
+        "backHome": "Back to home",
+        "noMap": "No layout available",
+        "stats": "Statistics",
+        "racesHere": "Races at this track",
+        "noRaces": "No races held here yet.",
+        "noResult": "No results entered yet.",
+        "where": "Season {{s}} · Division {{d}} · Round {{r}}",
+        "sprint": "Sprint",
+        "pts": "pts",
+        "fullResult": "Full result",
+        "turnsCount": "{{count}} turns",
+        "since": "Since season {{n}}",
+        "tiles": {
+            "length": "Track length",
+            "turns": "Turns",
+            "races": "Races held",
+            "winners": "Different winners",
+            "mostWins": "Most wins"
+        }
     }
 }

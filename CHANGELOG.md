@@ -5,6 +5,34 @@ Versienummers volgen [Semantic Versioning](https://semver.org/lang/nl/):
 
 Werkwijze: wijzigingen gaan eerst naar branch `dev` (testsite), na akkoord naar `main` (live) met een tag `vX.Y.Z`.
 
+## [Unreleased] (op `dev`)
+
+## [2.4.0] – 2026-11-28
+
+### Nieuw (admin)
+- **Add Results sneller**: opent direct op de eerstvolgende race zonder uitslag; lijst "To do" met alle gereden races zonder uitslag; laadt alleen open races (i.p.v. alle ±9.500 uitslagen).
+- Statusbalk onderaan (blijft in beeld): aantal coureurs, "✓ alles herkend" of "⚠ x rijen controleren" met sprong naar de rij, waarschuwing bij 0 of meerdere snelste ronden.
+- Na opslaan: blijft op de pagina met "Bekijk race", "Kopieer link" en **"Volgende: … →"**.
+- Nieuwe coureurs bevestigen in de pagina (geen browser-pop-up); foutmeldingen in de pagina.
+- Waarschuwing bij weggaan of van race wisselen met niet-opgeslagen invoer.
+- **Edit Results vernieuwd**: race kiezen via "Latest"-knoppen of zoeken (circuit, S31, D2…); coureur met aanvulling + groen/rood; team-keuzelijst; ↑ ↓ om te verplaatsen met ▲/▼ t.o.v. de oude positie; coureur toevoegen/verwijderen; snelste ronde aan te passen; **straffen**: seconden invullen → "Re-order by time" zet de volgorde op tijd + straf, punten en tijdsverschillen rekenen mee; overzicht van alle wijzigingen (ook punten) vóór opslaan; alles-of-niets opslaan; "Undo all".
+- Ongewijzigde rijen houden hun opgeslagen punten (oudere seizoenen hadden soms andere puntenregels).
+- **Admin-dashboard** (vervangt het Admin Hub): To do (gereden races zonder uitslag, met knop "Add results"), seizoensvoortgang per divisie, laatst ingevoerd (View / Edit / Copy link), komende races (→ kalender bewerken), data-check (mogelijk dubbele coureurs, races zonder YouTube-link, oude races zonder uitslag) en snelle acties.
+- Edit Season opent via `?season=…&division=…`.
+- **Add Track en Edit Track vernieuwd** (nieuwe stijl): alle velden (GP-naam, circuit, land met vlag-controle, landcode, bochten, lengte) en **layout-afbeelding uploaden** (slepen, kiezen of plakken met Ctrl+V; voorbeeld vooraf; verwijderen). Edit Track: zoekbare lijst met vlaggen, 🖼 = eigen afbeelding, opent via `?track=…`.
+- Circuitpagina toont de geüploade layout-afbeelding; zonder upload valt hij terug op de ingebouwde afbeeldingen.
+- **Add Season en Edit Season in de nieuwe stijl**: donkere kaarten, nette tabel, labels bij de velden, gewijzigde races geel gemarkeerd, meldingen in de pagina in plaats van browser-pop-ups.
+
+### Opgelost
+- De opmaak van Edit Season zette kleurvariabelen voor de hele site (licht thema); daardoor had o.a. de kampioenschapspagina de verkeerde tekstkleur. De opmaak geldt nu alleen nog voor de seizoenspagina's.
+
+### Verbeterd
+- Google: gestructureerde gegevens (naam "STB Racing League", logo, YouTube/Twitch/TikTok/Discord), zodat Google de juiste sitenaam toont in plaats van "Vercel".
+- Vierkante favicons (48/192 px + Apple-icoon); Google toonde het oude, niet-vierkante favicon niet.
+- **Circuitpagina in de nieuwe stijl** (zoals de coureurspagina): grote kop met vlag en layout-afbeelding, statistiek-tegels (lengte, bochten, verreden races, verschillende winnaars, meeste overwinningen), races als kaarten met podium-badges; alle teksten in de 5 talen; datums in de gekozen taal.
+- Homepage-kop noemt de volledige naam: "… STB Racing League".
+- Google Search Console-verificatiebestand toegevoegd.
+
 ## [2.3.0] – 2026-11-25
 
 ### Nieuw

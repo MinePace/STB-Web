@@ -187,7 +187,7 @@ function HomePage() {
           {season.divisions ? ` · ${season.divisions} ${t("home.divisions")}` : ""}
         </p>
         <h1 className="hp-hero__title">
-          {t("home.heroTitle")} <span className="hp-accent">STB League</span>
+          {t("home.heroTitle")} <span className="hp-accent">STB Racing League</span>
         </h1>
         <p className="hp-hero__sub">
           {season.next

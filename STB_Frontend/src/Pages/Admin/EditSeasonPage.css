@@ -1,249 +1,250 @@
-/* ===== Theme ===== */
-:root {
-  --brand: var(--surface);   /* royal blue, main */
-  --accent: var(--primary);          /* hover/focus */
-  --danger: rgb(147, 59, 59); /* red accent */
-
-  --bg: #f6f9fe;              /* page background */
-  --card: #ffffff;            /* card/table background */
-  --muted: #eef4fb;           /* light rows, inputs */
-  --border: #c9d9f2;          /* soft border */
-  --text: #1b2738;            /* primary text */
-  --text-dim: #5a6a85;        /* muted text */
-
-  --shadow: 0 6px 16px rgba(0,0,0,.08);
-  --accent-veil: rgba(76, 174, 255, .18);
-}
-
-/* ===== Page Wrapper ===== */
+/* =====================================================================
+   Add Season + Edit Season (both pages use .add-season-page).
+   Everything is scoped to these pages and uses the theme tokens from
+   index.css — no global variables or class rules (they used to leak into
+   other pages, e.g. the text colour of the championship page).
+   ===================================================================== */
 .add-season-page {
-  max-width: 1100px;
-  margin: 24px auto 48px;
-  padding: 0 16px;
-  color: var(--text);
-}
-
-.add-season-page h1 {
-  font-size: 26px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  color: var(--brand);
-}
-
-/* ===== Card (filters) ===== */
-.card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: var(--shadow);
-  margin-bottom: 20px;
-}
-
-.header-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-}
-
-/* ===== Controls ===== */
-.select,
-.input,
-.button {
-  width: 100%;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  padding: 8px 10px;
-  font-size: 14px;
-}
-
-.select,
-.input {
-  background: var(--muted);
-  color: var(--text);
-}
-
-.input:focus,
-.select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-veil);
-  background: #fff;
-}
-
-/* ===== Buttons ===== */
-
-.button.ghost {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--brand);
-}
-.button.ghost:hover {
-  background: var(--muted);
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* ===== Table ===== */
-.table-wrap {
-  overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--card);
-  box-shadow: var(--shadow);
-}
-
-.season-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 900px;
-  table-layout: auto; /* <-- allow columns to size to content */
-}
-
-.season-table th,
-.season-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--border);
-  font-size: 14px;
-}
-
-.season-table thead th {
-  background: var(--muted);
+  max-width: 1200px;
+  margin: 28px auto 64px;
+  padding: 0 20px;
+  color: var(--fg);
   text-align: left;
-  color: var(--brand);
-  font-weight: 600;
-}
-
-.season-table tbody tr:nth-child(odd) { background: #fdfdfd; }
-.season-table tbody tr:nth-child(even) { background: #fafcff; }
-.season-table tbody tr:hover { background: var(--accent-veil); }
-
-/* ===== Column sizing (optimized widths) ===== */
-
-/* 1) Round — very compact */
-.season-table th:nth-child(1),
-.season-table td:nth-child(1) {
-  width: 45px;
-  max-width: 60px;
-  text-align: center;
-}
-.season-table td:nth-child(1) .cell-input {
-  width: 55px;
-  text-align: center;
-  padding-right: 0;
-}
-
-/* 2) Track — enough room for long names */
-.season-table th:nth-child(2),
-.season-table td:nth-child(2) {
-  min-width: 200px;
-  max-width: 200px;
-}
-
-/* 3) Sprint — short yes/no dropdown */
-.season-table th:nth-child(3),
-.season-table td:nth-child(3) {
-  width: 60px;
-  max-width: 60px;
-}
-
-/* 4) Race Date — date input width */
-.season-table th:nth-child(4),
-.season-table td:nth-child(4) {
-  width: 90px;
-  max-width: 100px;
-}
-
-/* 5) YouTube — takes remaining space, flexible */
-.season-table th:nth-child(5),
-.season-table td:nth-child(5) {
-  width: auto;
-  min-width: 260px;
-}
-
-/* Make YouTube input resilient for long URLs */
-.season-table td:nth-child(5) .cell-input {
-  width: 100%;
-  box-sizing: border-box;
-  font-size: 13px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.season-table td:nth-child(5) .cell-input:focus {
-  white-space: normal;
-  word-break: break-all;
-}
-
-
-/* ===== Changed row highlight ===== */
-.season-table tbody tr[style] {
-  box-shadow: inset 0 0 0 2px var(--accent);
-}
-
-/* ===== Inputs inside table ===== */
-.cell-input,
-.cell-select {
-  width: 100%;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  padding: 6px 8px;
-  font-size: 13px;
-  background: #fff;
-}
-.cell-input:focus,
-.cell-select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-veil);
-}
-
-/* ===== Toasts ===== */
-.toast {
-  margin-top: 12px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 14px;
-  background: var(--muted);
-  color: var(--text-dim);
-}
-.toast.error {
-  background: rgba(147,59,59,.12);
-  color: var(--danger);
-  border: 1px solid rgba(147,59,59,.3);
-}
-
-/* Add-row divider shown between rows */
-.add-divider {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  height: 28px;
-  margin: 8px 0;
-}
-.season-table tbody tr:hover + .add-divider,
-.add-divider:hover {
   display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
-.add-divider .add-btn {
-  border: 1px dashed var(--border);
-  background: var(--muted);
-  color: var(--brand);
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
+.add-season-page .ss-muted { color: var(--muted-fg); font-size: 13px; }
+
+/* Header */
+.add-season-page .ss-hero h1 {
+  font-family: "Saira Condensed", sans-serif;
+  font-weight: 900;
+  font-size: clamp(34px, 5.5vw, 50px);
+  text-transform: uppercase;
+  line-height: 1;
+  margin: 4px 0;
+  color: var(--fg);
+}
+.add-season-page .ss-hero p { margin: 4px 0 0; }
+
+/* Notices */
+.add-season-page .ss-notice {
+  position: relative;
+  padding: 12px 40px 12px 14px;
+  border-radius: 10px;
+  white-space: pre-line;
+}
+.add-season-page .ss-notice--error { background: rgba(255, 59, 59, 0.12); border: 1px solid rgba(255, 59, 59, 0.45); color: #ffb3b3; }
+.add-season-page .ss-notice--success { background: rgba(74, 222, 128, 0.12); border: 1px solid rgba(74, 222, 128, 0.45); color: #b9f5cf; }
+.add-season-page .ss-notice button {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 20px;
   cursor: pointer;
 }
-.add-divider .add-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+
+/* Cards */
+.add-season-page .card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.6);
+}
+.add-season-page .card h2,
+.add-season-page .ss-teams h2 {
+  font-family: "Saira Condensed", sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  text-transform: uppercase;
+  margin: 0 0 12px;
+  color: var(--fg);
+}
+.add-season-page .header-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+.add-season-page .ss-field { display: flex; flex-direction: column; gap: 4px; }
+.add-season-page .ss-field > span,
+.add-season-page .modal label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-fg);
+}
+.add-season-page .inline-row { display: flex; flex-direction: column; gap: 4px; }
+.add-season-page .ss-count { display: inline-flex; align-items: center; justify-content: center; }
+
+/* Controls */
+.add-season-page .input,
+.add-season-page .select,
+.add-season-page .cell-input,
+.add-season-page .cell-select,
+.add-season-page .season-table input[type="text"],
+.add-season-page .season-table input[type="date"],
+.add-season-page .season-table select {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--fg);
+  font-size: 14px;
+  color-scheme: dark;
+}
+.add-season-page .input:focus,
+.add-season-page .select:focus,
+.add-season-page .cell-input:focus,
+.add-season-page .cell-select:focus,
+.add-season-page .season-table input:focus,
+.add-season-page .season-table select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26, 163, 255, 0.2);
+}
+.add-season-page .season-table input:disabled { opacity: 0.35; }
+.add-season-page [data-error="true"] { border-color: var(--danger) !important; color: #ffb3b3; }
+.add-season-page select option { background: var(--card); color: var(--fg); }
+
+/* Buttons */
+.add-season-page .button,
+.add-season-page .button-date,
+.add-season-page .button-ghost,
+.add-season-page .submit-button,
+.add-season-page .add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  margin: 0;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  width: auto;
+  white-space: nowrap;
+}
+.add-season-page .button:hover,
+.add-season-page .button-date:hover,
+.add-season-page .button-ghost:hover,
+.add-season-page .add-btn:hover { border-color: var(--primary); color: var(--primary); background: transparent; }
+.add-season-page .submit-button { background: var(--primary); border-color: var(--primary); color: var(--primary-fg, #04122b); }
+.add-season-page .submit-button:hover:not(:disabled) { filter: brightness(1.1); }
+.add-season-page button:disabled { opacity: 0.45; cursor: not-allowed; }
+.add-season-page .button.small { padding: 5px 10px; font-size: 13px; }
+.add-season-page .actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+.add-season-page .ss-save-teams { margin-top: 16px; }
+
+/* Table */
+.add-season-page .table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+}
+.add-season-page .season-table { width: 100%; min-width: 900px; border-collapse: collapse; }
+.add-season-page .season-table th,
+.add-season-page .season-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 14px;
+  text-align: left;
+  vertical-align: middle;
+}
+.add-season-page .season-table thead th {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted-fg);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.add-season-page .season-table tbody tr:hover { background: rgba(26, 163, 255, 0.06); }
+.add-season-page .season-table tbody tr.is-changed { box-shadow: inset 3px 0 0 var(--accent); background: rgba(255, 210, 31, 0.05); }
+.add-season-page .season-table th:nth-child(1),
+.add-season-page .season-table td:nth-child(1) { width: 70px; }
+.add-season-page .season-table td:nth-child(1) .cell-input { width: 60px; text-align: center; }
+.add-season-page .season-table td:nth-child(2) { min-width: 220px; }
+.add-season-page .season-table input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); }
+.add-season-page .ss-empty { padding: 16px; }
+
+/* Insert-row divider (Edit Season) */
+.add-season-page .add-divider { display: none; }
+.add-season-page .season-table tbody tr:hover + .add-divider,
+.add-season-page .add-divider:hover { display: table-row; }
+.add-season-page .add-divider td { padding: 2px; text-align: center; border-bottom: 0; }
+.add-season-page .add-divider .add-btn { padding: 3px 10px; font-size: 12px; border-style: dashed; border-radius: 999px; }
+.add-season-page .add-bottom td { text-align: center; padding: 12px; }
+
+/* Messages inside the page */
+.add-season-page .toast {
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--muted-fg);
+}
+.add-season-page .toast.error { background: rgba(255, 59, 59, 0.12); border-color: rgba(255, 59, 59, 0.45); color: #ffb3b3; }
+
+/* Teams & drivers (Edit Season) */
+.add-season-page .team-card {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
 }
 
-/* Bottom add button row */
-.add-bottom {
-  padding: 12px;
-  text-align: center;
+/* Auto-fill dates dialog (Add Season) */
+.add-season-page .modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(3, 10, 24, 0.7);
 }
-.add-bottom .button {
-  min-width: 160px;
+.add-season-page .modal {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--fg);
+}
+.add-season-page .modal h3 {
+  font-family: "Saira Condensed", sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+.add-season-page .ss-modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+
+@media (max-width: 700px) {
+  .add-season-page .team-card { grid-template-columns: 1fr; }
 }

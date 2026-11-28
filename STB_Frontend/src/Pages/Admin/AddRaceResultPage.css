@@ -38,3 +38,128 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   }
+/* ---------- Faster workflow (to-do list, status bar, saved panel) ---------- */
+.ar-muted { color: var(--muted-fg); font-size: 13px; }
+.ar-pick { padding: 16px 18px; margin-bottom: 18px; text-align: left; }
+.ar-pick__head { display: flex; align-items: baseline; gap: 12px; }
+.ar-pick__head h2 { margin: 0 0 10px; }
+.ar-pick select { margin-top: 10px; min-width: 320px; max-width: 100%; }
+.ar-todo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ar-todo__label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-right: 4px;
+}
+.ar-todo__chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--fg);
+  cursor: pointer;
+  text-align: left;
+}
+.ar-todo__chip span { font-size: 12px; color: var(--muted-fg); }
+.ar-todo__chip:hover { border-color: var(--primary); }
+.ar-todo__chip.is-active { border-color: var(--primary); background: rgba(26, 163, 255, 0.15); }
+
+.ar-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+.ar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ar-btn--primary { background: var(--primary); color: var(--primary-fg, #04122b); }
+.ar-btn--primary:hover:not(:disabled) { filter: brightness(1.1); }
+.ar-btn--ghost { background: transparent; border-color: var(--border); color: var(--fg); }
+.ar-btn--ghost:hover { border-color: var(--primary); color: var(--primary); }
+
+.ar-saved {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+  text-align: left;
+  border-color: rgba(46, 204, 113, 0.5);
+}
+.ar-saved h2 { margin: 4px 0; }
+.ar-saved__actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+.ar-statusbar {
+  position: sticky;
+  bottom: 12px;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding: 12px 16px;
+  box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.7);
+  text-align: left;
+}
+.ar-statusbar__info { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+.ar-check {
+  background: rgba(255, 180, 0, 0.14);
+  border: 1px solid rgba(255, 180, 0, 0.5);
+  color: #ffd27a;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ar-ok { color: #4ade80; font-weight: 700; }
+.ar-warn { color: #ffd27a; font-size: 13px; font-weight: 600; }
+.ar-save { min-width: 150px; }
+
+.results-table tr.ar-row--issue td:first-child { box-shadow: inset 3px 0 0 #ffb400; }
+.results-table tr.ar-row--flash td { animation: ar-flash 1.4s ease; }
+@keyframes ar-flash {
+  0%, 60% { background: rgba(255, 180, 0, 0.22); }
+  100% { background: transparent; }
+}
+
+.ar-notice {
+  position: relative;
+  margin-top: 14px;
+  padding: 12px 40px 12px 14px;
+  border-radius: 10px;
+  text-align: left;
+}
+.ar-notice--error { background: rgba(255, 59, 59, 0.12); border: 1px solid rgba(255, 59, 59, 0.45); color: #ffb3b3; }
+.ar-notice--info { background: rgba(26, 163, 255, 0.12); border: 1px solid rgba(26, 163, 255, 0.45); color: var(--fg); }
+.ar-notice__close {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  background: none;
+  border: 0;
+  color: inherit;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.ar-overlay { position: fixed; inset: 0; background: rgba(3, 10, 24, 0.7); display: grid; place-items: center; z-index: 60; padding: 20px; }
+.ar-dialog { width: min(460px, 100%); padding: 22px; text-align: left; }
+.ar-dialog h2 { margin-top: 0; }
+.ar-dialog ul { margin: 6px 0 12px; padding-left: 20px; font-weight: 700; }
+.ar-dialog__actions { display: flex; justify-content: flex-end; gap: 10px; flex-wrap: wrap; margin-top: 14px; }

@@ -276,5 +276,28 @@
         "older": "älter",
         "newer": "neuer",
         "formAvgShort": "Ø {{n}}"
+    },
+    "trackPage": {
+        "eyebrow": "Strecke",
+        "notFound": "Strecke nicht gefunden",
+        "backHome": "Zur Startseite",
+        "noMap": "Kein Layout verfügbar",
+        "stats": "Statistiken",
+        "racesHere": "Rennen auf dieser Strecke",
+        "noRaces": "Hier wurde noch kein Rennen gefahren.",
+        "noResult": "Noch kein Ergebnis eingetragen.",
+        "where": "Saison {{s}} · Division {{d}} · Runde {{r}}",
+        "sprint": "Sprint",
+        "pts": "Pkt.",
+        "fullResult": "Komplettes Ergebnis",
+        "turnsCount": "{{count}} Kurven",
+        "since": "Seit Saison {{n}}",
+        "tiles": {
+            "length": "Streckenlänge",
+            "turns": "Kurven",
+            "races": "Gefahrene Rennen",
+            "winners": "Verschiedene Sieger",
+            "mostWins": "Meiste Siege"
+        }
     }
 }
